@@ -5,7 +5,7 @@
       "Humanizer.Core/2.14.1": {
         "type": "package",
         "compile": {
-          "lib/net6.0/Humanizer.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -18,7 +18,7 @@
       "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/netstandard2.1/_._": {
             "related": ".xml"
           }
         },
@@ -44,7 +44,7 @@
           "System.Text.Encoding.CodePages": "6.0.0"
         },
         "compile": {
-          "lib/netcoreapp3.1/Microsoft.CodeAnalysis.dll": {
+          "lib/netcoreapp3.1/_._": {
             "related": ".pdb;.xml"
           }
         },
@@ -101,7 +101,7 @@
           "Microsoft.CodeAnalysis.Common": "[4.5.0]"
         },
         "compile": {
-          "lib/netcoreapp3.1/Microsoft.CodeAnalysis.CSharp.dll": {
+          "lib/netcoreapp3.1/_._": {
             "related": ".pdb;.xml"
           }
         },
@@ -161,7 +161,7 @@
           "Microsoft.CodeAnalysis.Workspaces.Common": "[4.5.0]"
         },
         "compile": {
-          "lib/netcoreapp3.1/Microsoft.CodeAnalysis.CSharp.Workspaces.dll": {
+          "lib/netcoreapp3.1/_._": {
             "related": ".pdb;.xml"
           }
         },
@@ -223,7 +223,7 @@
           "System.Threading.Channels": "6.0.0"
         },
         "compile": {
-          "lib/netcoreapp3.1/Microsoft.CodeAnalysis.Workspaces.dll": {
+          "lib/netcoreapp3.1/_._": {
             "related": ".pdb;.xml"
           }
         },
@@ -283,7 +283,7 @@
           "Microsoft.Extensions.Logging": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.EntityFrameworkCore.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -299,7 +299,7 @@
       "Microsoft.EntityFrameworkCore.Abstractions/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -328,7 +328,7 @@
           "Mono.TextTemplating": "2.2.1"
         },
         "compile": {
-          "lib/net8.0/Microsoft.EntityFrameworkCore.Design.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -348,7 +348,7 @@
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -376,7 +376,7 @@
           "Microsoft.Extensions.Primitives": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.Caching.Abstractions.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -399,7 +399,7 @@
           "Microsoft.Extensions.Primitives": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.Caching.Memory.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -418,7 +418,7 @@
           "Microsoft.Extensions.Primitives": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.Configuration.Abstractions.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -437,7 +437,7 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.DependencyInjection.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -453,7 +453,7 @@
       "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -473,7 +473,7 @@
           "System.Text.Json": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.DependencyModel.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -494,7 +494,7 @@
           "Microsoft.Extensions.Options": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.Logging.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -513,7 +513,7 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -533,7 +533,7 @@
           "Microsoft.Extensions.Primitives": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.Options.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -549,7 +549,7 @@
       "Microsoft.Extensions.Primitives/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -568,7 +568,7 @@
           "System.CodeDom": "4.4.0"
         },
         "compile": {
-          "lib/netstandard2.0/Mono.TextTemplating.dll": {}
+          "lib/netstandard2.0/_._": {}
         },
         "runtime": {
           "lib/netstandard2.0/Mono.TextTemplating.dll": {}
@@ -577,7 +577,7 @@
       "System.CodeDom/4.4.0": {
         "type": "package",
         "compile": {
-          "ref/netstandard2.0/System.CodeDom.dll": {
+          "ref/netstandard2.0/_._": {
             "related": ".xml"
           }
         },
@@ -591,7 +591,7 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Collections.Immutable.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -620,7 +620,7 @@
       "System.Composition.AttributedModel/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.Composition.AttributedModel.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -639,7 +639,7 @@
           "System.Composition.AttributedModel": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Composition.Convention.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -658,7 +658,7 @@
           "System.Composition.Runtime": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Composition.Hosting.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -674,7 +674,7 @@
       "System.Composition.Runtime/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.Composition.Runtime.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -695,7 +695,7 @@
           "System.Composition.Runtime": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Composition.TypedParts.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -711,7 +711,7 @@
       "System.IO.Pipelines/6.0.3": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.IO.Pipelines.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -730,7 +730,7 @@
           "System.Collections.Immutable": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Reflection.Metadata.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -746,7 +746,7 @@
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -765,7 +765,7 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Text.Encoding.CodePages.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
@@ -787,7 +787,7 @@
       "System.Text.Encodings.Web/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net8.0/System.Text.Encodings.Web.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -812,7 +812,7 @@
           "System.Text.Encodings.Web": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/System.Text.Json.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
@@ -828,7 +828,7 @@
       "System.Threading.Channels/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.Threading.Channels.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         },
