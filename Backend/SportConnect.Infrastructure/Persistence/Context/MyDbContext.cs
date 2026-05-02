@@ -3,11 +3,8 @@ using SportConnect.Core.Entities;
 
 namespace SportConnect.Infrastructure.Persistence.Context;
 
-public class MyDbContext : DbContext
+public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(options)
 {
-    public MyDbContext(DbContextOptions<MyDbContext> options)
-        : base(options) { }
-
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
