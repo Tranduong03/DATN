@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SportConnect.Infrastructure.Persistence.Context;
+using SportConnect.Application.Interfaces;
+using SportConnect.Application.Services;
+using SportConnect.Infrastructure.Persistence.Repositories;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Database
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Repositories & UnitOfWork
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Application Services
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Controllers & Swagger
 builder.Services.AddControllers();
