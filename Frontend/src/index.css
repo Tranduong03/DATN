@@ -1,0 +1,453 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #326441;
+  --primary-hover: #265033;
+  --bg-color-1: #c66f44;
+  --bg-color-2: #8f3e20;
+  --text-main: #333333;
+  --text-muted: #888888;
+  --text-green: #204e2e;
+  --border-color: #e0e0e0;
+  --tab-inactive: #f2f2f2;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color-2);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.login-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 480px; /* Mobile first */
+  margin: 0 auto;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--bg-color-1) 0%, var(--bg-color-2) 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Background Curves (Approximation using radial gradients & shapes) */
+.bg-curves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bg-curve {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.curve-1 {
+  width: 150%;
+  height: 60%;
+  top: -20%;
+  left: -25%;
+  background: rgba(255, 255, 255, 0.05);
+  transform: rotate(-10deg);
+}
+
+.curve-2 {
+  width: 200%;
+  height: 50%;
+  bottom: -10%;
+  right: -50%;
+  background: rgba(0, 0, 0, 0.1);
+  transform: rotate(15deg);
+}
+
+/* Content wrapper */
+.login-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+/* Header */
+.login-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  margin-top: 16px;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-header h1 {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.header-placeholder {
+  width: 24px; /* to balance the flex layout with the back button */
+}
+
+/* Main Area */
+.login-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Login Card */
+.login-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  margin-bottom: 32px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: #e6e6e6; /* Inactive tab background */
+  border-radius: 12px 12px 0 0;
+  position: relative;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 14px 0;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  position: relative;
+  z-index: 1;
+  border-radius: 12px 12px 0 0;
+}
+
+.tab-btn.active {
+  background: white;
+  color: var(--text-green);
+  z-index: 2;
+  /* Drop shadow to make active tab pop over the inactive one */
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.04);
+}
+
+/* Smooth curves bridging the active tab and the inactive one */
+.tab-btn.active::before,
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.tab-btn.active::before {
+  left: -24px;
+  box-shadow: 12px 12px 0 0 white;
+}
+
+.tab-btn.active::after {
+  right: -24px;
+  box-shadow: -12px 12px 0 0 white;
+}
+
+/* Hide the outer curves so they don't stick out of the container */
+.tab-btn:first-child.active::before {
+  display: none;
+}
+
+.tab-btn:last-child.active::after {
+  display: none;
+}
+
+/* Form Container */
+.form-container {
+  padding: 24px;
+  background: white;
+  border-radius: 0 0 12px 12px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-green);
+  margin-bottom: 8px;
+}
+
+.input-wrapper, .phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 48px;
+  transition: border-color 0.2s;
+}
+
+.input-wrapper:focus-within, .phone-input-wrapper:focus-within {
+  border-color: var(--primary-color);
+}
+
+.input-wrapper input {
+  flex: 1;
+  border: none;
+  outline: none;
+  height: 100%;
+  font-size: 14px;
+  color: var(--text-main);
+  background: transparent;
+}
+
+.input-wrapper input::placeholder {
+  color: #aaa;
+}
+
+/* Custom elements inside input */
+.clear-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.eye-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Phone Input */
+.phone-input-wrapper {
+  padding: 0;
+  overflow: hidden;
+}
+
+.country-code {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: #f8f8f8;
+  height: 100%;
+  border-right: 1px solid var(--border-color);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.country-code img {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  color: #666;
+}
+
+.phone-input-wrapper input {
+  flex: 1;
+  border: none;
+  outline: none;
+  height: 100%;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+/* Buttons */
+.primary-btn {
+  width: 100%;
+  height: 48px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.primary-btn:hover {
+  background: var(--primary-hover);
+}
+
+.biometric-btn {
+  width: 100%;
+  height: 48px;
+  background: white;
+  color: var(--text-green);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s;
+}
+
+.biometric-btn:hover {
+  background: #f9f9f9;
+}
+
+.scan-icon {
+  color: var(--text-green);
+}
+
+/* Links */
+.forgot-password {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.forgot-password a {
+  color: var(--text-green);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.signup-link {
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.signup-link a {
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.google-btn {
+  width: 100%;
+  height: 48px;
+  background: white;
+  color: var(--text-main);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.google-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Bottom Banner */
+.login-banner {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(135deg, #f5d58f 0%, #a8d5ba 100%);
+  padding: 20px;
+  text-align: center;
+  margin: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.login-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255,255,255,0.2) 10px,
+    rgba(255,255,255,0.2) 20px
+  );
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.login-banner p {
+  color: #c79e43;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+  z-index: 2;
+  text-decoration: underline;
+}
+
+/* Adjust layout on desktop */
+@media (min-width: 481px) {
+  body {
+    background-color: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  
+  .login-container {
+    height: 850px;
+    max-height: 95vh;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+}
