@@ -1,6 +1,35 @@
-@SportConnect.API_HostAddress = http://localhost:5101
+@SportConnect.API_HostAddress = http://localhost:5001
 
-GET {{SportConnect.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### 1. Đăng ký tài khoản mới (Register)
+POST {{SportConnect.API_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "testuser@gmail.com",
+  "username": "testuser123",
+  "password": "Password123!",
+  "fullName": "Test User",
+  "phone": "0123456789"
+}
 
 ###
+
+### 2. Đăng nhập (Login)
+POST {{SportConnect.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "testuser123",
+  "password": "Password123!"
+}
+
+###
+
+### 3. Đăng nhập bằng Email (Login with Email)
+POST {{SportConnect.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "testuser@gmail.com",
+  "password": "Password123!"
+}
