@@ -19,286 +19,360 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(modelBuilder);
 
-    // ==========================================
-    // 1. CẤU HÌNH BẢNG NGƯỜI DÙNG & PHÂN QUYỀN
-    // ==========================================
-    modelBuilder.Entity<User>(entity =>
-    {
-        entity.ToTable("Users");
-        entity.Property(e => e.Username).HasMaxLength(255).IsRequired();
-        entity.HasIndex(e => e.Username).IsUnique();
-        entity.Property(e => e.Email).HasMaxLength(255).IsRequired();
-        entity.HasIndex(e => e.Email).IsUnique();
-        entity.Property(e => e.PasswordHash).HasMaxLength(255).IsRequired();
-        entity.Property(e => e.FullName).HasMaxLength(255);
-        entity.Property(e => e.Phone).HasMaxLength(50);
-        entity.Property(e => e.TrustScore).HasDefaultValue(5.0);
-        entity.Property(e => e.NoShowCount).HasDefaultValue(0);
-        entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
-        entity.Property(e => e.Status).HasDefaultValue(true);
-    });
+        // ==========================================
+        // 1. CẤU HÌNH BẢNG NGƯỜI DÙNG & PHÂN QUYỀN
+        // ==========================================
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("Users");
 
-    modelBuilder.Entity<Role>(entity =>
-    {
-        entity.ToTable("Roles");
-        entity.Property(e => e.RoleName).HasMaxLength(50).IsRequired();
-        entity.HasIndex(e => e.RoleName).IsUnique();
-        entity.Property(e => e.Description).HasMaxLength(255);
-    });
+            entity.HasKey(e => e.Id);
 
-    modelBuilder.Entity<UserRole>(entity =>
-    {
-        entity.ToTable("User_Role");
-        entity.HasKey(ur => new { ur.UserId, ur.RoleId });
-    });
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
 
-    modelBuilder.Entity<Permission>(entity =>
-    {
-        entity.ToTable("Permissions");
-        entity.Property(e => e.PermissionCode).HasMaxLength(255).IsRequired();
-        entity.HasIndex(e => e.PermissionCode).IsUnique();
-        entity.Property(e => e.PermissionName).HasMaxLength(255).IsRequired();
-    });
+            entity.Property(e => e.Username)
+                .HasColumnName("username")
+                .HasMaxLength(255)
+                .IsRequired();
 
-    modelBuilder.Entity<RolePermission>(entity =>
-    {
-        entity.ToTable("Role_Permission");
-        entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
-    });
+            entity.HasIndex(e => e.Username)
+                .IsUnique();
 
-    // ==========================================
-    // 2. CẤU HÌNH BẢNG SÂN BÃI & ĐẶT LỊCH
-    // ==========================================
-    modelBuilder.Entity<Venue>(entity =>
-    {
-        entity.ToTable("Venues");
-        entity.Property(e => e.Name).HasMaxLength(255).IsRequired();
-        entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("ACTIVE");
-        entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
-    });
+            entity.Property(e => e.Email)
+                .HasColumnName("email")
+                .HasMaxLength(255)
+                .IsRequired();
 
-    modelBuilder.Entity<Court>(entity =>
-    {
-        entity.ToTable("Courts");
-        entity.Property(e => e.CourtName).HasMaxLength(100).IsRequired();
-        entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("AVAILABLE");
-        entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
-    });
+            entity.HasIndex(e => e.Email)
+                .IsUnique();
 
-    modelBuilder.Entity<PriceRule>(entity =>
-    {
-        entity.ToTable("PriceRules");
-        entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
-        entity.Property(e => e.Description).HasMaxLength(255);
-    });
+            entity.Property(e => e.PasswordHash)
+                .HasColumnName("password_hash")
+                .HasMaxLength(255)
+                .IsRequired();
 
-    modelBuilder.Entity<Booking>(entity =>
-    {
-        entity.ToTable("Bookings");
-        entity.Property(e => e.TotalPrice).HasColumnType("decimal(18,2)").IsRequired();
-        entity.Property(e => e.Status).HasMaxLength(50).IsRequired();
-        entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+            entity.Property(e => e.FullName)
+                .HasColumnName("full_name")
+                .HasMaxLength(255);
 
-        // Chống lỗi Cascade Delete
-        entity.HasOne(b => b.Booker)
-              .WithMany(u => u.Bookings)
-              .HasForeignKey(b => b.BookerId)
-              .OnDelete(DeleteBehavior.Restrict);
-    });
+            entity.Property(e => e.Phone)
+                .HasColumnName("phone")
+                .HasMaxLength(50);
 
-    // ==========================================
-    // 3. CẤU HÌNH BẢNG KÈO ĐẤU (MATCHES)
-    // ==========================================
-    modelBuilder.Entity<Match>(entity =>
-    {
-        entity.ToTable("Matches");
-        entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
-        entity.Property(e => e.SkillLevel).HasMaxLength(50);
-        entity.Property(e => e.FeePerPlayer).HasColumnType("decimal(18,2)").IsRequired();
-        entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("OPEN");
-        entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+            entity.Property(e => e.AvatarUrl)
+                .HasColumnName("avatar_url");
 
-        // Mối quan hệ 1-1 giữa Match và Booking
-        entity.HasOne(m => m.Booking)
-              .WithOne(b => b.Match)
-              .HasForeignKey<Match>(m => m.BookingId)
-              .OnDelete(DeleteBehavior.Restrict);
+            entity.Property(e => e.TrustScore)
+                .HasColumnName("trust_score")
+                .HasDefaultValue(5.0);
 
-        // Chống lỗi Cascade Delete
-        entity.HasOne(m => m.Host)
-              .WithMany(u => u.HostedMatches)
-              .HasForeignKey(m => m.HostId)
-              .OnDelete(DeleteBehavior.Restrict);
-    });
+            entity.Property(e => e.NoShowCount)
+                .HasColumnName("no_show_count")
+                .HasDefaultValue(0);
 
-    modelBuilder.Entity<MatchPlayer>(entity =>
-    {
-        entity.ToTable("Match_Players");
-        entity.HasKey(mp => new { mp.MatchId, mp.UserId });
-        entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("PENDING");
-        entity.Property(e => e.JoinedAt).HasDefaultValueSql("GETDATE()");
-    });
-  }
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("GETDATE()");
 
-    // protected override void OnModelCreating(ModelBuilder modelBuilder)
-    // {
-    //     base.OnModelCreating(modelBuilder);
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasDefaultValue(true);
+        });
 
-    //     // ==========================================
-    //     // User
-    //     // ==========================================
-    //     modelBuilder.Entity<User>(e =>
-    //     {
-    //         e.HasKey(u => u.Id);
-    //         e.HasIndex(u => u.Username).IsUnique();
-    //         e.HasIndex(u => u.Email).IsUnique();
-    //         e.Property(u => u.TrustScore).HasDefaultValue(5.0);
-    //         e.Property(u => u.Status).HasDefaultValue(true);
-    //     });
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.ToTable("Roles");
 
-    //     // ==========================================
-    //     // Role
-    //     // ==========================================
-    //     modelBuilder.Entity<Role>(e =>
-    //     {
-    //         e.HasKey(r => r.Id);
-    //         e.HasIndex(r => r.RoleName).IsUnique();
-    //     });
+            entity.HasKey(e => e.Id);
 
-    //     // ==========================================
-    //     // UserRole (Many-to-Many)
-    //     // ==========================================
-    //     modelBuilder.Entity<UserRole>(e =>
-    //     {
-    //         e.HasKey(ur => new { ur.UserId, ur.RoleId });
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
 
-    //         e.HasOne(ur => ur.User)
-    //             .WithMany(u => u.UserRoles)
-    //             .HasForeignKey(ur => ur.UserId);
+            entity.Property(e => e.RoleName)
+                .HasColumnName("role_name")
+                .HasMaxLength(50)
+                .IsRequired();
 
-    //         e.HasOne(ur => ur.Role)
-    //             .WithMany(r => r.UserRoles)
-    //             .HasForeignKey(ur => ur.RoleId);
-    //     });
+            entity.HasIndex(e => e.RoleName)
+                .IsUnique();
 
-    //     // ==========================================
-    //     // Permission
-    //     // ==========================================
-    //     modelBuilder.Entity<Permission>(e =>
-    //     {
-    //         e.HasKey(p => p.Id);
-    //         e.HasIndex(p => p.PermissionCode).IsUnique();
-    //     });
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(255);
+        });
 
-    //     // ==========================================
-    //     // RolePermission (Many-to-Many)
-    //     // ==========================================
-    //     modelBuilder.Entity<RolePermission>(e =>
-    //     {
-    //         e.HasKey(rp => new { rp.RoleId, rp.PermissionId });
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.ToTable("User_Role");
 
-    //         e.HasOne(rp => rp.Role)
-    //             .WithMany(r => r.RolePermissions)
-    //             .HasForeignKey(rp => rp.RoleId);
+            entity.HasKey(e => new { e.UserId, e.RoleId });
 
-    //         e.HasOne(rp => rp.Permission)
-    //             .WithMany(p => p.RolePermissions)
-    //             .HasForeignKey(rp => rp.PermissionId);
-    //     });
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
 
-    //     // ==========================================
-    //     // Venue
-    //     // ==========================================
-    //     modelBuilder.Entity<Venue>(e =>
-    //     {
-    //         e.HasKey(v => v.Id);
-    //         e.Property(v => v.Status).HasDefaultValue("ACTIVE");
+            entity.Property(e => e.RoleId)
+                .HasColumnName("role_id");
+        });
 
-    //         e.HasOne(v => v.Owner)
-    //             .WithMany(u => u.OwnedVenues)
-    //             .HasForeignKey(v => v.OwnerId);
-    //     });
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.ToTable("Permissions");
 
-    //     // ==========================================
-    //     // Court
-    //     // ==========================================
-    //     modelBuilder.Entity<Court>(e =>
-    //     {
-    //         e.HasKey(c => c.Id);
-    //         e.Property(c => c.Status).HasDefaultValue("AVAILABLE");
+            entity.HasKey(e => e.Id);
 
-    //         e.HasOne(c => c.Venue)
-    //             .WithMany(v => v.Courts)
-    //             .HasForeignKey(c => c.VenueId);
-    //     });
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
 
-    //     // ==========================================
-    //     // PriceRule
-    //     // ==========================================
-    //     modelBuilder.Entity<PriceRule>(e =>
-    //     {
-    //         e.HasKey(pr => pr.Id);
-    //         e.Property(pr => pr.Price).HasColumnType("decimal(18,2)");
-    //         e.Property(pr => pr.DayOfWeek).IsRequired(false);
+            entity.Property(e => e.PermissionCode)
+                .HasColumnName("permission_code")
+                .HasMaxLength(255)
+                .IsRequired();
 
-    //         e.HasOne(pr => pr.Venue)
-    //             .WithMany(v => v.PriceRules)
-    //             .HasForeignKey(pr => pr.VenueId);
-    //     });
+            entity.HasIndex(e => e.PermissionCode)
+                .IsUnique();
 
-    //     // ==========================================
-    //     // Booking
-    //     // ==========================================
-    //     modelBuilder.Entity<Booking>(e =>
-    //     {
-    //         e.HasKey(b => b.Id);
-    //         e.Property(b => b.TotalPrice).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.PermissionName)
+                .HasColumnName("permission_name")
+                .HasMaxLength(255)
+                .IsRequired();
 
-    //         e.HasOne(b => b.Booker)
-    //             .WithMany(u => u.Bookings)
-    //             .HasForeignKey(b => b.BookerId);
+            entity.Property(e => e.Description)
+                .HasColumnName("description");
+        });
 
-    //         e.HasOne(b => b.Court)
-    //             .WithMany(c => c.Bookings)
-    //             .HasForeignKey(b => b.CourtId);
-    //     });
+        modelBuilder.Entity<RolePermission>(entity =>
+        {
+            entity.ToTable("Role_Permission");
 
-    //     // ==========================================
-    //     // Match
-    //     // ==========================================
-    //     modelBuilder.Entity<Match>(e =>
-    //     {
-    //         e.HasKey(m => m.Id);
-    //         e.Property(m => m.FeePerPlayer).HasColumnType("decimal(18,2)");
-    //         e.Property(m => m.Status).HasDefaultValue("OPEN");
+            entity.HasKey(e => new { e.RoleId, e.PermissionId });
 
-    //         // Booking - Match là quan hệ 1-1
-    //         e.HasOne(m => m.Booking)
-    //             .WithOne(b => b.Match)
-    //             .HasForeignKey<Match>(m => m.BookingId);
+            entity.Property(e => e.RoleId)
+                .HasColumnName("role_id");
 
-    //         e.HasOne(m => m.Host)
-    //             .WithMany(u => u.HostedMatches)
-    //             .HasForeignKey(m => m.HostId);
-    //     });
+            entity.Property(e => e.PermissionId)
+                .HasColumnName("permission_id");
+        });
 
-    //     // ==========================================
-    //     // MatchPlayer (Many-to-Many)
-    //     // ==========================================
-    //     modelBuilder.Entity<MatchPlayer>(e =>
-    //     {
-    //         e.HasKey(mp => new { mp.MatchId, mp.UserId });
-    //         e.Property(mp => mp.Status).HasDefaultValue("PENDING");
+        // ==========================================
+        // 2. CẤU HÌNH BẢNG SÂN BÃI & ĐẶT LỊCH
+        // ==========================================
+        modelBuilder.Entity<Venue>(entity =>
+        {
+            entity.ToTable("Venues");
 
-    //         e.HasOne(mp => mp.Match)
-    //             .WithMany(m => m.MatchPlayers)
-    //             .HasForeignKey(mp => mp.MatchId);
+            entity.HasKey(e => e.Id);
 
-    //         e.HasOne(mp => mp.User)
-    //             .WithMany(u => u.MatchPlayers)
-    //             .HasForeignKey(mp => mp.UserId);
-    //     });
-    // }
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.OwnerId)
+                .HasColumnName("owner_id");
+
+            entity.Property(e => e.Name)
+                .HasColumnName("name")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.Address)
+                .HasColumnName("address")
+                .IsRequired();
+
+            entity.Property(e => e.BankQrUrl)
+                .HasColumnName("bank_qr_url");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .HasDefaultValue("ACTIVE");
+        });
+
+        modelBuilder.Entity<Court>(entity =>
+        {
+            entity.ToTable("Courts");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.VenueId)
+                .HasColumnName("venue_id");
+
+            entity.Property(e => e.CourtName)
+                .HasColumnName("court_name")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .HasDefaultValue("AVAILABLE");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("GETDATE()");
+        });
+
+        modelBuilder.Entity<PriceRule>(entity =>
+        {
+            entity.ToTable("PriceRules");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.VenueId)
+                .HasColumnName("venue_id");
+
+            entity.Property(e => e.DayOfWeek)
+                .HasColumnName("day_of_week");
+
+            entity.Property(e => e.StartHour)
+                .HasColumnName("start_hour");
+
+            entity.Property(e => e.EndHour)
+                .HasColumnName("end_hour");
+
+            entity.Property(e => e.Price)
+                .HasColumnName("price")
+                .HasColumnType("decimal(18,2)");
+
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(255);
+
+            entity.HasOne(e => e.Venue)
+                .WithMany(v => v.PriceRules)
+                .HasForeignKey(e => e.VenueId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Booking>(entity =>
+        {
+            entity.ToTable("Bookings");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.BookerId)
+                .HasColumnName("booker_id");
+
+            entity.Property(e => e.CourtId)
+                .HasColumnName("court_id");
+
+            entity.Property(e => e.StartTime)
+                .HasColumnName("start_time");
+
+            entity.Property(e => e.EndTime)
+                .HasColumnName("end_time");
+
+            entity.Property(e => e.TotalPrice)
+                .HasColumnName("total_price")
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(b => b.Booker)
+                .WithMany(u => u.Bookings)
+                .HasForeignKey(b => b.BookerId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ==========================================
+        // 3. CẤU HÌNH BẢNG KÈO ĐẤU (MATCHES)
+        // ==========================================
+        modelBuilder.Entity<Match>(entity =>
+        {
+            entity.ToTable("Matches");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.BookingId)
+                .HasColumnName("booking_id");
+
+            entity.Property(e => e.HostId)
+                .HasColumnName("host_id");
+
+            entity.Property(e => e.Title)
+                .HasColumnName("title")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.SkillLevel)
+                .HasColumnName("skill_level")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.MaxPlayers)
+                .HasColumnName("max_players");
+
+            entity.Property(e => e.FeePerPlayer)
+                .HasColumnName("fee_per_player")
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .HasDefaultValue("OPEN");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("GETDATE()");
+
+            // Quan hệ 1-1 với Booking
+            entity.HasOne(m => m.Booking)
+                .WithOne(b => b.Match)
+                .HasForeignKey<Match>(m => m.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Quan hệ Host
+            entity.HasOne(m => m.Host)
+                .WithMany(u => u.HostedMatches)
+                .HasForeignKey(m => m.HostId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MatchPlayer>(entity =>
+        {
+            entity.ToTable("Match_Players");
+
+            entity.HasKey(e => new { e.MatchId, e.UserId });
+
+            entity.Property(e => e.MatchId)
+                .HasColumnName("match_id");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .HasDefaultValue("PENDING");
+
+            entity.Property(e => e.JoinedAt)
+                .HasColumnName("joined_at")
+                .HasDefaultValueSql("GETDATE()");
+        });
+    }
 }
