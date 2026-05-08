@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronLeft, X, EyeOff, ScanFace } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 
 export default function LoginPage() {
@@ -24,7 +25,7 @@ export default function LoginPage() {
           
           <div className="signup-link">
             <span>Bạn chưa có tài khoản? </span>
-            <a href="#">Đăng ký</a>
+            <Link to="/register">Đăng ký</Link>
           </div>
 
           <button className="google-btn">

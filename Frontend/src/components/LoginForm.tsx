@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { X, EyeOff, ScanFace } from 'lucide-react';
+import { X, EyeOff, Eye, ScanFace } from 'lucide-react';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="login-card">
@@ -26,8 +30,17 @@ export default function LoginForm() {
           <div className="form-group">
             <label>Email của bạn?</label>
             <div className="input-wrapper">
-              <input type="email" placeholder="Nhập email của bạn (*)" />
-              <button className="clear-btn"><X size={16} /></button>
+              <input 
+                type="email" 
+                placeholder="Nhập email của bạn (*)" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {email.length > 0 && (
+                <button className="clear-btn" onClick={() => setEmail('')}>
+                  <X size={16} />
+                </button>
+              )}
             </div>
           </div>
         ) : (
@@ -39,7 +52,17 @@ export default function LoginForm() {
                 <span>+ 84</span>
                 <span className="dropdown-arrow">▼</span>
               </div>
-              <input type="tel" placeholder="Nhập số điện thoại" />
+              <input 
+                type="tel" 
+                placeholder="Nhập số điện thoại" 
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+              {phone.length > 0 && (
+                <button className="clear-btn" onClick={() => setPhone('')}>
+                  <X size={16} />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -47,8 +70,15 @@ export default function LoginForm() {
         <div className="form-group">
           <label>Mật khẩu (*)</label>
           <div className="input-wrapper">
-            <input type="password" placeholder="Nhập mật khẩu (*)" />
-            <button className="eye-btn"><EyeOff size={20} /></button>
+            <input 
+              type={showPassword ? "text" : "password"} 
+              placeholder="Nhập mật khẩu (*)" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+            </button>
           </div>
         </div>
 

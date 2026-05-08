@@ -196,6 +196,10 @@ body {
   border-radius: 0 0 12px 12px;
 }
 
+.register-card .form-container {
+  border-radius: 12px;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -234,6 +238,12 @@ body {
 
 .input-wrapper input::placeholder {
   color: #aaa;
+}
+
+/* Hide default password reveal icon in Edge and other browsers */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }
 
 /* Custom elements inside input */
@@ -277,6 +287,8 @@ body {
   border-right: 1px solid var(--border-color);
   font-size: 14px;
   font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .country-code img {
@@ -368,6 +380,19 @@ body {
 
 .signup-link a {
   color: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.login-link a {
+  color: var(--text-green);
   font-weight: 700;
   text-decoration: none;
 }
