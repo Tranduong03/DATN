@@ -12,8 +12,8 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       }
-    }
-    // host: true, // Listen on all local IPs
-    // port: 5173,
+    },
+    host: true, // Listen on all local IPs
+    port: 5173,
   }
 })

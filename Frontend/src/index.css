@@ -273,7 +273,7 @@ input[type="password"]::-ms-clear {
 
 /* Phone Input */
 .phone-input-wrapper {
-  padding: 0;
+  padding: 0 12px 0 0;
   overflow: hidden;
 }
 

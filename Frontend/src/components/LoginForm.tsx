@@ -79,7 +79,7 @@ export default function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
               />
               {email.length > 0 && (
-                <button className="clear-btn" onClick={() => setEmail('')}>
+                <button type="button" className="clear-btn" onClick={() => setEmail('')}>
                   <X size={16} />
                 </button>
               )}
@@ -101,7 +101,7 @@ export default function LoginForm() {
                 onChange={(e) => setPhone(e.target.value)}
               />
               {phone.length > 0 && (
-                <button className="clear-btn" onClick={() => setPhone('')}>
+                <button type="button" className="clear-btn" onClick={() => setPhone('')}>
                   <X size={16} />
                 </button>
               )}
@@ -118,7 +118,7 @@ export default function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
+            <button type="button" className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>

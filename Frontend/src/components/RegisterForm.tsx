@@ -78,7 +78,7 @@ export default function RegisterForm() {
               onChange={(e) => setPhone(e.target.value)}
             />
             {phone.length > 0 && (
-              <button className="clear-btn" onClick={() => setPhone('')}>
+              <button type="button" className="clear-btn" onClick={() => setPhone('')}>
                 <X size={16} />
               </button>
             )}
@@ -95,7 +95,7 @@ export default function RegisterForm() {
               onChange={(e) => setEmail(e.target.value)}
             />
             {email.length > 0 && (
-              <button className="clear-btn" onClick={() => setEmail('')}>
+              <button type="button" className="clear-btn" onClick={() => setEmail('')}>
                 <X size={16} />
               </button>
             )}
@@ -112,7 +112,7 @@ export default function RegisterForm() {
               onChange={(e) => setFullName(e.target.value)}
             />
             {fullName.length > 0 && (
-              <button className="clear-btn" onClick={() => setFullName('')}>
+              <button type="button" className="clear-btn" onClick={() => setFullName('')}>
                 <X size={16} />
               </button>
             )}
@@ -128,7 +128,7 @@ export default function RegisterForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
+            <button type="button" className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
@@ -143,7 +143,7 @@ export default function RegisterForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <button className="eye-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <button type="button" className="eye-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
               {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
