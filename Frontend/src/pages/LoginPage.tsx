@@ -1,8 +1,9 @@
 import { ChevronLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   return (
     <div className="login-container">
       {/* Background layer */}
@@ -14,7 +15,7 @@ export default function LoginPage() {
 
       <div className="login-content">
         <header className="login-header">
-          <button className="back-btn"><ChevronLeft color="#fff" /></button>
+          <button className="back-btn" onClick={() => navigate(-1)}><ChevronLeft color="#fff" /></button>
           <h1>Đăng nhập</h1>
           <div className="header-placeholder"></div>
         </header>

@@ -13,10 +13,10 @@ export default function AccountPage() {
         <div className="profile-card">
           <img src="/SportConnect.jpg" alt="Logo" className="profile-logo" />
           <div className="profile-info">
-            <h2 className="profile-title">SportConnect - Hệ Thống Kết Nối Thể Thao</h2>
+            <h2 className="profile-title">Sport Connect - Hệ Thống Kết Nối <br />Thể Thao</h2>
             <p className="profile-subtitle">Tạo tài khoản để nhận nhiều ưu đãi hơn</p>
             <div className="profile-actions">
-              <Link to="/" className="btn-login">Đăng nhập</Link>
+              <Link to="/login" className="btn-login">Đăng nhập</Link>
               <Link to="/register" className="btn-register">Đăng kí</Link>
             </div>
           </div>
