@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { X, EyeOff, Eye, ScanFace } from 'lucide-react';
+import type { FormEvent } from 'react';
+import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
@@ -7,6 +8,47 @@ export default function LoginForm() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+    
+    const usernameOrEmail = activeTab === 'email' ? email : phone;
+    if (!usernameOrEmail || !password) {
+      setErrorMessage('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/Auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          usernameOrEmail,
+          password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        // Có thể navigate sang trang chủ, tạm thời reload lại trang
+        window.location.href = '/'; 
+      } else {
+        setErrorMessage(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
+      }
+    } catch {
+      setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="login-card">
@@ -25,7 +67,7 @@ export default function LoginForm() {
         </button>
       </div>
 
-      <div className="form-container">
+      <form className="form-container" onSubmit={handleLogin}>
         {activeTab === 'email' ? (
           <div className="form-group">
             <label>Email của bạn?</label>
@@ -82,9 +124,17 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <button className="primary-btn">ĐĂNG NHẬP</button>
+        {errorMessage && (
+          <div style={{ color: 'red', fontSize: '13px', marginBottom: '12px', textAlign: 'center' }}>
+            {errorMessage}
+          </div>
+        )}
+
+        <button type="submit" className="primary-btn" disabled={isLoading} style={{ opacity: isLoading ? 0.7 : 1 }}>
+          {isLoading ? <Loader2 className="animate-spin inline-block mr-2" size={20} /> : 'ĐĂNG NHẬP'}
+        </button>
         
-        <button className="biometric-btn">
+        <button type="button" className="biometric-btn" disabled={isLoading}>
           <ScanFace className="scan-icon" size={24} />
           <span>Đăng nhập với sinh trắc học</span>
         </button>
@@ -93,7 +143,7 @@ export default function LoginForm() {
           <span>Bạn quên mật khẩu? </span>
           <a href="#">Quên mật khẩu</a>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

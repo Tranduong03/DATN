@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { ChevronLeft, X, EyeOff, ScanFace } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 

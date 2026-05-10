@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { X, EyeOff, Eye } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import type { FormEvent } from 'react';
+import { X, EyeOff, Eye, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
@@ -10,9 +11,58 @@ export default function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+
+  const handleRegister = async (e: FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (!email || !password || !fullName || !phone) {
+      setErrorMessage('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage('Mật khẩu không khớp');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/Auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          username: email, // Backend cần username, dùng email làm username tạm
+          password,
+          fullName,
+          phone
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Đăng ký thành công! Vui lòng đăng nhập.');
+        navigate('/');
+      } else {
+        setErrorMessage(data.message || 'Đăng ký thất bại. Vui lòng thử lại!');
+      }
+    } catch {
+      setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="login-card register-card">
-      <div className="form-container">
+      <form className="form-container" onSubmit={handleRegister}>
         <div className="form-group">
           <label>Số điện thoại của bạn?</label>
           <div className="phone-input-wrapper">
@@ -99,13 +149,21 @@ export default function RegisterForm() {
           </div>
         </div>
 
-        <button className="primary-btn">ĐĂNG KÝ</button>
+        {errorMessage && (
+          <div style={{ color: 'red', fontSize: '13px', marginBottom: '12px', textAlign: 'center' }}>
+            {errorMessage}
+          </div>
+        )}
+
+        <button type="submit" className="primary-btn" disabled={isLoading} style={{ opacity: isLoading ? 0.7 : 1 }}>
+          {isLoading ? <Loader2 className="animate-spin inline-block mr-2" size={20} /> : 'ĐĂNG KÝ'}
+        </button>
 
         <div className="login-link">
           <span>Bạn đã có tài khoản? </span>
           <Link to="/">Đăng nhập</Link>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
