@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SportConnect.Application.DTOs.Auth;
@@ -58,6 +60,50 @@ public class AuthService : IAuthService
         await _unitOfWork.CompleteAsync();
 
         return true;
+    }
+
+    public async Task<string> GoogleLoginAsync(GoogleLoginDto googleLoginDto)
+    {
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", googleLoginDto.Token);
+
+        var response = await httpClient.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Invalid Google token.");
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+        var payload = JsonSerializer.Deserialize<JsonElement>(content);
+
+        var email = payload.GetProperty("email").GetString();
+        var name = payload.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
+        var picture = payload.TryGetProperty("picture", out var picProp) ? picProp.GetString() : string.Empty;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            throw new Exception("Google token did not contain an email.");
+        }
+
+        var existingUsers = await _unitOfWork.Repository<User>().FindAsync(u => u.Email == email);
+        var user = existingUsers.FirstOrDefault();
+
+        if (user == null)
+        {
+            user = new User
+            {
+                Username = email.Split('@')[0] + Guid.NewGuid().ToString().Substring(0, 4),
+                Email = email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Random password
+                FullName = name,
+                AvatarUrl = picture,
+                Status = true
+            };
+            await _unitOfWork.Repository<User>().AddAsync(user);
+            await _unitOfWork.CompleteAsync();
+        }
+
+        return GenerateJwtToken(user);
     }
 
     private string GenerateJwtToken(User user)

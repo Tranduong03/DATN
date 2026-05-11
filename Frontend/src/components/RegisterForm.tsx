@@ -161,7 +161,7 @@ export default function RegisterForm() {
 
         <div className="login-link">
           <span>Bạn đã có tài khoản? </span>
-          <Link to="/">Đăng nhập</Link>
+          <Link to="/login">Đăng nhập</Link>
         </div>
       </form>
     </div>
