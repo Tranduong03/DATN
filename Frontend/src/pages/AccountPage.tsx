@@ -43,7 +43,7 @@ export default function AccountPage() {
               <div className="menu-icon">
                 <Info size={20} />
               </div>
-              <span className="menu-text">Thông tin phiên bản: 2.9.0</span>
+              <span className="menu-text">Thông tin phiên bản: 1.1.0</span>
               <ChevronRight className="menu-chevron" size={20} />
             </Link>
             <Link to="/terms" className="menu-item">

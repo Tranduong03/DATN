@@ -3,8 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function BottomNavigation() {
   const location = useLocation();
+  const token = localStorage.getItem('token');
+  const accountPath = token ? '/me' : '/account';
 
   const isActive = (path: string) => {
+    if (path === '/account' && (location.pathname === '/account' || location.pathname === '/me')) {
+      return 'active';
+    }
     return location.pathname === path ? 'active' : '';
   };
 
@@ -35,7 +40,7 @@ export default function BottomNavigation() {
         <span>Nổi bật</span>
       </Link>
       
-      <Link to="/account" className={`nav-item ${isActive('/account')}`}>
+      <Link to={accountPath} className={`nav-item ${isActive('/account')}`}>
         <User size={24} />
         <span>Tài khoản</span>
       </Link>
