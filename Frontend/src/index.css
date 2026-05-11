@@ -907,3 +907,93 @@ input[type="password"]::-ms-clear {
 .me-logout-btn:hover {
   background: #fff1f0;
 }
+
+/* Settings Page Styles */
+.settings-page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #eafbf1;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  height: 60px;
+  background-color: #00A859;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.settings-back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.settings-content {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.settings-menu-icon-container {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-icon {
+  color: #1a4f32;
+}
+
+.settings-menu-text {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a4f32;
+}
+
+.settings-chevron {
+  color: #cccccc;
+}
+
+.settings-icon-danger {
+  color: #e53935;
+}
+
+.settings-menu-text-danger {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: #e53935;
+}
+
+.settings-chevron-danger {
+  color: #e53935;
+}
