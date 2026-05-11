@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('./assets/fonts/montserrat.css');
 
 :root {
   --primary-color: #326441;
@@ -19,7 +19,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   background-color: var(--bg-color-2);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
