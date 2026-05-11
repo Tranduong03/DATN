@@ -1,8 +1,18 @@
+import { useEffect } from 'react';
 import { ChevronRight, CalendarDays, Info, ShieldCheck, Sparkles, Languages } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/MainLayout';
 
 export default function AccountPage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/me');
+    }
+  }, [navigate]);
+
   return (
     <MainLayout>
       <div className="account-page">

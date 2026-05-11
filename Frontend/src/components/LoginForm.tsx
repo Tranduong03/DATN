@@ -39,7 +39,7 @@ export default function LoginForm() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         // Có thể navigate sang trang chủ, tạm thời reload lại trang
-        window.location.href = '/'; 
+        window.location.href = '/me'; 
       } else {
         setErrorMessage(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
       }

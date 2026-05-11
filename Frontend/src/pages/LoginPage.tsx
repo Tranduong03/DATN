@@ -22,7 +22,7 @@ export default function LoginPage() {
         if (response.ok) {
           const data = await response.json();
           localStorage.setItem('token', data.token);
-          navigate('/account'); // Navigate to account or home
+          navigate('/me'); // Navigate to account or home
         } else {
           const errorData = await response.json();
           setError(errorData.message || 'Google login failed');
