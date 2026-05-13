@@ -1,4 +1,4 @@
-import { ChevronRight, CalendarDays, Bell, GraduationCap, Gift, Users, Crown, Settings, Info, ShieldCheck, Sparkles } from 'lucide-react';
+import { ChevronRight, GraduationCap, Users, Crown, Settings, Info, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/MainLayout';
 import { useEffect, useState } from 'react';
@@ -71,40 +71,43 @@ export default function MePage() {
             <ChevronRight color="white" />
           </div>
 
-          <div className="me-membership">
-            <span className="me-membership-icon">💎</span>
-            <span className="me-membership-text">Hạng thành viên</span>
-            <ChevronRight color="white" size={16} style={{ marginLeft: '4px' }} />
-          </div>
+          <div className="me-dashboard-box">
+            <div className="me-membership">
+              <span className="me-membership-icon">💎</span>
+              <span className="me-membership-text">Hạng thành viên</span>
+              <ChevronRight color="white" size={16} style={{ marginLeft: '4px' }} />
+            </div>
 
-          <div className="me-card-container">
             {/* Quick Actions Grid */}
             <div className="me-grid-actions">
               <div className="me-action-item">
-                <div className="me-action-icon bg-calendar">
-                  <CalendarDays size={24} color="#e57373" />
+                <div className="me-action-icon">
+                  <span style={{ fontSize: '28px' }}>📅</span>
                 </div>
                 <span>Lịch đã đặt</span>
               </div>
               <div className="me-action-item">
-                <div className="me-action-icon bg-bell">
-                  <Bell size={24} color="#ffb74d" />
+                <div className="me-action-icon">
+                  <span style={{ fontSize: '28px' }}>🎉</span>
                 </div>
                 <span>Thông báo</span>
               </div>
               <div className="me-action-item">
-                <div className="me-action-icon bg-course">
-                  <GraduationCap size={24} color="#81c784" />
+                <div className="me-action-icon">
+                  <span style={{ fontSize: '28px' }}>📚</span>
                 </div>
                 <span>Khoá học</span>
               </div>
               <div className="me-action-item">
-                <div className="me-action-icon bg-gift">
-                  <Gift size={24} color="#e53935" />
+                <div className="me-action-icon">
+                  <span style={{ fontSize: '28px' }}>🎁</span>
                 </div>
                 <span>Ưu đãi</span>
               </div>
             </div>
+          </div>
+
+          <div className="me-card-container">
 
             <div className="me-menu-section">
               <h3 className="me-menu-title">Hoạt động</h3>
@@ -154,13 +157,7 @@ export default function MePage() {
             </div>
 
             <div className="me-footer">
-              <p>Thông tin phiên bản: 2.9.0</p>
-              <button 
-                className="me-logout-btn" 
-                onClick={() => { localStorage.removeItem('token'); navigate('/account'); }}
-              >
-                Đăng xuất
-              </button>
+              <p>Thông tin phiên bản: 1.1.0</p>
             </div>
           </div>
         </div>
