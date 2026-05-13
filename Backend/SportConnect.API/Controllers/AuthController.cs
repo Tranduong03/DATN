@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SportConnect.Application.DTOs.Auth;
 using SportConnect.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SportConnect.API.Controllers;
 
@@ -63,5 +64,26 @@ public class AuthController : ControllerBase
   public IActionResult Me()
   {
     return Ok("Authorized");
+  }
+
+  [Authorize]
+  [HttpPut("change-password")]
+  public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+  {
+    try
+    {
+      var userIdClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+      if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+      {
+        return Unauthorized(new { Message = "User is not authorized." });
+      }
+
+      var success = await _authService.ChangePasswordAsync(userId, dto);
+      return Ok(new { Message = "Đổi mật khẩu thành công!" });
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { Message = ex.Message });
+    }
   }
 }

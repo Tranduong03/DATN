@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Bell, Globe, RectangleEllipsis, LogOut, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BellRing, Globe, RectangleEllipsis, LogOut, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function SettingsPage() {
@@ -22,42 +22,42 @@ export default function SettingsPage() {
       <div className="settings-content">
         <div className="settings-menu-item">
           <div className="settings-menu-icon-container">
-            <Bell size={20} className="settings-icon" />
+            <BellRing size={18} className="settings-icon" />
           </div>
           <span className="settings-menu-text">Cài đặt thông báo</span>
-          <ChevronRight className="settings-chevron" size={20} />
+          <ChevronRight className="settings-chevron" size={16} strokeWidth={1.5} />
         </div>
 
         <div className="settings-menu-item">
           <div className="settings-menu-icon-container">
-            <Globe size={20} className="settings-icon" />
+            <Globe size={18} className="settings-icon" />
           </div>
           <span className="settings-menu-text">Ngôn ngữ - Tiếng Việt</span>
-          <ChevronRight className="settings-chevron" size={20} />
+          <ChevronRight className="settings-chevron" size={16} strokeWidth={1.5} />
         </div>
 
-        <div className="settings-menu-item">
+        <div className="settings-menu-item" onClick={() => navigate('/settings/change-password')} style={{ cursor: 'pointer' }}>
           <div className="settings-menu-icon-container">
-            <RectangleEllipsis size={20} className="settings-icon" />
+            <RectangleEllipsis size={18} className="settings-icon" />
           </div>
           <span className="settings-menu-text">Đổi mật khẩu</span>
-          <ChevronRight className="settings-chevron" size={20} />
+          <ChevronRight className="settings-chevron" size={16} strokeWidth={1.5} />
         </div>
 
         <div className="settings-menu-item" onClick={handleLogout} style={{ cursor: 'pointer' }}>
           <div className="settings-menu-icon-container">
-            <LogOut size={20} className="settings-icon" />
+            <LogOut size={18} className="settings-icon" />
           </div>
           <span className="settings-menu-text">Đăng xuất tài khoản</span>
-          <ChevronRight className="settings-chevron" size={20} />
+          <ChevronRight className="settings-chevron" size={16} strokeWidth={1.5} />
         </div>
 
         <div className="settings-menu-item delete-account" style={{ cursor: 'pointer' }}>
           <div className="settings-menu-icon-container">
-            <Trash2 size={20} className="settings-icon-danger" />
+            <Trash2 size={18} className="settings-icon-danger" />
           </div>
           <span className="settings-menu-text-danger">Xóa tài khoản</span>
-          <ChevronRight className="settings-chevron-danger" size={20} />
+          <ChevronRight className="settings-chevron-danger" size={16} strokeWidth={1.5} />
         </div>
       </div>
     </div>

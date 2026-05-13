@@ -8,7 +8,8 @@
   --text-main: #333333;
   --text-muted: #888888;
   --text-green: #204e2e;
-  --border-color: #e0e0e0;
+  /* --border-color: #e0e0e0; */
+  --border-color: #188748;
   --tab-inactive: #f2f2f2;
 }
 
@@ -920,8 +921,8 @@ input[type="password"]::-ms-clear {
 }
 
 .settings-header {
-  height: 60px;
-  background-color: #00A859;
+  height: 53px;
+  background: linear-gradient(to right, #033e23, #01b863);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -939,8 +940,8 @@ input[type="password"]::-ms-clear {
 
 .settings-title {
   color: white;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 500;
   margin: 0;
 }
 
@@ -948,17 +949,17 @@ input[type="password"]::-ms-clear {
   padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .settings-menu-item {
   display: flex;
   align-items: center;
   background: white;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #188748; 
   border-radius: 8px;
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.04); 
 }
 
 .settings-menu-icon-container {
@@ -969,14 +970,14 @@ input[type="password"]::-ms-clear {
 }
 
 .settings-icon {
-  color: #1a4f32;
+  color: #1b3d29;
 }
 
 .settings-menu-text {
   flex: 1;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
-  color: #1a4f32;
+  color: #1b3d29;
 }
 
 .settings-chevron {
@@ -989,7 +990,7 @@ input[type="password"]::-ms-clear {
 
 .settings-menu-text-danger {
   flex: 1;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   color: #e53935;
 }

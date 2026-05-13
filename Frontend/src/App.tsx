@@ -4,6 +4,7 @@ import RegisterPage from './pages/RegisterPage';
 import AccountPage from './pages/AccountPage';
 import MePage from './pages/MePage';
 import SettingsPage from './pages/SettingsPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/account" element={<AccountPage />} />
         <Route path="/me" element={<MePage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings/change-password" element={<ChangePasswordPage />} />
       </Routes>
     </BrowserRouter>
   );

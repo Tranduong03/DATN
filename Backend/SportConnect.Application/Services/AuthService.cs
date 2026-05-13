@@ -106,6 +106,26 @@ public class AuthService : IAuthService
         return GenerateJwtToken(user);
     }
 
+    public async Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordDto changePasswordDto)
+    {
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("User not found.");
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, user.PasswordHash))
+        {
+            throw new Exception("Mật khẩu cũ không chính xác.");
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return true;
+    }
+
     private string GenerateJwtToken(User user)
     {
         var jwtSettings = _config.GetSection("JwtSettings");
