@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import AccountPage from './pages/AccountPage';
-import MePage from './pages/MePage';
-import SettingsPage from './pages/SettingsPage';
-import ChangePasswordPage from './pages/ChangePasswordPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import AccountPage from './pages/profile/AccountPage';
+import MePage from './pages/profile/MePage';
+import SettingsPage from './pages/profile/SettingsPage';
+import ChangePasswordPage from './pages/profile/ChangePasswordPage';
 
 function App() {
   return (

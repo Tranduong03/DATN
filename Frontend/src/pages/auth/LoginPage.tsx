@@ -1,6 +1,6 @@
 import { ChevronLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '../../components/auth/LoginForm';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 
