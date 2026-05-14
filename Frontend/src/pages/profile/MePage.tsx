@@ -1,13 +1,12 @@
 import { ChevronRight, GraduationCap, Users, Crown, Settings, Info, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import MainLayout from '../components/MainLayout';
+import MainLayout from '../../components/layout/MainLayout';
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
-
-import avataBoy1 from '../assets/icon/avata_boy_1.avif';
-import avataBoy2 from '../assets/icon/avata_boy_2.jpg';
-import avataGirl1 from '../assets/icon/avata_girl_1.jpg';
-import avataGirl2 from '../assets/icon/avata_girl_2.avif';
+import avataBoy1 from '../../assets/icon/avata_boy_1.avif';
+import avataBoy2 from '../../assets/icon/avata_boy_2.jpg';
+import avataGirl1 from '../../assets/icon/avata_girl_1.jpg';
+import avataGirl2 from '../../assets/icon/avata_girl_2.avif';
 
 const defaultAvatars = [avataBoy1, avataBoy2, avataGirl1, avataGirl2];
 

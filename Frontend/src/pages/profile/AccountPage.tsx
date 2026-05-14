@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ChevronRight, CalendarDays, Info, ShieldCheck, Sparkles, Languages } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import MainLayout from '../components/MainLayout';
+import MainLayout from '../../components/layout/MainLayout';
 
 export default function AccountPage() {
   const navigate = useNavigate();
