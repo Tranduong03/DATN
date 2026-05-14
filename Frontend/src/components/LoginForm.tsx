@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
@@ -141,7 +142,7 @@ export default function LoginForm() {
 
         <div className="forgot-password">
           <span>Bạn quên mật khẩu? </span>
-          <a href="#">Quên mật khẩu</a>
+          <Link to="/forgot-password">Quên mật khẩu</Link>
         </div>
       </form>
     </div>

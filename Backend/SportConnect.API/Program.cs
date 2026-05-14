@@ -22,6 +22,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Controllers & Swagger
 builder.Services.AddControllers();

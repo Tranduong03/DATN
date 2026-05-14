@@ -5,6 +5,7 @@ import AccountPage from './pages/AccountPage';
 import MePage from './pages/MePage';
 import SettingsPage from './pages/SettingsPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<AccountPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/me" element={<MePage />} />
         <Route path="/settings" element={<SettingsPage />} />

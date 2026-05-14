@@ -1030,3 +1030,91 @@ input[type="password"]::-ms-clear {
 .settings-chevron-danger {
   color: #e53935;
 }
+
+/* Forgot Password Page */
+.forgot-password-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.forgot-password-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.forgot-password-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  margin-bottom: 24px;
+}
+
+.instruction-text {
+  font-size: 14px;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.contact-banner {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: auto;
+  padding-bottom: 20px;
+}
+
+.contact-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.contact-buttons button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.facebook-btn {
+  background-color: #4267B2;
+}
+
+.zalo-btn {
+  background-color: #008FE5;
+}
+
+@media (min-width: 481px) {
+  .forgot-password-container {
+    height: 850px;
+    max-height: 95vh;
+    min-height: auto;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+  }
+}

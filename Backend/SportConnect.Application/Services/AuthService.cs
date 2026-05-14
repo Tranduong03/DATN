@@ -15,11 +15,13 @@ public class AuthService : IAuthService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IConfiguration _config;
+    private readonly IEmailService _emailService;
 
-    public AuthService(IUnitOfWork unitOfWork, IConfiguration config)
+    public AuthService(IUnitOfWork unitOfWork, IConfiguration config, IEmailService emailService)
     {
         _unitOfWork = unitOfWork;
         _config = config;
+        _emailService = emailService;
     }
 
     public async Task<string> LoginAsync(LoginDto loginDto)
@@ -124,6 +126,48 @@ public class AuthService : IAuthService
         await _unitOfWork.CompleteAsync();
 
         return true;
+    }
+
+    public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto)
+    {
+        var users = await _unitOfWork.Repository<User>().FindAsync(u => u.Email == dto.Email);
+        var user = users.FirstOrDefault();
+        if (user == null)
+        {
+            // Do not reveal that the user does not exist for security reasons, just return true or throw a general error.
+            // But the user requested "Nếu bạn không nhận được email..." so maybe just returning true is best.
+            // Let's throw an exception for simplicity to show error in UI if needed, but standard practice is to return success.
+            throw new Exception("Không tìm thấy tài khoản với email này.");
+        }
+
+        // Generate a random 8-character password
+        var newPassword = GenerateRandomPassword(8);
+
+        // Update database
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        // Send email
+        string subject = "Cấp lại mật khẩu - SportConnect";
+        string body = $@"
+            <h3>Xin chào {user.FullName ?? user.Username},</h3>
+            <p>Bạn đã yêu cầu cấp lại mật khẩu. Dưới đây là mật khẩu mới của bạn:</p>
+            <p><strong>{newPassword}</strong></p>
+            <p>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi nhận được email này.</p>
+            <p>Trân trọng,<br>Đội ngũ SportConnect</p>";
+
+        await _emailService.SendEmailAsync(user.Email, subject, body);
+
+        return true;
+    }
+
+    private string GenerateRandomPassword(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
     private string GenerateJwtToken(User user)

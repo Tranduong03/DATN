@@ -86,4 +86,21 @@ public class AuthController : ControllerBase
       return BadRequest(new { Message = ex.Message });
     }
   }
+
+  [HttpPost("forgot-password")]
+  public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+  {
+    if (string.IsNullOrWhiteSpace(dto.Email))
+      return BadRequest(new { Message = "Email không được để trống." });
+
+    try
+    {
+      await _authService.ForgotPasswordAsync(dto);
+      return Ok(new { Message = "Mật khẩu mới đã được gửi vào email của bạn." });
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { Message = ex.Message });
+    }
+  }
 }
