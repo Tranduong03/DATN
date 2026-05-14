@@ -3,6 +3,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import AccountPage from './pages/profile/AccountPage';
+import HomePage from './pages/home/HomePage';
 import MePage from './pages/profile/MePage';
 import SettingsPage from './pages/profile/SettingsPage';
 import ChangePasswordPage from './pages/profile/ChangePasswordPage';
@@ -11,7 +12,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AccountPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
