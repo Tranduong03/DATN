@@ -156,7 +156,6 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
 
         modelBuilder.Entity<Court>(entity =>
         {
-          
             entity.ToTable("Courts");
 
             entity.HasKey(e => e.Id);
@@ -335,6 +334,42 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
             entity.Property(e => e.JoinedAt)
                 .HasColumnName("joined_at")
                 .HasDefaultValueSql("GETDATE()");
+        });
+
+        // ==========================================
+        // 4. CẤU HÌNH BẢNG QUẢN LÝ QUYỀN NHÂN VIÊN VÀ LOG
+        // ==========================================
+        modelBuilder.Entity<StaffVenuePermission>(entity =>
+        {
+            entity.ToTable("StaffVenuePermissions");
+
+            entity.HasKey(e => new { e.StaffUserId, e.VenueId, e.Permission });
+
+            entity.HasOne(e => e.Staff)
+                .WithMany()
+                .HasForeignKey(e => e.StaffUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Venue)
+                .WithMany()
+                .HasForeignKey(e => e.VenueId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Granter)
+                .WithMany()
+                .HasForeignKey(e => e.GrantedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ActivityLog>(entity =>
+        {
+            entity.ToTable("ActivityLogs");
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Actor)
+                .WithMany()
+                .HasForeignKey(e => e.ActorId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

@@ -1,12 +1,12 @@
-namespace SportConnect.Application.Services;
+namespace SportConnect.Infrastructure.Services;
 
 using Microsoft.EntityFrameworkCore;
 using SportConnect.Infrastructure.Persistence.Context;
 
 public class StaffPermissionService
 {
-    private readonly ApplicationDbContext _db;
-    public StaffPermissionService(ApplicationDbContext db) => _db = db;
+    private readonly MyDbContext _db;
+    public StaffPermissionService(MyDbContext db) => _db = db;
 
     public async Task<bool> HasPermission(Guid staffUserId, Guid venueId, string code)
         => await _db.StaffVenuePermissions.AnyAsync(x =>

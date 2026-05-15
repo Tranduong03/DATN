@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using SportConnect.Infrastructure.Persistence.Context;
 using SportConnect.Application.Interfaces;
 using SportConnect.Application.Services;
+using SportConnect.Infrastructure.Services;
 using SportConnect.Infrastructure.Persistence.Repositories;
 using System.Text;
 using Microsoft.OpenApi.Models;

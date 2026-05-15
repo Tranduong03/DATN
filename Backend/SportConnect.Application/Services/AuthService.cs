@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using SportConnect.Application.DTOs.Auth;
 using SportConnect.Application.Interfaces;
 using SportConnect.Core.Entities;
+using SportConnect.Core.Constants;
 
 namespace SportConnect.Application.Services;
 
@@ -59,6 +60,21 @@ public class AuthService : IAuthService
         };
 
         await _unitOfWork.Repository<User>().AddAsync(user);
+
+        var roles = await _unitOfWork.Repository<Role>().FindAsync(r => r.RoleName == AppRoles.Default);
+        var defaultRole = roles.FirstOrDefault();
+        if (defaultRole == null)
+        {
+            defaultRole = new Role { RoleName = AppRoles.Default, Description = "Người dùng cơ bản" };
+            await _unitOfWork.Repository<Role>().AddAsync(defaultRole);
+        }
+
+        await _unitOfWork.Repository<UserRole>().AddAsync(new UserRole
+        {
+            UserId = user.Id,
+            RoleId = defaultRole.Id
+        });
+
         await _unitOfWork.CompleteAsync();
 
         return true;
@@ -102,6 +118,21 @@ public class AuthService : IAuthService
                 Status = true
             };
             await _unitOfWork.Repository<User>().AddAsync(user);
+
+            var roles = await _unitOfWork.Repository<Role>().FindAsync(r => r.RoleName == AppRoles.Default);
+            var defaultRole = roles.FirstOrDefault();
+            if (defaultRole == null)
+            {
+                defaultRole = new Role { RoleName = AppRoles.Default, Description = "Người dùng cơ bản" };
+                await _unitOfWork.Repository<Role>().AddAsync(defaultRole);
+            }
+
+            await _unitOfWork.Repository<UserRole>().AddAsync(new UserRole
+            {
+                UserId = user.Id,
+                RoleId = defaultRole.Id
+            });
+
             await _unitOfWork.CompleteAsync();
         }
 
