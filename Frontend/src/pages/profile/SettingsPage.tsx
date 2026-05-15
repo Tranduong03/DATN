@@ -1,8 +1,10 @@
-import { ChevronLeft, ChevronRight, BellRing, Globe, RectangleEllipsis, LogOut, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BellRing, Globe, RectangleEllipsis, LogOut, ArrowRightLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
+  const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -44,7 +46,7 @@ export default function SettingsPage() {
           <ChevronRight className="settings-chevron" size={16} strokeWidth={1.5} />
         </div>
 
-        <div className="settings-menu-item" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+        <div className="settings-menu-item" onClick={() => setIsLogoutPopupOpen(true)} style={{ cursor: 'pointer' }}>
           <div className="settings-menu-icon-container">
             <LogOut size={18} className="settings-icon" />
           </div>
@@ -52,14 +54,38 @@ export default function SettingsPage() {
           <ChevronRight className="settings-chevron" size={16} strokeWidth={1.5} />
         </div>
 
-        <div className="settings-menu-item delete-account" style={{ cursor: 'pointer' }}>
+        <div className="settings-menu-item" style={{ cursor: 'pointer' }}>
           <div className="settings-menu-icon-container">
-            <Trash2 size={18} className="settings-icon-danger" />
+            <ArrowRightLeft size={18} style={{ color: '#d97706' }} />
           </div>
-          <span className="settings-menu-text-danger">Xóa tài khoản</span>
-          <ChevronRight className="settings-chevron-danger" size={16} strokeWidth={1.5} />
+          <span className="settings-menu-text" style={{ color: '#d97706', fontWeight: 600 }}>Dành cho Chủ sân</span>
+          <ChevronRight size={16} strokeWidth={1.5} style={{ color: '#d97706' }} />
         </div>
       </div>
+
+      {/* Logout Confirmation Popup */}
+      {isLogoutPopupOpen && (
+        <div className="logout-popup-overlay">
+          <div className="logout-popup-card">
+            <h3 className="logout-popup-title">Đăng xuất</h3>
+            <p className="logout-popup-desc">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?</p>
+            <div className="logout-popup-actions">
+              <button 
+                className="logout-btn-cancel"
+                onClick={() => setIsLogoutPopupOpen(false)}
+              >
+                Hủy
+              </button>
+              <button 
+                className="logout-btn-confirm"
+                onClick={handleLogout}
+              >
+                Đăng xuất
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
