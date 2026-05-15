@@ -8,14 +8,14 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
-    public DbSet<Permission> Permissions => Set<Permission>();
-    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<Venue> Venues => Set<Venue>();
     public DbSet<Court> Courts => Set<Court>();
     public DbSet<PriceRule> PriceRules => Set<PriceRule>();
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<Match> Matches => Set<Match>();
     public DbSet<MatchPlayer> MatchPlayers => Set<MatchPlayer>();
+    public DbSet<StaffVenuePermission> StaffVenuePermissions => Set<StaffVenuePermission>();
+    public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -117,45 +117,6 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasColumnName("role_id");
         });
 
-        modelBuilder.Entity<Permission>(entity =>
-        {
-            entity.ToTable("Permissions");
-
-            entity.HasKey(e => e.Id);
-
-            entity.Property(e => e.Id)
-                .HasColumnName("id");
-
-            entity.Property(e => e.PermissionCode)
-                .HasColumnName("permission_code")
-                .HasMaxLength(255)
-                .IsRequired();
-
-            entity.HasIndex(e => e.PermissionCode)
-                .IsUnique();
-
-            entity.Property(e => e.PermissionName)
-                .HasColumnName("permission_name")
-                .HasMaxLength(255)
-                .IsRequired();
-
-            entity.Property(e => e.Description)
-                .HasColumnName("description");
-        });
-
-        modelBuilder.Entity<RolePermission>(entity =>
-        {
-            entity.ToTable("Role_Permission");
-
-            entity.HasKey(e => new { e.RoleId, e.PermissionId });
-
-            entity.Property(e => e.RoleId)
-                .HasColumnName("role_id");
-
-            entity.Property(e => e.PermissionId)
-                .HasColumnName("permission_id");
-        });
-
         // ==========================================
         // 2. CẤU HÌNH BẢNG SÂN BÃI & ĐẶT LỊCH
         // ==========================================
@@ -195,6 +156,7 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
 
         modelBuilder.Entity<Court>(entity =>
         {
+          
             entity.ToTable("Courts");
 
             entity.HasKey(e => e.Id);
