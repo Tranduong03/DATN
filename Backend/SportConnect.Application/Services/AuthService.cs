@@ -28,7 +28,7 @@ public class AuthService : IAuthService
     public async Task<string> LoginAsync(LoginDto loginDto)
     {
         var users = await _unitOfWork.Repository<User>().FindAsync(u => 
-            u.Username == loginDto.UsernameOrEmail || u.Email == loginDto.UsernameOrEmail);
+            u.Username == loginDto.UsernameOrEmail || u.Email == loginDto.UsernameOrEmail || u.Phone == loginDto.UsernameOrEmail);
         
         var user = users.FirstOrDefault();
 
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
         return GenerateJwtToken(user);
     }
 
-    public async Task<bool> RegisterAsync(RegisterDto registerDto)
+    public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
         var existingUsers = await _unitOfWork.Repository<User>().FindAsync(u => 
             u.Username == registerDto.Username || u.Email == registerDto.Email);
@@ -77,7 +77,7 @@ public class AuthService : IAuthService
 
         await _unitOfWork.CompleteAsync();
 
-        return true;
+        return GenerateJwtToken(user);
     }
 
     public async Task<string> GoogleLoginAsync(GoogleLoginDto googleLoginDto)

@@ -3,13 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import LoginForm from '../../components/auth/LoginForm';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
+import LoadingOverlay from '../../components/common/LoadingOverlay';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
+      setIsGoogleLoading(true);
       try {
         const response = await fetch('/api/Auth/google-login', {
           method: 'POST',
@@ -29,6 +32,8 @@ export default function LoginPage() {
         }
       } catch (err) {
         setError('Network error. Please try again.');
+      } finally {
+        setIsGoogleLoading(false);
       }
     },
     onError: () => {
@@ -37,6 +42,7 @@ export default function LoginPage() {
   });
   return (
     <div className="login-container">
+      <LoadingOverlay isLoading={isGoogleLoading} text="Đang đăng nhập Google..." />
       {/* Background layer */}
       <div className="bg-curves">
         <div className="bg-curve curve-1"></div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import LoadingOverlay from '../common/LoadingOverlay';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
@@ -48,8 +49,8 @@ export default function RegisterForm() {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Đăng ký thành công! Vui lòng đăng nhập.');
-        navigate('/');
+        localStorage.setItem('token', data.token);
+        window.location.href = '/me';
       } else {
         setErrorMessage(data.message || 'Đăng ký thất bại. Vui lòng thử lại!');
       }
@@ -62,6 +63,7 @@ export default function RegisterForm() {
 
   return (
     <div className="login-card register-card">
+      <LoadingOverlay isLoading={isLoading} text="Đang đăng ký..." />
       <form className="form-container" onSubmit={handleRegister}>
         <div className="form-group">
           <label>Số điện thoại của bạn?</label>

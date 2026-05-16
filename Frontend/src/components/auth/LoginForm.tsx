@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import LoadingOverlay from '../common/LoadingOverlay';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
@@ -53,6 +54,7 @@ export default function LoginForm() {
 
   return (
     <div className="login-card">
+      <LoadingOverlay isLoading={isLoading} text="Đang đăng nhập..." />
       <div className="tabs">
         <button 
           className={`tab-btn ${activeTab === 'phone' ? 'active' : ''}`}

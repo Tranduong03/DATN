@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { ChevronLeft, X, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import LoadingOverlay from '../../components/common/LoadingOverlay';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="forgot-password-container">
+      <LoadingOverlay isLoading={isLoading} text="Đang gửi email..." />
       {/* Background Curves - Using same classes for consistency, or custom ones if needed */}
       <div className="bg-curves">
         <div className="bg-curve curve-1"></div>

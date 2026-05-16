@@ -36,8 +36,8 @@ public class AuthController : ControllerBase
   {
     try
     {
-      var success = await _authService.RegisterAsync(registerDto);
-      return Ok(new { Message = "User registered successfully!" });
+      var token = await _authService.RegisterAsync(registerDto);
+      return Ok(new { Message = "User registered successfully!", Token = token });
     }
     catch (Exception ex)
     {
