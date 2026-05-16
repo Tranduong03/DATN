@@ -7,6 +7,8 @@ import HomePage from './pages/home/HomePage';
 import MePage from './pages/profile/MePage';
 import SettingsPage from './pages/profile/SettingsPage';
 import ChangePasswordPage from './pages/profile/ChangePasswordPage';
+import OwnerOnboardingFlow from './pages/owner/OwnerOnboardingFlow';
+import OwnerView from './pages/owner/OwnerView';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/me" element={<MePage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/settings/change-password" element={<ChangePasswordPage />} />
+        <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
+        <Route path="/owner" element={<OwnerView />} />
       </Routes>
     </BrowserRouter>
   );

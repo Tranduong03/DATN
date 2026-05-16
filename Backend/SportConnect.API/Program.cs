@@ -24,6 +24,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOwnerOnboardingService, OwnerOnboardingService>();
 builder.Services.AddScoped<StaffPermissionService>();
 builder.Services.AddScoped<ActivityLogService>();
 builder.Services.AddHttpContextAccessor();

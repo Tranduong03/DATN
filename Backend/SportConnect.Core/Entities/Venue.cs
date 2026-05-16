@@ -7,8 +7,14 @@ public class Venue
     public string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string? BankQrUrl { get; set; }
+    public string? ContactPhone { get; set; }
+    public string? Description { get; set; }
+    public TimeSpan OperatingStartHour { get; set; }
+    public TimeSpan OperatingEndHour { get; set; }
+    public List<string> SportTypes { get; set; } = new();
+    public int VenueScale { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public string Status { get; set; } = "ACTIVE"; // ACTIVE, INACTIVE
+    public string Status { get; set; } = "ACTIVE"; // ACTIVE, INACTIVE, PENDING_APPROVAL
 
     // Navigation properties
     public User Owner { get; set; } = null!;

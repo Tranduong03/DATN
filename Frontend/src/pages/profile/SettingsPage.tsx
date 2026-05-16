@@ -54,7 +54,7 @@ export default function SettingsPage() {
           <ChevronRight className="settings-chevron" size={16} strokeWidth={1.5} />
         </div>
 
-        <div className="settings-menu-item" style={{ cursor: 'pointer' }}>
+        <div className="settings-menu-item" onClick={() => navigate('/owner/onboarding')} style={{ cursor: 'pointer' }}>
           <div className="settings-menu-icon-container">
             <ArrowRightLeft size={18} style={{ color: '#d97706' }} />
           </div>

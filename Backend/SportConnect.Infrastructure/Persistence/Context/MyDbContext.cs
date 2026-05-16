@@ -16,6 +16,8 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
     public DbSet<MatchPlayer> MatchPlayers => Set<MatchPlayer>();
     public DbSet<StaffVenuePermission> StaffVenuePermissions => Set<StaffVenuePermission>();
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
+    public DbSet<VenueImage> VenueImages => Set<VenueImage>();
+    public DbSet<OwnerProfile> OwnerProfiles => Set<OwnerProfile>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,7 +54,7 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
             entity.Property(e => e.PasswordHash)
                 .HasColumnName("password_hash")
                 .HasMaxLength(255)
-                .IsRequired();
+                .IsRequired(false);
 
             entity.Property(e => e.FullName)
                 .HasColumnName("full_name")
@@ -118,6 +120,55 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
         });
 
         // ==========================================
+        // 1.5. CẤU HÌNH BẢNG OWNER PROFILE
+        // ==========================================
+        modelBuilder.Entity<OwnerProfile>(entity =>
+        {
+            entity.ToTable("OwnerProfiles");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id")
+                .IsRequired();
+
+            entity.Property(e => e.OnboardingStatus)
+                .HasColumnName("onboarding_status")
+                .HasMaxLength(50)
+                .HasDefaultValue("NotStarted");
+
+            entity.Property(e => e.VerificationStatus)
+                .HasColumnName("verification_status")
+                .HasMaxLength(50)
+                .HasDefaultValue("None");
+
+            entity.Property(e => e.CurrentStep)
+                .HasColumnName("current_step")
+                .HasDefaultValue(1);
+
+            entity.Property(e => e.DraftData)
+                .HasColumnName("draft_data")
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.RejectReason)
+                .HasColumnName("reject_reason")
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at")
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ==========================================
         // 2. CẤU HÌNH BẢNG SÂN BÃI & ĐẶT LỊCH
         // ==========================================
         modelBuilder.Entity<Venue>(entity =>
@@ -141,6 +192,27 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasColumnName("address")
                 .IsRequired();
 
+            entity.Property(e => e.ContactPhone)
+                .HasColumnName("contact_phone")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.OperatingStartHour)
+                .HasColumnName("operating_start_hour");
+
+            entity.Property(e => e.OperatingEndHour)
+                .HasColumnName("operating_end_hour");
+
+            entity.Property(e => e.SportTypes)
+                .HasColumnName("sport_types");
+
+            entity.Property(e => e.VenueScale)
+                .HasColumnName("venue_scale")
+                .HasDefaultValue(0);
+
             entity.Property(e => e.BankQrUrl)
                 .HasColumnName("bank_qr_url");
 
@@ -152,6 +224,32 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasColumnName("status")
                 .HasMaxLength(50)
                 .HasDefaultValue("ACTIVE");
+        });
+
+        modelBuilder.Entity<VenueImage>(entity =>
+        {
+            entity.ToTable("VenueImages");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.VenueId)
+                .HasColumnName("venue_id")
+                .IsRequired();
+
+            entity.Property(e => e.ImageUrl)
+                .HasColumnName("image_url")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(e => e.ImageType)
+                .HasColumnName("image_type")
+                .HasMaxLength(50)
+                .HasDefaultValue("Gallery");
+
+            entity.HasOne(e => e.Venue)
+                .WithMany()
+                .HasForeignKey(e => e.VenueId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Court>(entity =>
