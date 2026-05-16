@@ -23,8 +23,8 @@ export default function ChangePasswordPage() {
     setErrorMessage('');
     setSuccessMessage('');
 
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setErrorMessage('Vui lòng nhập đầy đủ thông tin');
+    if (!newPassword || !confirmPassword) {
+      setErrorMessage('Vui lòng nhập mật khẩu mới và xác nhận');
       return;
     }
 
@@ -88,7 +88,7 @@ export default function ChangePasswordPage() {
       <div className="settings-content">
         <form className="form-container" onSubmit={handleSubmit} style={{ borderRadius: '12px', marginTop: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
           <div className="form-group">
-            <label>Mật khẩu cũ (*)</label>
+            <label>Mật khẩu cũ (Bỏ qua nếu đăng nhập bằng Google)</label>
             <div className="input-wrapper">
               <input 
                 type={showOldPassword ? "text" : "password"} 

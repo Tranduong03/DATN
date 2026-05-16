@@ -39,7 +39,7 @@ export default function RegisterForm() {
         },
         body: JSON.stringify({
           email,
-          username: email, // Backend cần username, dùng email làm username tạm
+          username: email.split('@')[0] + Math.floor(1000 + Math.random() * 9000), // Randomize username
           password,
           fullName,
           phone
@@ -50,7 +50,7 @@ export default function RegisterForm() {
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        window.location.href = '/me';
+        navigate('/me');
       } else {
         setErrorMessage(data.message || 'Đăng ký thất bại. Vui lòng thử lại!');
       }

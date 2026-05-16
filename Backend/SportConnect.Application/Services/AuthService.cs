@@ -32,7 +32,17 @@ public class AuthService : IAuthService
         
         var user = users.FirstOrDefault();
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+        if (user == null)
+        {
+            throw new Exception("Invalid username/email or password.");
+        }
+
+        if (string.IsNullOrEmpty(user.PasswordHash))
+        {
+            throw new Exception("Vui lòng đăng nhập bằng Google hoặc thiết lập mật khẩu qua Quên mật khẩu.");
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
         {
             throw new Exception("Invalid username/email or password.");
         }
@@ -43,11 +53,11 @@ public class AuthService : IAuthService
     public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
         var existingUsers = await _unitOfWork.Repository<User>().FindAsync(u => 
-            u.Username == registerDto.Username || u.Email == registerDto.Email);
+            u.Username == registerDto.Username || u.Email == registerDto.Email || (u.Phone != null && u.Phone == registerDto.Phone));
             
         if (existingUsers.Any())
         {
-            throw new Exception("Username or Email already exists.");
+            throw new Exception("Username, Email hoặc Số điện thoại đã tồn tại.");
         }
 
         var user = new User
@@ -97,6 +107,7 @@ public class AuthService : IAuthService
         var email = payload.GetProperty("email").GetString();
         var name = payload.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
         var picture = payload.TryGetProperty("picture", out var picProp) ? picProp.GetString() : string.Empty;
+        var googleId = payload.TryGetProperty("sub", out var subProp) ? subProp.GetString() : string.Empty;
 
         if (string.IsNullOrEmpty(email))
         {
@@ -112,7 +123,8 @@ public class AuthService : IAuthService
             {
                 Username = email.Split('@')[0] + Guid.NewGuid().ToString().Substring(0, 4),
                 Email = email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Random password
+                PasswordHash = null,
+                GoogleId = googleId,
                 FullName = name,
                 AvatarUrl = picture,
                 Status = true
@@ -135,6 +147,16 @@ public class AuthService : IAuthService
 
             await _unitOfWork.CompleteAsync();
         }
+        else
+        {
+            // If user already exists but has no googleId, link the account
+            if (string.IsNullOrEmpty(user.GoogleId))
+            {
+                user.GoogleId = googleId;
+                _unitOfWork.Repository<User>().Update(user);
+                await _unitOfWork.CompleteAsync();
+            }
+        }
 
         return GenerateJwtToken(user);
     }
@@ -147,9 +169,13 @@ public class AuthService : IAuthService
             throw new Exception("User not found.");
         }
 
-        if (!BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, user.PasswordHash))
+        // If user does not have a password (e.g. Google Login only), allow them to set one without OldPassword
+        if (!string.IsNullOrEmpty(user.PasswordHash))
         {
-            throw new Exception("Mật khẩu cũ không chính xác.");
+            if (string.IsNullOrEmpty(changePasswordDto.OldPassword) || !BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, user.PasswordHash))
+            {
+                throw new Exception("Mật khẩu cũ không chính xác.");
+            }
         }
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
@@ -174,12 +200,7 @@ public class AuthService : IAuthService
         // Generate a random 8-character password
         var newPassword = GenerateRandomPassword(8);
 
-        // Update database
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-        _unitOfWork.Repository<User>().Update(user);
-        await _unitOfWork.CompleteAsync();
-
-        // Send email
+        // Send email FIRST
         string subject = "Cấp lại mật khẩu - SportConnect";
         string body = $@"
             <h3>Xin chào {user.FullName ?? user.Username},</h3>
@@ -189,6 +210,11 @@ public class AuthService : IAuthService
             <p>Trân trọng,<br>Đội ngũ SportConnect</p>";
 
         await _emailService.SendEmailAsync(user.Email, subject, body);
+
+        // Update database only if email succeeds
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
 
         return true;
     }

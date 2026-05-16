@@ -36,6 +36,11 @@ export default function MePage() {
 
     try {
       const decoded = jwtDecode<JwtPayload>(token);
+      
+      if (decoded.exp * 1000 < Date.now()) {
+        throw new Error('Token expired');
+      }
+
       let name = decoded.FullName || decoded.unique_name || 'Người dùng';
       let email = decoded.email || 'Chưa cập nhật email';
       let avatar = decoded.AvatarUrl;

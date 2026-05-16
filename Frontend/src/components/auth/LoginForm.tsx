@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 
 export default function LoginForm() {
@@ -12,6 +12,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -40,8 +41,7 @@ export default function LoginForm() {
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        // Có thể navigate sang trang chủ, tạm thời reload lại trang
-        window.location.href = '/me'; 
+        navigate('/me');
       } else {
         setErrorMessage(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
       }
