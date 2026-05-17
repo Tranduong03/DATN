@@ -8,6 +8,7 @@ using SportConnect.Infrastructure.Services;
 using SportConnect.Infrastructure.Persistence.Repositories;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using SportConnect.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,15 +87,38 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// CORS — cho phép Frontend gọi API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+        policy
+            .WithOrigins(
+                "http://localhost:5173",   // Vite dev server
+                "http://localhost:3000",   // CRA dev server (dự phòng)
+                "https://sportconnect.vercel.app" // Production domain (cập nhật sau)
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
+
 // ==================== BUILD ====================
 var app = builder.Build();
 
 // ==================== MIDDLEWARE ====================
+
+// 1. Global Exception Handler — phải là ĐẦUTIÊN để bắt tất cả exception
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+// 2. Swagger (chỉ development)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// 3. CORS — phải trước Authentication
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 app.UseAuthentication(); // ← phải trước UseAuthorization
