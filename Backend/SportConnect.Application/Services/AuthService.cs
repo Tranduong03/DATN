@@ -235,7 +235,7 @@ public class AuthService : IAuthService
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
@@ -243,6 +243,18 @@ public class AuthService : IAuthService
             new Claim("FullName", user.FullName ?? ""),
             new Claim("AvatarUrl", user.AvatarUrl ?? "")
         };
+
+        // Nhúng roles vào JWT để [Authorize(Roles = "Admin")] hoạt động
+        if (user.UserRoles != null)
+        {
+            foreach (var userRole in user.UserRoles)
+            {
+                if (userRole.Role != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, userRole.Role.RoleName));
+                }
+            }
+        }
 
         var token = new JwtSecurityToken(
             issuer: jwtSettings["Issuer"],

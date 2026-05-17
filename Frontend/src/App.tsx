@@ -9,6 +9,9 @@ import SettingsPage from './pages/profile/SettingsPage';
 import ChangePasswordPage from './pages/profile/ChangePasswordPage';
 import OwnerOnboardingFlow from './pages/owner/OwnerOnboardingFlow';
 import OwnerView from './pages/owner/OwnerView';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminOwnerRequestsPage from './pages/admin/AdminOwnerRequestsPage';
 
 function App() {
   return (
@@ -24,6 +27,10 @@ function App() {
         <Route path="/settings/change-password" element={<ChangePasswordPage />} />
         <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
         <Route path="/owner" element={<OwnerView />} />
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin/users" element={<AdminUsersPage />} />
+        <Route path="/admin/owner-requests" element={<AdminOwnerRequestsPage />} />
       </Routes>
     </BrowserRouter>
   );
