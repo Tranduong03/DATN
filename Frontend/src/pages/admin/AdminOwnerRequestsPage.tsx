@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import AdminLayout from './AdminLayout';
-import { adminService } from '../../services/adminService';
+import { useOwnerRequests, useOwnerRequestDetail } from '../../hooks/queries/useAdminQueries';
+import { useApproveOwnerRequest, useRejectOwnerRequest } from '../../hooks/mutations/useAdminMutations';
 
 interface OwnerRequest {
   userId: string;
@@ -57,100 +58,73 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function AdminOwnerRequestsPage() {
-  const [requests, setRequests] = useState<OwnerRequest[]>([]);
   const [statusFilter, setStatusFilter] = useState('Pending');
-  const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<OwnerRequestDetail | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [detailTab, setDetailTab] = useState<'user' | 'venue'>('user');
+
+  const { data: requestsData, isLoading: loading } = useOwnerRequests(statusFilter);
+  const requests: any[] = requestsData || [];
+  const { data: selectedUserData, isLoading: detailLoading } = useOwnerRequestDetail(selectedUserId);
+  const selectedUser: any = selectedUserData;
+  
+  const approveMutation = useApproveOwnerRequest();
+  const rejectMutation = useRejectOwnerRequest();
+
+  const actionLoading = approveMutation.isPending || rejectMutation.isPending;
 
   const showToast = (type: 'success' | 'error', msg: string) => {
     setToast({ type, msg });
     setTimeout(() => setToast(null), 4000);
   };
 
-  const fetchRequests = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = statusFilter !== 'All' ? `?status=${statusFilter}` : '';
-      const json: any = await adminService.getOwnerRequests(params);
-      if (json.isSuccess) setRequests(json.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter]);
-
-  useEffect(() => {
-    fetchRequests();
-  }, [fetchRequests]);
-
-  const openDetail = async (userId: string) => {
+  const openDetail = (userId: string) => {
+    setSelectedUserId(userId);
     setModalOpen(true);
-    setDetailLoading(true);
     setDetailTab('user');
-    try {
-      const json: any = await adminService.getOwnerRequestDetail(userId);
-      if (json.isSuccess) setSelectedUser(json.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setDetailLoading(false);
-    }
   };
 
   const closeModal = () => {
     setModalOpen(false);
-    setSelectedUser(null);
+    setSelectedUserId('');
     setRejectModalOpen(false);
     setRejectReason('');
   };
 
   const handleApprove = async (userId: string) => {
     if (!window.confirm('Bạn có chắc muốn phê duyệt yêu cầu này? Người dùng sẽ được cấp quyền Owner.')) return;
-    setActionLoading(true);
     try {
-      const json: any = await adminService.approveOwnerRequest(userId);
-      if (json.isSuccess) {
+      const res: any = await approveMutation.mutateAsync(userId);
+      if (res.isSuccess) {
         showToast('success', '✅ Đã phê duyệt thành công!');
         closeModal();
-        fetchRequests();
       } else {
-        showToast('error', json.message || 'Có lỗi xảy ra.');
+        showToast('error', res.message || 'Có lỗi xảy ra.');
       }
     } catch {
       showToast('error', 'Lỗi kết nối server.');
-    } finally {
-      setActionLoading(false);
     }
   };
 
   const handleRejectSubmit = async () => {
-    if (!selectedUser) return;
+    if (!selectedUserId) return;
     if (!rejectReason.trim()) {
       showToast('error', 'Vui lòng nhập lý do từ chối.');
       return;
     }
-    setActionLoading(true);
     try {
-      const json: any = await adminService.rejectOwnerRequest(selectedUser.userId, rejectReason);
-      if (json.isSuccess) {
+      const res: any = await rejectMutation.mutateAsync({ userId: selectedUserId, reason: rejectReason });
+      if (res.isSuccess) {
         showToast('success', '🚫 Đã từ chối yêu cầu.');
         closeModal();
-        fetchRequests();
       } else {
-        showToast('error', json.message || 'Có lỗi xảy ra.');
+        showToast('error', res.message || 'Có lỗi xảy ra.');
       }
     } catch {
       showToast('error', 'Lỗi kết nối server.');
-    } finally {
-      setActionLoading(false);
     }
   };
 
@@ -403,7 +377,7 @@ export default function AdminOwnerRequestsPage() {
                         <div className="admin-detail-item admin-detail-item--full">
                           <span className="admin-detail-label">Ảnh sân ({selectedUser.venueImages.length})</span>
                           <div className="admin-venue-images">
-                            {selectedUser.venueImages.map((url, i) => (
+                            {selectedUser.venueImages.map((url: string, i: number) => (
                               <img key={i} src={url} alt={`Ảnh sân ${i + 1}`} className="admin-venue-img" />
                             ))}
                           </div>

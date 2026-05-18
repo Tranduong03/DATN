@@ -1,33 +1,10 @@
-import { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
-import { adminService } from '../../services/adminService';
-
-interface Stats {
-  totalUsers: number;
-  pendingRequests: number;
-  verifiedOwners: number;
-  rejectedRequests: number;
-}
+import { useAdminStats } from '../../hooks/queries/useAdminQueries';
 
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState<Stats>({ totalUsers: 0, pendingRequests: 0, verifiedOwners: 0, rejectedRequests: 0 });
-  const [loading, setLoading] = useState(true);
+  const { data: statsData, isLoading: loading } = useAdminStats();
 
-  useEffect(() => {
-    Promise.all([
-      adminService.getUsers('page=1&pageSize=1'),
-      adminService.getOwnerRequests()
-    ]).then(([usersRes, requestsRes]: [any, any]) => {
-      const totalUsers = usersRes?.data?.totalCount ?? 0;
-      const allRequests: any[] = requestsRes?.data ?? [];
-      setStats({
-        totalUsers,
-        pendingRequests: allRequests.filter((r: any) => r.verificationStatus === 'Pending').length,
-        verifiedOwners: allRequests.filter((r: any) => r.verificationStatus === 'Verified').length,
-        rejectedRequests: allRequests.filter((r: any) => r.verificationStatus === 'Rejected').length,
-      });
-    }).catch(console.error).finally(() => setLoading(false));
-  }, []);
+  const stats = statsData || { totalUsers: 0, pendingRequests: 0, verifiedOwners: 0, rejectedRequests: 0 };
 
   const statCards = [
     {

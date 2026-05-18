@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import AdminLayout from './AdminLayout';
-import { adminService } from '../../services/adminService';
+import { useAdminUsers } from '../../hooks/queries/useAdminQueries';
 
 interface User {
   id: string;
@@ -23,40 +23,15 @@ const ROLE_BADGE: Record<string, string> = {
 };
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(true);
 
-  const pageSize = 15;
+  const { data, isLoading: loading } = useAdminUsers(page, search);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        pageSize: pageSize.toString(),
-        ...(search ? { search } : {}),
-      });
-      const json: any = await adminService.getUsers(params.toString());
-      if (json.isSuccess) {
-        setUsers(json.data.items);
-        setTotalPages(json.data.totalPages);
-        setTotalCount(json.data.totalCount);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const users: any[] = data?.items || [];
+  const totalPages = data?.totalPages || 1;
+  const totalCount = data?.totalCount || 0;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,7 +137,7 @@ export default function AdminUsersPage() {
                   <td className="admin-cell-secondary">{user.phone || '—'}</td>
                   <td>
                     <div className="admin-badges">
-                      {user.roles.length > 0 ? user.roles.map(role => (
+                      {user.roles.length > 0 ? user.roles.map((role: string) => (
                         <span key={role} className={`admin-badge ${ROLE_BADGE[role] || 'badge-slate'}`}>{role}</span>
                       )) : <span className="admin-badge badge-slate">—</span>}
                     </div>

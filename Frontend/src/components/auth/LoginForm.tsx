@@ -3,7 +3,7 @@ import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
-import { authService } from '../../services/authService';
+import { useLogin } from '../../hooks/mutations/useAuthMutations';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
@@ -11,9 +11,11 @@ export default function LoginForm() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+
+  const loginMutation = useLogin();
+  const isLoading = loginMutation.isPending;
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,9 +27,8 @@ export default function LoginForm() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const data: any = await authService.login({
+      const data: any = await loginMutation.mutateAsync({
         usernameOrEmail,
         password
       });
@@ -36,8 +37,6 @@ export default function LoginForm() {
       navigate('/me');
     } catch (err: any) {
       setErrorMessage(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
-    } finally {
-      setIsLoading(false);
     }
   };
 
