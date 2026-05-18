@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# SportConnect - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SportConnect is a modern web application designed to seamlessly connect sports enthusiasts with sports venues. This frontend repository is built with performance, modern aesthetics, and excellent developer experience in mind.
 
-Currently, two official plugins are available:
+## 🚀 Technologies
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+*   **Framework:** React 19
+*   **Language:** TypeScript
+*   **Build Tool:** Vite
+*   **Routing:** React Router v7
+*   **Data Fetching & State Management:** TanStack Query (React Query) & Axios
+*   **Authentication:** JWT (JSON Web Tokens) & Google OAuth
+*   **Styling:** Vanilla CSS (Modern, vibrant, dynamic design system)
+*   **Icons:** Lucide React
 
-## React Compiler
+## 📂 Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+src/
+├── api/          # Axios client configuration with interceptors
+├── assets/       # Static assets (images, fonts, icons)
+├── components/   # Reusable UI components (buttons, forms, layouts)
+├── hooks/        # Custom React hooks (TanStack Query hooks, etc.)
+├── pages/        # Page components corresponding to routes (Admin, Auth, Owner, etc.)
+├── services/     # API service layers
+├── App.tsx       # Main application routing
+├── main.tsx      # Application entry point and providers
+└── index.css     # Global styles and design tokens
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+*   Node.js (v18 or higher)
+*   npm or yarn
+
+### Installation
+
+1.  Clone the repository and navigate to the frontend directory.
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Set up environment variables:
+    Create a `.env` file in the root directory and add necessary variables (e.g., `VITE_GOOGLE_CLIENT_ID`).
+
+4.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+
+### Building for Production
+
+To create a production build:
+```bash
+npm run build
 ```
+
+## 🎨 Design Philosophy
+
+The UI is built focusing on a **Premium & Dynamic Aesthetic**:
+*   Rich, vibrant color palettes tailored for sports and activity.
+*   Glassmorphism effects, smooth gradients, and deep shadows.
+*   Subtle micro-animations to enhance user engagement.
+*   Fully responsive layout optimized for mobile (PWA-ready) and desktop.
