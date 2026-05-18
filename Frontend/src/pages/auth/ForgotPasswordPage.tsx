@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { ChevronLeft, X, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
+import { authService } from '../../services/authService';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -23,25 +24,12 @@ export default function ForgotPasswordPage() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/Auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message || 'Mật khẩu mới đã được gửi vào email của bạn.');
-        // Optionally navigate back to login after a few seconds
-        setTimeout(() => navigate('/login'), 3000);
-      } else {
-        setError(data.message || 'Có lỗi xảy ra. Vui lòng thử lại!');
-      }
-    } catch {
-      setError('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+      const data: any = await authService.forgotPassword(email);
+      setMessage(data.message || 'Mật khẩu mới đã được gửi vào email của bạn.');
+      // Optionally navigate back to login after a few seconds
+      setTimeout(() => navigate('/login'), 3000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại!');
     } finally {
       setIsLoading(false);
     }

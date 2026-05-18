@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { ChevronLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../../services/authService';
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -40,36 +41,19 @@ export default function ChangePasswordPage() {
 
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/Auth/change-password', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          oldPassword,
-          newPassword
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccessMessage(data.message || 'Đổi mật khẩu thành công!');
-        setOldPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        
-        // Return to settings after 2 seconds
-        setTimeout(() => {
-          navigate(-1);
-        }, 2000);
-      } else {
-        setErrorMessage(data.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại!');
-      }
-    } catch {
-      setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+      const data: any = await authService.changePassword({ oldPassword, newPassword });
+      
+      setSuccessMessage(data.message || 'Đổi mật khẩu thành công!');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      
+      // Return to settings after 2 seconds
+      setTimeout(() => {
+        navigate(-1);
+      }, 2000);
+    } catch (err: any) {
+      setErrorMessage(err.response?.data?.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại!');
     } finally {
       setIsLoading(false);
     }

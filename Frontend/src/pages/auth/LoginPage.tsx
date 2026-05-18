@@ -4,6 +4,7 @@ import LoginForm from '../../components/auth/LoginForm';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
+import { authService } from '../../services/authService';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,24 +15,11 @@ export default function LoginPage() {
     onSuccess: async (tokenResponse) => {
       setIsGoogleLoading(true);
       try {
-        const response = await fetch('/api/Auth/google-login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token: tokenResponse.access_token }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem('token', data.token);
-          navigate('/me'); // Navigate to account or home
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message || 'Google login failed');
-        }
-      } catch (err) {
-        setError('Network error. Please try again.');
+        const data: any = await authService.googleLogin(tokenResponse.access_token);
+        localStorage.setItem('token', data.token);
+        navigate('/me'); // Navigate to account or home
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Network error. Please try again.');
       } finally {
         setIsGoogleLoading(false);
       }

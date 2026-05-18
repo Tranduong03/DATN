@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
+import { authService } from '../../services/authService';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
@@ -32,30 +33,18 @@ export default function RegisterForm() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/Auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          username: email.split('@')[0] + Math.floor(1000 + Math.random() * 9000), // Randomize username
-          password,
-          fullName,
-          phone
-        }),
+      const data: any = await authService.register({
+        email,
+        username: email.split('@')[0] + Math.floor(1000 + Math.random() * 9000), // Randomize username
+        password,
+        fullName,
+        phone
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        navigate('/me');
-      } else {
-        setErrorMessage(data.message || 'Đăng ký thất bại. Vui lòng thử lại!');
-      }
-    } catch {
-      setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+      localStorage.setItem('token', data.token);
+      navigate('/me');
+    } catch (err: any) {
+      setErrorMessage(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại!');
     } finally {
       setIsLoading(false);
     }

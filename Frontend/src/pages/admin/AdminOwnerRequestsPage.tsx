@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import AdminLayout from './AdminLayout';
-
-const API_BASE = 'https://localhost:7034/api';
+import { adminService } from '../../services/adminService';
 
 interface OwnerRequest {
   userId: string;
@@ -78,12 +77,8 @@ export default function AdminOwnerRequestsPage() {
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const params = statusFilter !== 'All' ? `?status=${statusFilter}` : '';
-      const res = await fetch(`${API_BASE}/admin/owner-requests${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
+      const json: any = await adminService.getOwnerRequests(params);
       if (json.isSuccess) setRequests(json.data);
     } catch (err) {
       console.error(err);
@@ -101,11 +96,7 @@ export default function AdminOwnerRequestsPage() {
     setDetailLoading(true);
     setDetailTab('user');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE}/admin/owner-requests/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
+      const json: any = await adminService.getOwnerRequestDetail(userId);
       if (json.isSuccess) setSelectedUser(json.data);
     } catch (err) {
       console.error(err);
@@ -125,12 +116,7 @@ export default function AdminOwnerRequestsPage() {
     if (!window.confirm('Bạn có chắc muốn phê duyệt yêu cầu này? Người dùng sẽ được cấp quyền Owner.')) return;
     setActionLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE}/admin/owner-requests/${userId}/approve`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
+      const json: any = await adminService.approveOwnerRequest(userId);
       if (json.isSuccess) {
         showToast('success', '✅ Đã phê duyệt thành công!');
         closeModal();
@@ -153,13 +139,7 @@ export default function AdminOwnerRequestsPage() {
     }
     setActionLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE}/admin/owner-requests/${selectedUser.userId}/reject`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: rejectReason }),
-      });
-      const json = await res.json();
+      const json: any = await adminService.rejectOwnerRequest(selectedUser.userId, rejectReason);
       if (json.isSuccess) {
         showToast('success', '🚫 Đã từ chối yêu cầu.');
         closeModal();

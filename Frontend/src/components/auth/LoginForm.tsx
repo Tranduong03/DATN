@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
+import { authService } from '../../services/authService';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
@@ -26,27 +27,15 @@ export default function LoginForm() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/Auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          usernameOrEmail,
-          password
-        }),
+      const data: any = await authService.login({
+        usernameOrEmail,
+        password
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        navigate('/me');
-      } else {
-        setErrorMessage(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
-      }
-    } catch {
-      setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+      localStorage.setItem('token', data.token);
+      navigate('/me');
+    } catch (err: any) {
+      setErrorMessage(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');
     } finally {
       setIsLoading(false);
     }

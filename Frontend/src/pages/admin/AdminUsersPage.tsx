@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import AdminLayout from './AdminLayout';
-
-const API_BASE = 'https://localhost:7034/api';
+import { adminService } from '../../services/adminService';
 
 interface User {
   id: string;
@@ -37,16 +36,12 @@ export default function AdminUsersPage() {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const params = new URLSearchParams({
         page: page.toString(),
         pageSize: pageSize.toString(),
         ...(search ? { search } : {}),
       });
-      const res = await fetch(`${API_BASE}/admin/users?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
+      const json: any = await adminService.getUsers(params.toString());
       if (json.isSuccess) {
         setUsers(json.data.items);
         setTotalPages(json.data.totalPages);

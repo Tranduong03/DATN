@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
-
-const API_BASE = 'https://localhost:7034/api';
+import { adminService } from '../../services/adminService';
 
 interface Stats {
   totalUsers: number;
@@ -15,13 +14,10 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     Promise.all([
-      fetch(`${API_BASE}/admin/users?page=1&pageSize=1`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json()),
-      fetch(`${API_BASE}/admin/owner-requests`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json()),
-    ]).then(([usersRes, requestsRes]) => {
+      adminService.getUsers('page=1&pageSize=1'),
+      adminService.getOwnerRequests()
+    ]).then(([usersRes, requestsRes]: [any, any]) => {
       const totalUsers = usersRes?.data?.totalCount ?? 0;
       const allRequests: any[] = requestsRes?.data ?? [];
       setStats({

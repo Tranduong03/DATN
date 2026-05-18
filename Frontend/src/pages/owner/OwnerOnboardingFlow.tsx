@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Trophy, Wifi, TrendingUp, Users, CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
+import { ownerService } from '../../services/ownerService';
 
-const API_BASE_URL = '/api';
 
 /* ─── tiny inline style helpers ─── */
 const card: React.CSSProperties = {
@@ -76,7 +76,7 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
 export default function OwnerOnboardingFlow() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<number | null>(null);
-  const [verificationStatus, setVerificationStatus] = useState<string>('None');
+
   const [rejectReason, setRejectReason] = useState<string>('');
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(true);
@@ -85,16 +85,10 @@ export default function OwnerOnboardingFlow() {
 
   const fetchStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) { navigate('/account'); return; }
-      const res = await fetch(`${API_BASE_URL}/OwnerOnboarding/status`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) { setCurrentStep(1); return; }
-      const data = await res.json();
+      const data: any = await ownerService.getOnboardingStatus();
       if (data.isSuccess) {
         const { verificationStatus: vs, currentStep: cs, draftData, rejectReason: rr } = data.data;
-        setVerificationStatus(vs);
+
         setRejectReason(rr || '');
         if (draftData) { try { setFormData(JSON.parse(draftData)); } catch (_) {} }
         if (vs === 'Pending') setCurrentStep(7);
@@ -108,25 +102,14 @@ export default function OwnerOnboardingFlow() {
 
   const saveDraft = async (step: number, data: any) => {
     try {
-      const token = localStorage.getItem('token');
-      await fetch(`${API_BASE_URL}/OwnerOnboarding/save-draft`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ step, draftData: JSON.stringify(data) }),
-      });
+      await ownerService.saveDraft({ step, draftData: JSON.stringify(data) });
     } catch (e) { console.error(e); }
   };
 
   const submitOnboarding = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE_URL}/OwnerOnboarding/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ step: 7, draftData: JSON.stringify(formData) }),
-      });
-      const data = await res.json();
+      const data: any = await ownerService.submitOnboarding({ step: 7, draftData: JSON.stringify(formData) });
       if (data.isSuccess) setCurrentStep(7);
       else alert(data.message || 'Có lỗi xảy ra');
     } catch (e) { console.error(e); }
