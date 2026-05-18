@@ -4,24 +4,23 @@ import LoginForm from '../../components/auth/LoginForm';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
-import { authService } from '../../services/authService';
+import { useGoogleAuth } from '../../hooks/mutations/useAuthMutations';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  
+  const googleAuthMutation = useGoogleAuth();
+  const isGoogleLoading = googleAuthMutation.isPending;
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      setIsGoogleLoading(true);
       try {
-        const data: any = await authService.googleLogin(tokenResponse.access_token);
+        const data: any = await googleAuthMutation.mutateAsync(tokenResponse.access_token);
         localStorage.setItem('token', data.token);
         navigate('/me'); // Navigate to account or home
       } catch (err: any) {
         setError(err.response?.data?.message || 'Network error. Please try again.');
-      } finally {
-        setIsGoogleLoading(false);
       }
     },
     onError: () => {

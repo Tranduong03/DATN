@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { ChevronLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../../services/authService';
+import { useChangePassword } from '../../hooks/mutations/useAuthMutations';
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -15,9 +15,11 @@ export default function ChangePasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  const changeMutation = useChangePassword();
+  const isLoading = changeMutation.isPending;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,9 +41,8 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const data: any = await authService.changePassword({ oldPassword, newPassword });
+      const data: any = await changeMutation.mutateAsync({ oldPassword, newPassword });
       
       setSuccessMessage(data.message || 'Đổi mật khẩu thành công!');
       setOldPassword('');
@@ -54,8 +55,6 @@ export default function ChangePasswordPage() {
       }, 2000);
     } catch (err: any) {
       setErrorMessage(err.response?.data?.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại!');
-    } finally {
-      setIsLoading(false);
     }
   };
 

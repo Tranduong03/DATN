@@ -3,14 +3,16 @@ import type { FormEvent } from 'react';
 import { ChevronLeft, X, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
-import { authService } from '../../services/authService';
+import { useForgotPassword } from '../../hooks/mutations/useAuthMutations';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  const forgotMutation = useForgotPassword();
+  const isLoading = forgotMutation.isPending;
 
   const handleForgotPassword = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,16 +24,13 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const data: any = await authService.forgotPassword(email);
+      const data: any = await forgotMutation.mutateAsync(email);
       setMessage(data.message || 'Mật khẩu mới đã được gửi vào email của bạn.');
       // Optionally navigate back to login after a few seconds
       setTimeout(() => navigate('/login'), 3000);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại!');
-    } finally {
-      setIsLoading(false);
     }
   };
 

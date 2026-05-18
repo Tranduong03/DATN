@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Trophy, Wifi, TrendingUp, Users, CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
-import { ownerService } from '../../services/ownerService';
-
+import { useOnboardingStatus } from '../../hooks/queries/useOwnerQueries';
+import { useSaveDraft, useSubmitOnboarding } from '../../hooks/mutations/useOwnerMutations';
 
 /* ─── tiny inline style helpers ─── */
 const card: React.CSSProperties = {
@@ -79,42 +79,42 @@ export default function OwnerOnboardingFlow() {
 
   const [rejectReason, setRejectReason] = useState<string>('');
   const [formData, setFormData] = useState<any>({});
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchStatus(); }, []);
+  const { data: statusData, isLoading: loadingStatus } = useOnboardingStatus();
+  const saveDraftMutation = useSaveDraft();
+  const submitMutation = useSubmitOnboarding();
 
-  const fetchStatus = async () => {
-    try {
-      const data: any = await ownerService.getOnboardingStatus();
-      if (data.isSuccess) {
-        const { verificationStatus: vs, currentStep: cs, draftData, rejectReason: rr } = data.data;
-
-        setRejectReason(rr || '');
-        if (draftData) { try { setFormData(JSON.parse(draftData)); } catch (_) {} }
-        if (vs === 'Pending') setCurrentStep(7);
-        else if (vs === 'Verified') navigate('/owner');
-        else if (vs === 'Rejected') setCurrentStep(8);
-        else setCurrentStep(cs || 1);
-      } else setCurrentStep(1);
-    } catch (e) { console.error(e); setCurrentStep(1); }
-    finally { setLoading(false); }
-  };
+  useEffect(() => {
+    if (statusData && currentStep === null) {
+      const { verificationStatus: vs, currentStep: cs, draftData, rejectReason: rr } = statusData;
+      setRejectReason(rr || '');
+      if (draftData) { try { setFormData(JSON.parse(draftData)); } catch (_) {} }
+      if (vs === 'Pending') setCurrentStep(7);
+      else if (vs === 'Verified') navigate('/owner');
+      else if (vs === 'Rejected') setCurrentStep(8);
+      else setCurrentStep(cs || 1);
+    } else if (statusData === undefined && !loadingStatus && currentStep === null) {
+      setCurrentStep(1);
+    }
+  }, [statusData, loadingStatus, currentStep, navigate]);
 
   const saveDraft = async (step: number, data: any) => {
     try {
-      await ownerService.saveDraft({ step, draftData: JSON.stringify(data) });
+      await saveDraftMutation.mutateAsync({ step, draftData: JSON.stringify(data) });
     } catch (e) { console.error(e); }
   };
 
   const submitOnboarding = async () => {
-    setLoading(true);
     try {
-      const data: any = await ownerService.submitOnboarding({ step: 7, draftData: JSON.stringify(formData) });
+      const data: any = await submitMutation.mutateAsync({ step: 7, draftData: JSON.stringify(formData) });
       if (data.isSuccess) setCurrentStep(7);
       else alert(data.message || 'Có lỗi xảy ra');
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    } catch (e: any) { 
+      alert(e.response?.data?.message || 'Có lỗi xảy ra'); 
+    }
   };
+
+  const loading = loadingStatus || submitMutation.isPending;
 
   const handleNext = (nextStep: number, newData: any) => {
     const merged = { ...formData, ...newData };

@@ -13,7 +13,7 @@ export const useRegister = () => {
   });
 };
 
-export const useGoogleLogin = () => {
+export const useGoogleAuth = () => {
   return useMutation({
     mutationFn: (token: string) => authService.googleLogin(token),
   });

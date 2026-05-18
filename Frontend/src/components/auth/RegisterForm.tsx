@@ -3,7 +3,7 @@ import type { FormEvent } from 'react';
 import { X, EyeOff, Eye, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
-import { authService } from '../../services/authService';
+import { useRegister } from '../../hooks/mutations/useAuthMutations';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
@@ -13,9 +13,11 @@ export default function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+
+  const registerMutation = useRegister();
+  const isLoading = registerMutation.isPending;
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
@@ -31,9 +33,8 @@ export default function RegisterForm() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const data: any = await authService.register({
+      const data: any = await registerMutation.mutateAsync({
         email,
         username: email.split('@')[0] + Math.floor(1000 + Math.random() * 9000), // Randomize username
         password,
@@ -45,8 +46,6 @@ export default function RegisterForm() {
       navigate('/me');
     } catch (err: any) {
       setErrorMessage(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại!');
-    } finally {
-      setIsLoading(false);
     }
   };
 
