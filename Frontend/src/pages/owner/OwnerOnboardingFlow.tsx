@@ -125,7 +125,7 @@ export default function OwnerOnboardingFlow() {
 
   const goBack = () => {
     if (!currentStep) return;
-    if (currentStep === 1 || currentStep >= 7) navigate('/settings');
+    if (currentStep === 1 || currentStep >= 7) navigate(-1);
     else if (currentStep === 4) setCurrentStep(3);
     else if (currentStep === 6) setCurrentStep(4);
     else setCurrentStep(currentStep - 1);
@@ -170,8 +170,8 @@ export default function OwnerOnboardingFlow() {
         {currentStep === 3 && <Step3 data={formData} onNext={(d) => handleNext(4, d)} />}
         {currentStep === 4 && <Step4 data={formData} onNext={(d) => handleNext(6, d)} />}
         {currentStep === 6 && <Step6 data={formData} onSubmit={submitOnboarding} />}
-        {currentStep === 7 && <StepPending onBack={() => navigate('/me')} />}
-        {currentStep === 8 && <StepRejected reason={rejectReason} onBack={() => navigate('/me')} />}
+        {currentStep === 7 && <StepPending onBack={() => navigate(-1)} />}
+        {currentStep === 8 && <StepRejected reason={rejectReason} onBack={() => navigate(-1)} />}
       </div>
     </div>
   );

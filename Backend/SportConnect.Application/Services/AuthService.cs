@@ -47,8 +47,53 @@ public class AuthService : IAuthService
             throw new Exception("Invalid username/email or password.");
         }
 
-        return GenerateJwtToken(user);
+        return await GenerateJwtTokenAsync(user);
     }
+
+    public async Task<string> AdminLoginAsync(LoginDto loginDto)
+    {
+        var users = await _unitOfWork.Repository<User>().FindAsync(u => 
+            u.Username == loginDto.UsernameOrEmail || u.Email == loginDto.UsernameOrEmail || u.Phone == loginDto.UsernameOrEmail);
+        
+        var user = users.FirstOrDefault();
+
+        if (user == null)
+        {
+            throw new Exception("Tài khoản hoặc mật khẩu không đúng.");
+        }
+
+        if (string.IsNullOrEmpty(user.PasswordHash))
+        {
+            throw new Exception("Tài khoản không có mật khẩu hợp lệ.");
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+        {
+            throw new Exception("Tài khoản hoặc mật khẩu không đúng.");
+        }
+
+        // Kiểm tra Role Admin
+        var userRoles = await _unitOfWork.Repository<UserRole>().FindAsync(ur => ur.UserId == user.Id);
+        user.UserRoles = userRoles.ToList();
+        
+        bool isAdmin = false;
+        foreach (var userRole in user.UserRoles)
+        {
+            userRole.Role = await _unitOfWork.Repository<Role>().GetByIdAsync(userRole.RoleId);
+            if (userRole.Role != null && userRole.Role.RoleName == AppRoles.Admin)
+            {
+                isAdmin = true;
+            }
+        }
+
+        if (!isAdmin)
+        {
+            throw new Exception("Bạn không có quyền truy cập trang quản trị.");
+        }
+
+        return await GenerateJwtTokenAsync(user);
+    }
+
 
     public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
@@ -87,7 +132,7 @@ public class AuthService : IAuthService
 
         await _unitOfWork.CompleteAsync();
 
-        return GenerateJwtToken(user);
+        return await GenerateJwtTokenAsync(user);
     }
 
     public async Task<string> GoogleLoginAsync(GoogleLoginDto googleLoginDto)
@@ -158,7 +203,7 @@ public class AuthService : IAuthService
             }
         }
 
-        return GenerateJwtToken(user);
+        return await GenerateJwtTokenAsync(user);
     }
 
     public async Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordDto changePasswordDto)
@@ -227,7 +272,7 @@ public class AuthService : IAuthService
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
-    private string GenerateJwtToken(User user)
+    private async Task<string> GenerateJwtTokenAsync(User user)
     {
         var jwtSettings = _config.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"];
@@ -244,15 +289,14 @@ public class AuthService : IAuthService
             new Claim("AvatarUrl", user.AvatarUrl ?? "")
         };
 
-        // Nhúng roles vào JWT để [Authorize(Roles = "Admin")] hoạt động
-        if (user.UserRoles != null)
+        // Fetch user roles
+        var userRoles = await _unitOfWork.Repository<UserRole>().FindAsync(ur => ur.UserId == user.Id);
+        foreach (var userRole in userRoles)
         {
-            foreach (var userRole in user.UserRoles)
+            var role = await _unitOfWork.Repository<Role>().GetByIdAsync(userRole.RoleId);
+            if (role != null)
             {
-                if (userRole.Role != null)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, userRole.Role.RoleName));
-                }
+                claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
             }
         }
 
