@@ -188,17 +188,25 @@ public class BookingService : IBookingService
 
     public async Task<IEnumerable<BookingDto>> GetMyBookingsAsync(Guid userId)
     {
-        // Need to join Booking, Court, Venue. Currently, we can fetch all and map.
-        // For production, a specialized query in repository is better.
-        var bookings = await _unitOfWork.Repository<Booking>().FindAsync(b => b.BookerId == userId);
-        var result = new List<BookingDto>();
+        var bookings = (await _unitOfWork.Repository<Booking>().FindAsync(b => b.BookerId == userId))
+            .OrderByDescending(x => x.CreatedAt).ToList();
 
-        foreach(var b in bookings.OrderByDescending(x => x.CreatedAt))
+        if (!bookings.Any()) return new List<BookingDto>();
+
+        // Fix N+1: batch load courts and venues in 2 queries instead of 2*N
+        var courtIds = bookings.Select(b => b.CourtId).ToHashSet();
+        var courts = (await _unitOfWork.Repository<Court>().FindAsync(c => courtIds.Contains(c.Id)))
+            .ToDictionary(c => c.Id);
+
+        var venueIds = courts.Values.Select(c => c.VenueId).ToHashSet();
+        var venues = (await _unitOfWork.Repository<Venue>().FindAsync(v => venueIds.Contains(v.Id)))
+            .ToDictionary(v => v.Id);
+
+        return bookings.Select(b =>
         {
-            var court = await _unitOfWork.Repository<Court>().GetByIdAsync(b.CourtId);
-            var venue = court != null ? (await _unitOfWork.Repository<Venue>().GetByIdAsync(court.VenueId)) : null;
-
-            result.Add(new BookingDto
+            courts.TryGetValue(b.CourtId, out var court);
+            var venue = court != null && venues.TryGetValue(court.VenueId, out var v) ? v : null;
+            return new BookingDto
             {
                 Id = b.Id,
                 VenueId = venue?.Id ?? Guid.Empty,
@@ -210,9 +218,7 @@ public class BookingService : IBookingService
                 TotalPrice = b.TotalPrice,
                 Status = b.Status,
                 CreatedAt = b.CreatedAt
-            });
-        }
-
-        return result;
+            };
+        }).ToList();
     }
 }

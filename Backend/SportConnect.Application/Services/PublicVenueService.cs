@@ -19,22 +19,28 @@ public class PublicVenueService : IPublicVenueService
 
     public async Task<IEnumerable<PublicVenueDto>> GetActiveVenuesAsync(string? searchTerm = null)
     {
-        var allVenues = await _unitOfWork.Repository<Venue>().FindAsync(v => v.Status == "ACTIVE");
+        var allVenues = (await _unitOfWork.Repository<Venue>().FindAsync(v => v.Status == "ACTIVE")).ToList();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var lowerSearch = searchTerm.ToLower();
-            allVenues = allVenues.Where(v => v.Name.ToLower().Contains(lowerSearch) || v.Address.ToLower().Contains(lowerSearch));
+            allVenues = allVenues.Where(v =>
+                v.Name.ToLower().Contains(lowerSearch) ||
+                v.Address.ToLower().Contains(lowerSearch)).ToList();
         }
 
-        var result = new List<PublicVenueDto>();
+        if (!allVenues.Any()) return new List<PublicVenueDto>();
 
-        foreach (var venue in allVenues)
+        // Fix N+1: load ALL price rules for all venues in ONE query
+        var venueIds = allVenues.Select(v => v.Id).ToHashSet();
+        var allPriceRules = await _unitOfWork.Repository<PriceRule>().FindAsync(p => venueIds.Contains(p.VenueId));
+        var priceRulesByVenue = allPriceRules.GroupBy(p => p.VenueId).ToDictionary(g => g.Key, g => g.ToList());
+
+        return allVenues.Select(venue =>
         {
-            var priceRules = await _unitOfWork.Repository<PriceRule>().FindAsync(p => p.VenueId == venue.Id);
-            decimal minPrice = priceRules.Any() ? priceRules.Min(p => p.Price) : 0;
-
-            result.Add(new PublicVenueDto
+            var rules = priceRulesByVenue.GetValueOrDefault(venue.Id, new List<PriceRule>());
+            decimal minPrice = rules.Any() ? rules.Min(p => p.Price) : 0;
+            return new PublicVenueDto
             {
                 Id = venue.Id,
                 Name = venue.Name,
@@ -44,12 +50,10 @@ public class PublicVenueService : IPublicVenueService
                 OperatingEndHour = venue.OperatingEndHour.ToString(@"hh\:mm"),
                 VenueScale = venue.VenueScale,
                 MinPrice = minPrice,
-                Rating = 5.0, // Mock for now
-                Distance = "5km" // Mock for now
-            });
-        }
-
-        return result;
+                Rating = 5.0,
+                Distance = "5km"
+            };
+        }).ToList();
     }
 
     public async Task<PublicVenueDetailDto?> GetVenueDetailAsync(Guid venueId)

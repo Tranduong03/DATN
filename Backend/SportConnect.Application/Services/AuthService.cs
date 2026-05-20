@@ -289,14 +289,17 @@ public class AuthService : IAuthService
             new Claim("AvatarUrl", user.AvatarUrl ?? "")
         };
 
-        // Fetch user roles
-        var userRoles = await _unitOfWork.Repository<UserRole>().FindAsync(ur => ur.UserId == user.Id);
-        foreach (var userRole in userRoles)
+        // Fix N+1: load all roles in one query, then look up in memory
+        var userRoles = (await _unitOfWork.Repository<UserRole>().FindAsync(ur => ur.UserId == user.Id)).ToList();
+        if (userRoles.Any())
         {
-            var role = await _unitOfWork.Repository<Role>().GetByIdAsync(userRole.RoleId);
-            if (role != null)
+            var roleIds = userRoles.Select(ur => ur.RoleId).ToHashSet();
+            var roles = await _unitOfWork.Repository<Role>().FindAsync(r => roleIds.Contains(r.Id));
+            var rolesById = roles.ToDictionary(r => r.Id);
+            foreach (var userRole in userRoles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
+                if (rolesById.TryGetValue(userRole.RoleId, out var role))
+                    claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
             }
         }
 
