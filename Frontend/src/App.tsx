@@ -16,11 +16,14 @@ import VenueDetailPage from './pages/home/VenueDetailPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminOwnerRequestsPage from './pages/admin/AdminOwnerRequestsPage';
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminGuard from './pages/admin/AdminGuard';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/venue/:id" element={<VenueDetailPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -31,14 +34,22 @@ function App() {
         <Route path="/me/bookings" element={<MyBookingsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/settings/change-password" element={<ChangePasswordPage />} />
+
+        {/* Owner routes */}
         <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
         <Route path="/owner" element={<OwnerDashboardPage />} />
         <Route path="/owner/venues" element={<OwnerVenuesPage />} />
         <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
-        {/* Admin routes */}
-        <Route path="/admin" element={<AdminDashboardPage />} />
-        <Route path="/admin/users" element={<AdminUsersPage />} />
-        <Route path="/admin/owner-requests" element={<AdminOwnerRequestsPage />} />
+
+        {/* Admin login — public, không cần guard */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        {/* Admin routes — được bảo vệ bởi AdminGuard */}
+        <Route element={<AdminGuard />}>
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/owner-requests" element={<AdminOwnerRequestsPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

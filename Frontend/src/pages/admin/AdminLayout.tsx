@@ -46,8 +46,8 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem('adminToken');
+    navigate('/admin/login');
   };
 
   return (
