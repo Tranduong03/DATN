@@ -5,7 +5,7 @@ export const usePublicVenues = (search?: string) => {
   return useQuery({
     queryKey: ['publicVenues', search],
     queryFn: () => publicService.getVenues(search),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 2, // 2 phút
   });
 };
 

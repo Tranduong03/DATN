@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosClient from '../../api/axiosClient';
+import axiosClient from '../../api/axiosClient'; // Login không cần token, dùng regular client
 
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || 'trannguyenphiduong_6351071014';
 

@@ -9,8 +9,7 @@ export default function HomePage() {
   const [searchTerm] = useState(''); // We can use it later
   const navigate = useNavigate();
 
-  const { data: venuesData, isLoading } = usePublicVenues(searchTerm);
-  const venues = venuesData?.data || [];
+  const { data: venues = [], isLoading } = usePublicVenues(searchTerm);
 
   const quickFilters = ['Cầu lông gần tôi', 'Pickleball gần tôi', 'Xé vé gần tôi', 'Bóng đá gần tôi'];
   

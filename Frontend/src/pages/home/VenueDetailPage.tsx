@@ -16,11 +16,9 @@ export default function VenueDetailPage() {
   // { courtId: [startTime1, startTime2] }
   const [selectedSlots, setSelectedSlots] = useState<{ courtId: string, startTime: string, endTime: string, price: number } | null>(null);
 
-  const { data: venueData, isLoading: loadingVenue } = usePublicVenueDetail(venueId!);
-  const venue = venueData?.data;
+  const { data: venue, isLoading: loadingVenue } = usePublicVenueDetail(venueId!);
 
-  const { data: availabilityData, isLoading: loadingAvailability } = useVenueAvailability(venueId!, selectedDate);
-  const courtsAvailability = availabilityData?.data || [];
+  const { data: courtsAvailability = [], isLoading: loadingAvailability } = useVenueAvailability(venueId!, selectedDate);
 
   const createBookingMutation = useCreateBooking();
 
