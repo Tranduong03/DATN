@@ -268,25 +268,51 @@ export default function ProfilePage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) { navigate('/account'); return; }
+
+    // Kiểm tra token cũ có hợp lệ không trước
     try {
       const decoded = jwtDecode<JwtPayload>(token);
       if (decoded.exp * 1000 < Date.now()) throw new Error('expired');
-
-      const rawRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-      const roles = Array.isArray(rawRole) ? rawRole : rawRole ? [rawRole] : ['Default'];
-
-      setUser({
-        id: decoded.sub,
-        name: decoded.FullName || decoded.unique_name || 'Người dùng',
-        email: decoded.email || '',
-        username: decoded.unique_name || '',
-        avatar: decoded.AvatarUrl || '',
-        roles,
-      });
     } catch {
       localStorage.removeItem('token');
       navigate('/account');
+      return;
     }
+
+    // Luôn gọi refresh-token để lấy roles mới nhất từ DB
+    // (tránh tình huống token cũ không có role Owner sau khi admin duyệt)
+    fetch('/api/Auth/refresh-token', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(res => {
+        const freshToken = res.token || res.Token;
+        if (freshToken) {
+          localStorage.setItem('token', freshToken);
+          return freshToken;
+        }
+        return token; // Fallback: dùng token cũ
+      })
+      .catch(() => token) // Nếu network lỗi, dùng token cũ
+      .then(finalToken => {
+        try {
+          const decoded = jwtDecode<JwtPayload>(finalToken);
+          const rawRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+          const roles = Array.isArray(rawRole) ? rawRole : rawRole ? [rawRole] : ['Default'];
+          setUser({
+            id: decoded.sub,
+            name: decoded.FullName || decoded.unique_name || 'Người dùng',
+            email: decoded.email || '',
+            username: decoded.unique_name || '',
+            avatar: decoded.AvatarUrl || '',
+            roles,
+          });
+        } catch {
+          localStorage.removeItem('token');
+          navigate('/account');
+        }
+      });
   }, [navigate]);
 
   if (!user) return null;

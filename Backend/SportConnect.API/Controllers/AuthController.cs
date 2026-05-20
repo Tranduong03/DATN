@@ -94,9 +94,30 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult Me()
+    public async Task<IActionResult> Me()
     {
-        return Ok("Authorized");
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        // Trả về token mới với roles cập nhật từ DB
+        var newToken = await _authService.RefreshTokenAsync(userId);
+        return Ok(new { isSuccess = true, token = newToken });
+    }
+
+    /// <summary>
+    /// Cấp lại JWT với roles mới nhất từ DB (dùng sau khi admin duyệt owner)
+    /// </summary>
+    [Authorize]
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var newToken = await _authService.RefreshTokenAsync(userId);
+        return Ok(new { isSuccess = true, token = newToken });
     }
 
     [Authorize]

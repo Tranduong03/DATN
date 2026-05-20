@@ -28,9 +28,12 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     // Optionally handle global 401/403 errors here
-    if (error.response && error.response.status === 401) {
-      // localStorage.removeItem('token');
-      // window.location.href = '/login';
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.removeItem('token');
+      // Redirect to login only if not already on login page to prevent loops
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

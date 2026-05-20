@@ -272,6 +272,14 @@ public class AuthService : IAuthService
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
+    public async Task<string> RefreshTokenAsync(Guid userId)
+    {
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId);
+        if (user == null) throw new Exception("User not found.");
+        // GenerateJwtTokenAsync sẽ load roles mới nhất từ DB
+        return await GenerateJwtTokenAsync(user);
+    }
+
     private async Task<string> GenerateJwtTokenAsync(User user)
     {
         var jwtSettings = _config.GetSection("JwtSettings");

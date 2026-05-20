@@ -10,4 +10,5 @@ public interface IAuthService
   Task<string> GoogleLoginAsync(GoogleLoginDto googleLoginDto);
   Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordDto changePasswordDto);
   Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto);
+  Task<string> RefreshTokenAsync(Guid userId); // Cấp lại JWT với roles mới nhất từ DB
 }

@@ -20,6 +20,9 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminGuard from './pages/admin/AdminGuard';
 import ProfilePage from './pages/profile/ProfilePage';
 
+import AuthGuard from './pages/auth/AuthGuard';
+import OwnerGuard from './pages/owner/OwnerGuard';
+
 function App() {
   return (
     <BrowserRouter>
@@ -30,18 +33,24 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/account" element={<AccountPage />} />
-        <Route path="/me" element={<MePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/me/bookings" element={<MyBookingsPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/settings/change-password" element={<ChangePasswordPage />} />
 
-        {/* Owner routes */}
-        <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
-        <Route path="/owner" element={<OwnerDashboardPage />} />
-        <Route path="/owner/venues" element={<OwnerVenuesPage />} />
-        <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
+        {/* User Protected Routes */}
+        <Route element={<AuthGuard />}>
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/me" element={<MePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/me/bookings" element={<MyBookingsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/settings/change-password" element={<ChangePasswordPage />} />
+          <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
+        </Route>
+
+        {/* Owner Only Routes */}
+        <Route element={<OwnerGuard />}>
+          <Route path="/owner" element={<OwnerDashboardPage />} />
+          <Route path="/owner/venues" element={<OwnerVenuesPage />} />
+          <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
+        </Route>
 
         {/* Admin login — public, không cần guard */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
