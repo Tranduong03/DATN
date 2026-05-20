@@ -18,6 +18,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminOwnerRequestsPage from './pages/admin/AdminOwnerRequestsPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminGuard from './pages/admin/AdminGuard';
+import ProfilePage from './pages/profile/ProfilePage';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/me" element={<MePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/me/bookings" element={<MyBookingsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/settings/change-password" element={<ChangePasswordPage />} />

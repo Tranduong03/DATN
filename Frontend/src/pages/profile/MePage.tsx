@@ -64,7 +64,7 @@ export default function MePage() {
         <div className="me-header-bg"></div>
         
         <div className="me-content">
-          <div className="me-profile-card">
+          <Link to="/profile" className="me-profile-card" style={{ textDecoration: 'none' }}>
             <div className="me-avatar-container">
               <img src={userInfo.avatar} alt="Avatar" className="me-avatar" />
             </div>
@@ -73,7 +73,7 @@ export default function MePage() {
               <p className="me-email">{userInfo.email}</p>
             </div>
             <ChevronRight color="white" />
-          </div>
+          </Link>
 
           <div className="me-dashboard-box">
             <div className="me-membership">
