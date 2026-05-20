@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { Bell, Search, Heart, Share2, Star, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
+import { usePublicVenues } from '../../hooks/queries/usePublicQueries';
 
 export default function HomePage() {
   const [activeSport, setActiveSport] = useState('Pickleball');
+  const [searchTerm] = useState(''); // We can use it later
+  const navigate = useNavigate();
+
+  const { data: venuesData, isLoading } = usePublicVenues(searchTerm);
+  const venues = venuesData?.data || [];
 
   const quickFilters = ['Cầu lông gần tôi', 'Pickleball gần tôi', 'Xé vé gần tôi', 'Bóng đá gần tôi'];
   
   const sports = [
-    { name: 'Pickleball', color: '#4A90E2', icon: '🎾' }, // using emojis temporarily for variety, will style later
+    { name: 'Pickleball', color: '#4A90E2', icon: '🎾' },
     { name: 'Cầu lông', color: '#50E3C2', icon: '🏸' },
     { name: 'Bóng đá', color: '#7ED321', icon: '⚽' },
     { name: 'Tennis', color: '#F5A623', icon: '🥎' },
@@ -16,41 +23,9 @@ export default function HomePage() {
     { name: 'Bóng rổ', color: '#FF9500', icon: '🏀' },
   ];
 
-  const venues = [
-    {
-      id: 1,
-      name: 'Catchy Pickleball Club (Sân có mái che)',
-      distance: '6.7km',
-      address: 'Đối diện ngõ 136 phố Tân Khai, quận H...',
-      time: '05:00 - 24:00',
-      rating: 4.6,
-      tags: ['Đơn ngày', 'Sự kiện'],
-      logoColor: '#F5A623',
-      coverColor: '#A8DADC',
-    },
-    {
-      id: 2,
-      name: 'Family Pickleball',
-      distance: '92.1km',
-      address: 'Số 6/215 P Lê Lai, Máy Chai, Ngô Quy...',
-      time: '06:00 - 22:00',
-      rating: 0,
-      tags: ['Đơn ngày', 'Sự kiện'],
-      logoColor: '#1D3557',
-      coverColor: '#457B9D',
-    },
-    {
-      id: 3,
-      name: 'Hường Đỗ Central-418 Bà Triệu',
-      distance: '135.6km',
-      address: 'Đ. Bà Triệu/418 Phường Hạc Thành, tỉ...',
-      time: '05:00 - 22:00',
-      rating: 0,
-      tags: ['Đơn ngày', 'Sự kiện'],
-      logoColor: '#E63946',
-      coverColor: '#1A1A24',
-    }
-  ];
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
 
   return (
     <MainLayout>
@@ -117,26 +92,19 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Venue List */}
           <div className="venue-list">
-            {venues.map(venue => (
+            {isLoading ? (
+              <p>Đang tải danh sách sân...</p>
+            ) : venues.length === 0 ? (
+              <p>Không tìm thấy sân nào.</p>
+            ) : venues.map((venue: any) => (
               <div key={venue.id} className="venue-card">
-                <div className="venue-cover" style={{ backgroundColor: venue.coverColor }}>
+                <div className="venue-cover" style={{ backgroundColor: '#A8DADC' }}>
                   <div className="venue-badges">
-                    {venue.rating > 0 ? (
-                      <span className="badge badge-rating">
-                        <Star size={12} fill="#F5A623" color="#F5A623" /> {venue.rating}
-                      </span>
-                    ) : (
-                      <span className="badge badge-rating">
-                        <Star size={12} color="#999" />
-                      </span>
-                    )}
-                    {venue.tags.map((tag, idx) => (
-                      <span key={idx} className={`badge badge-${tag === 'Đơn ngày' ? 'green' : 'purple'}`}>
-                        {tag}
-                      </span>
-                    ))}
+                    <span className="badge badge-rating">
+                      <Star size={12} fill="#F5A623" color="#F5A623" /> {venue.rating}
+                    </span>
+                    <span className="badge badge-green">Từ {formatPrice(venue.minPrice)}/h</span>
                   </div>
                   <div className="venue-cover-actions">
                     <button className="action-btn"><Heart size={16} /></button>
@@ -145,17 +113,19 @@ export default function HomePage() {
                 </div>
                 
                 <div className="venue-info">
-                  <div className="venue-logo-placeholder" style={{ backgroundColor: venue.logoColor }}></div>
+                  <div className="venue-logo-placeholder" style={{ backgroundColor: '#F5A623' }}>
+                    <span style={{ color: 'white', fontWeight: 'bold' }}>{venue.name.substring(0,2).toUpperCase()}</span>
+                  </div>
                   <div className="venue-details">
                     <h3 className="venue-name">{venue.name}</h3>
                     <div className="venue-address">
                       <span className="distance">({venue.distance})</span> {venue.address}
                     </div>
                     <div className="venue-time">
-                      <Clock size={12} /> {venue.time}
+                      <Clock size={12} /> {venue.operatingStartHour} - {venue.operatingEndHour}
                     </div>
                   </div>
-                  <button className="btn-book">ĐẶT LỊCH</button>
+                  <button className="btn-book" onClick={() => navigate(`/venue/${venue.id}`)}>ĐẶT LỊCH</button>
                 </div>
               </div>
             ))}

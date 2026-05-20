@@ -28,6 +28,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOwnerOnboardingService, OwnerOnboardingService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IOwnerVenueService, OwnerVenueService>();
+builder.Services.AddScoped<IPublicVenueService, PublicVenueService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<StaffPermissionService>();
 builder.Services.AddScoped<ActivityLogService>();
 builder.Services.AddHttpContextAccessor();

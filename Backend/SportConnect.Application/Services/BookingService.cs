@@ -1,0 +1,218 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using SportConnect.Application.DTOs.Public;
+using SportConnect.Application.Interfaces;
+using SportConnect.Core.Entities;
+
+namespace SportConnect.Application.Services;
+
+public class BookingService : IBookingService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public BookingService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    private decimal CalculatePriceForBlock(TimeSpan blockStart, TimeSpan blockEnd, List<PriceRule> rules, int dayOfWeek)
+    {
+        // 1. Find exact match for the day
+        var applicableRule = rules.FirstOrDefault(r => 
+            r.DayOfWeek == dayOfWeek && 
+            r.StartHour <= blockStart && 
+            r.EndHour >= blockEnd);
+
+        // 2. If no exact day, find "all days" rule (DayOfWeek == null)
+        if (applicableRule == null)
+        {
+            applicableRule = rules.FirstOrDefault(r => 
+                r.DayOfWeek == null && 
+                r.StartHour <= blockStart && 
+                r.EndHour >= blockEnd);
+        }
+
+        // If no rule matches, default to 0
+        if (applicableRule == null) return 0;
+
+        // The price in PriceRule is usually Per Hour.
+        // So for a 30-minute block, it is Price / 2.
+        var durationHours = (decimal)(blockEnd - blockStart).TotalHours;
+        return applicableRule.Price * durationHours;
+    }
+
+    public async Task<List<CourtAvailabilityDto>> GetAvailabilityAsync(Guid venueId, DateTime date)
+    {
+        var targetDate = date.Date; // Ensure time is 00:00:00
+        int dayOfWeekIndex = (int)targetDate.DayOfWeek; // 0 = Sunday, 1 = Monday...
+
+        var venues = await _unitOfWork.Repository<Venue>().FindAsync(v => v.Id == venueId);
+        var venue = venues.FirstOrDefault();
+        if (venue == null) throw new Exception("Venue not found");
+
+        var courts = await _unitOfWork.Repository<Court>().FindAsync(c => c.VenueId == venueId && c.Status == "AVAILABLE");
+        var priceRules = (await _unitOfWork.Repository<PriceRule>().FindAsync(p => p.VenueId == venueId)).ToList();
+        
+        // Find bookings for the date
+        var bookings = await _unitOfWork.Repository<Booking>().FindAsync(b => 
+            b.Court.VenueId == venueId && 
+            b.Status != "CANCELLED" && 
+            b.StartTime.Date == targetDate);
+
+        var result = new List<CourtAvailabilityDto>();
+
+        foreach (var court in courts)
+        {
+            var courtBookings = bookings.Where(b => b.CourtId == court.Id).ToList();
+            var timeSlots = new List<TimeSlotDto>();
+
+            var currentSlotStart = venue.OperatingStartHour;
+            var endOfDay = venue.OperatingEndHour;
+
+            while (currentSlotStart < endOfDay)
+            {
+                var currentSlotEnd = currentSlotStart.Add(TimeSpan.FromMinutes(30));
+                
+                // If the end exceeds operating hour, cap it
+                if (currentSlotEnd > endOfDay)
+                {
+                    currentSlotEnd = endOfDay;
+                }
+
+                // Check availability
+                var slotStartDateTime = targetDate.Add(currentSlotStart);
+                var slotEndDateTime = targetDate.Add(currentSlotEnd);
+
+                bool isAvailable = !courtBookings.Any(b => 
+                    b.StartTime < slotEndDateTime && b.EndTime > slotStartDateTime);
+
+                decimal slotPrice = CalculatePriceForBlock(currentSlotStart, currentSlotEnd, priceRules, dayOfWeekIndex);
+
+                timeSlots.Add(new TimeSlotDto
+                {
+                    StartTime = slotStartDateTime,
+                    EndTime = slotEndDateTime,
+                    Price = slotPrice,
+                    IsAvailable = isAvailable
+                });
+
+                currentSlotStart = currentSlotEnd;
+            }
+
+            result.Add(new CourtAvailabilityDto
+            {
+                CourtId = court.Id,
+                CourtName = court.CourtName,
+                TimeSlots = timeSlots
+            });
+        }
+
+        return result;
+    }
+
+    public async Task<BookingDto> CreateBookingAsync(Guid userId, CreateBookingDto dto)
+    {
+        var court = await _unitOfWork.Repository<Court>().GetByIdAsync(dto.CourtId);
+        if (court == null) throw new Exception("Court not found");
+
+        // Validate time
+        if (dto.EndTime <= dto.StartTime) throw new Exception("End time must be after start time");
+        if (dto.StartTime < DateTime.UtcNow) throw new Exception("Cannot book in the past");
+
+        // Validate overlap
+        var existingBookings = await _unitOfWork.Repository<Booking>().FindAsync(b => 
+            b.CourtId == dto.CourtId && 
+            b.Status != "CANCELLED" && 
+            b.StartTime < dto.EndTime && 
+            b.EndTime > dto.StartTime);
+
+        if (existingBookings.Any())
+        {
+            throw new Exception("The selected time slot is no longer available.");
+        }
+
+        // Calculate price
+        var targetDate = dto.StartTime.Date;
+        int dayOfWeekIndex = (int)targetDate.DayOfWeek;
+        var priceRules = (await _unitOfWork.Repository<PriceRule>().FindAsync(p => p.VenueId == court.VenueId)).ToList();
+        
+        decimal totalPrice = 0;
+        var currentCursor = dto.StartTime.TimeOfDay;
+        var endCursor = dto.EndTime.TimeOfDay;
+
+        // Iterate through 30-min blocks to calculate exactly
+        while (currentCursor < endCursor)
+        {
+            var nextCursor = currentCursor.Add(TimeSpan.FromMinutes(30));
+            if (nextCursor > endCursor) nextCursor = endCursor;
+
+            totalPrice += CalculatePriceForBlock(currentCursor, nextCursor, priceRules, dayOfWeekIndex);
+            
+            currentCursor = nextCursor;
+        }
+
+        var booking = new Booking
+        {
+            BookerId = userId,
+            CourtId = dto.CourtId,
+            StartTime = dto.StartTime,
+            EndTime = dto.EndTime,
+            TotalPrice = totalPrice,
+            Status = "PENDING",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _unitOfWork.Repository<Booking>().AddAsync(booking);
+        await _unitOfWork.CompleteAsync();
+
+        // For response, we need venue info
+        var venues = await _unitOfWork.Repository<Venue>().FindAsync(v => v.Id == court.VenueId);
+        var venue = venues.FirstOrDefault();
+
+        return new BookingDto
+        {
+            Id = booking.Id,
+            VenueId = court.VenueId,
+            VenueName = venue?.Name ?? "",
+            CourtId = court.Id,
+            CourtName = court.CourtName,
+            StartTime = booking.StartTime,
+            EndTime = booking.EndTime,
+            TotalPrice = booking.TotalPrice,
+            Status = booking.Status,
+            CreatedAt = booking.CreatedAt
+        };
+    }
+
+    public async Task<IEnumerable<BookingDto>> GetMyBookingsAsync(Guid userId)
+    {
+        // Need to join Booking, Court, Venue. Currently, we can fetch all and map.
+        // For production, a specialized query in repository is better.
+        var bookings = await _unitOfWork.Repository<Booking>().FindAsync(b => b.BookerId == userId);
+        var result = new List<BookingDto>();
+
+        foreach(var b in bookings.OrderByDescending(x => x.CreatedAt))
+        {
+            var court = await _unitOfWork.Repository<Court>().GetByIdAsync(b.CourtId);
+            var venue = court != null ? (await _unitOfWork.Repository<Venue>().GetByIdAsync(court.VenueId)) : null;
+
+            result.Add(new BookingDto
+            {
+                Id = b.Id,
+                VenueId = venue?.Id ?? Guid.Empty,
+                VenueName = venue?.Name ?? "N/A",
+                CourtId = court?.Id ?? Guid.Empty,
+                CourtName = court?.CourtName ?? "N/A",
+                StartTime = b.StartTime,
+                EndTime = b.EndTime,
+                TotalPrice = b.TotalPrice,
+                Status = b.Status,
+                CreatedAt = b.CreatedAt
+            });
+        }
+
+        return result;
+    }
+}
