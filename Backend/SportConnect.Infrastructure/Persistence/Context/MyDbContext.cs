@@ -207,7 +207,11 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasColumnName("operating_end_hour");
 
             entity.Property(e => e.SportTypes)
-                .HasColumnName("sport_types");
+                .HasColumnName("sport_types")
+                .HasConversion(
+                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions)null),
+                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions)null) ?? new List<string>()
+                );
 
             entity.Property(e => e.VenueScale)
                 .HasColumnName("venue_scale")
