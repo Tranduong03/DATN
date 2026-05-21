@@ -503,6 +503,16 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasDefaultValue(true);
+
+            entity.HasData(
+                new SportCategory { Id = 1, Name = "Cầu lông", Color = "#50E3C2", Icon = "🏸", Status = true },
+                new SportCategory { Id = 2, Name = "Pickleball", Color = "#4A90E2", Icon = "🎾", Status = true },
+                new SportCategory { Id = 3, Name = "Bóng đá", Color = "#7ED321", Icon = "⚽", Status = true },
+                new SportCategory { Id = 4, Name = "Quần vợt", Color = "#F5A623", Icon = "🥎", Status = true },
+                new SportCategory { Id = 5, Name = "Golf", Color = "#417505", Icon = "⛳", Status = true },
+                new SportCategory { Id = 6, Name = "Bóng chuyền", Color = "#F8E71C", Icon = "🏐", Status = true },
+                new SportCategory { Id = 7, Name = "Bóng rổ", Color = "#FF9500", Icon = "🏀", Status = true }
+            );
         });
     }
 }

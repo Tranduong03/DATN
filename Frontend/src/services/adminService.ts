@@ -19,5 +19,17 @@ export const adminService = {
 
   rejectOwnerRequest: (userId: string, reason: string) => {
     return adminAxiosClient.post(`/admin/owner-requests/${userId}/reject`, { reason });
+  },
+
+  createSportCategory: (data: any) => {
+    return adminAxiosClient.post('/SportCategories', data);
+  },
+
+  updateSportCategory: (id: number, data: any) => {
+    return adminAxiosClient.put(`/SportCategories/${id}`, data);
+  },
+
+  deleteSportCategory: (id: number) => {
+    return adminAxiosClient.delete(`/SportCategories/${id}`);
   }
 };

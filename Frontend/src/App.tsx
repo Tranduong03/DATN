@@ -18,6 +18,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminOwnerRequestsPage from './pages/admin/AdminOwnerRequestsPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminGuard from './pages/admin/AdminGuard';
+import AdminSportCategoriesPage from './pages/admin/AdminSportCategoriesPage';
 import ProfilePage from './pages/profile/ProfilePage';
 
 import AuthGuard from './pages/auth/AuthGuard';
@@ -60,6 +61,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/owner-requests" element={<AdminOwnerRequestsPage />} />
+          <Route path="/admin/sport-categories" element={<AdminSportCategoriesPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
