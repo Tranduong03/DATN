@@ -13,8 +13,8 @@ export default function VenueDetailPage() {
   // YYYY-MM-DD
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   
-  // { courtId: [startTime1, startTime2] }
-  const [selectedSlots, setSelectedSlots] = useState<{ courtId: string, startTime: string, endTime: string, price: number } | null>(null);
+  // [{ courtId, startTime, endTime, price }]
+  const [selectedSlots, setSelectedSlots] = useState<{ courtId: string, startTime: string, endTime: string, price: number }[]>([]);
 
   const { data: venue, isLoading: loadingVenue } = usePublicVenueDetail(venueId!);
 
@@ -25,49 +25,47 @@ export default function VenueDetailPage() {
   const handleSlotClick = (courtId: string, slot: any) => {
     if (!slot.isAvailable) return;
     
-    // For simplicity right now, selecting a slot overwrites the current selection.
-    // To support dragging/multiple blocks, we need a more complex state.
-    // The user requested: "Người dùng có thể chọn đặt sân 60 phút, 90 phút... bằng cách chọn điểm đầu và điểm cuối".
-    // Since we are clicking, let's just allow selecting one block at first, and then extending it.
-    
-    if (!selectedSlots) {
-      setSelectedSlots({
-        courtId,
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-        price: slot.price
-      });
+    const existingIndex = selectedSlots.findIndex(s => s.courtId === courtId);
+
+    if (existingIndex === -1) {
+      setSelectedSlots([
+        ...selectedSlots,
+        { courtId, startTime: slot.startTime, endTime: slot.endTime, price: slot.price }
+      ]);
     } else {
-      // If clicking same court and it's adjacent, extend it
-      if (selectedSlots.courtId === courtId) {
-        if (slot.startTime === selectedSlots.endTime) {
-          setSelectedSlots({
-            ...selectedSlots,
-            endTime: slot.endTime,
-            price: selectedSlots.price + slot.price
-          });
-          return;
-        } else if (slot.endTime === selectedSlots.startTime) {
-          setSelectedSlots({
-            ...selectedSlots,
-            startTime: slot.startTime,
-            price: selectedSlots.price + slot.price
-          });
-          return;
-        }
+      const current = selectedSlots[existingIndex];
+      const clickStart = new Date(slot.startTime).getTime();
+      const clickEnd = new Date(slot.endTime).getTime();
+      const currentStart = new Date(current.startTime).getTime();
+      const currentEnd = new Date(current.endTime).getTime();
+
+      // Extend forward
+      if (clickStart === currentEnd) {
+        const newSlots = [...selectedSlots];
+        newSlots[existingIndex] = { ...current, endTime: slot.endTime, price: current.price + slot.price };
+        setSelectedSlots(newSlots);
+      } 
+      // Extend backward
+      else if (clickEnd === currentStart) {
+        const newSlots = [...selectedSlots];
+        newSlots[existingIndex] = { ...current, startTime: slot.startTime, price: current.price + slot.price };
+        setSelectedSlots(newSlots);
+      } 
+      // Click inside to remove the selection for this court
+      else if (clickStart >= currentStart && clickEnd <= currentEnd) {
+        setSelectedSlots(selectedSlots.filter(s => s.courtId !== courtId));
       }
-      // Otherwise reset
-      setSelectedSlots({
-        courtId,
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-        price: slot.price
-      });
+      // Otherwise reset this court's selection
+      else {
+        const newSlots = [...selectedSlots];
+        newSlots[existingIndex] = { courtId, startTime: slot.startTime, endTime: slot.endTime, price: slot.price };
+        setSelectedSlots(newSlots);
+      }
     }
   };
 
   const handleBook = async () => {
-    if (!selectedSlots) return;
+    if (selectedSlots.length === 0) return;
     
     const token = localStorage.getItem('token');
     if (!token) {
@@ -77,14 +75,16 @@ export default function VenueDetailPage() {
     }
 
     try {
-      await createBookingMutation.mutateAsync({
-        courtId: selectedSlots.courtId,
-        startTime: selectedSlots.startTime,
-        endTime: selectedSlots.endTime
-      });
+      await Promise.all(selectedSlots.map(selection => 
+        createBookingMutation.mutateAsync({
+          courtId: selection.courtId,
+          startTime: selection.startTime,
+          endTime: selection.endTime
+        })
+      ));
       alert('Đặt lịch thành công!');
-      setSelectedSlots(null);
-      navigate('/me/bookings'); // Or wherever
+      setSelectedSlots([]);
+      navigate('/me/bookings'); 
     } catch (error: any) {
       alert('Lỗi đặt lịch: ' + (error.response?.data?.message || error.message));
     }
@@ -154,9 +154,10 @@ export default function VenueDetailPage() {
                     </td>
                     {court.timeSlots.map((slot: any, idx: number) => {
                       // Check if selected
-                      const isSelected = selectedSlots && selectedSlots?.courtId === court.courtId && 
-                                       new Date(slot.startTime) >= new Date(selectedSlots.startTime) && 
-                                       new Date(slot.endTime) <= new Date(selectedSlots.endTime);
+                      const courtSelection = selectedSlots.find(s => s.courtId === court.courtId);
+                      const isSelected = courtSelection && 
+                                       new Date(slot.startTime) >= new Date(courtSelection.startTime) && 
+                                       new Date(slot.endTime) <= new Date(courtSelection.endTime);
 
                       return (
                         <td key={idx} style={{ padding: 2, borderBottom: '1px solid #eee' }}>
@@ -190,20 +191,25 @@ export default function VenueDetailPage() {
         )}
 
         {/* Checkout Bar */}
-        {selectedSlots && (
+        {selectedSlots.length > 0 && (
           <div style={{ marginTop: 24, padding: 20, backgroundColor: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: 18 }}>Thông tin đặt sân</h3>
-              <p style={{ margin: '4px 0 0 0', color: '#475569' }}>
-                {new Date(selectedSlots.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - 
-                {new Date(selectedSlots.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                {' '}| Ngày {new Date(selectedSlots.startTime).toLocaleDateString('vi-VN')}
-              </p>
+              <h3 style={{ margin: 0, fontSize: 18 }}>Thông tin đặt sân ({selectedSlots.length} sân)</h3>
+              {selectedSlots.map(s => {
+                const courtName = courtsAvailability.find((c:any) => c.courtId === s.courtId)?.courtName;
+                return (
+                  <p key={s.courtId} style={{ margin: '4px 0 0 0', color: '#475569', fontSize: 14 }}>
+                    <strong>{courtName}:</strong> {new Date(s.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date(s.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                )
+              })}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 14, color: '#64748b' }}>Tổng tiền tạm tính</div>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#0f172a' }}>{selectedSlots.price.toLocaleString('vi-VN')} đ</div>
+                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#0f172a' }}>
+                  {selectedSlots.reduce((sum, s) => sum + s.price, 0).toLocaleString('vi-VN')} đ
+                </div>
               </div>
               <button 
                 onClick={handleBook}
