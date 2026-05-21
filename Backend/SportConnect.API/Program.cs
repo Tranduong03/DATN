@@ -30,6 +30,7 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IOwnerVenueService, OwnerVenueService>();
 builder.Services.AddScoped<IPublicVenueService, PublicVenueService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
 builder.Services.AddScoped<StaffPermissionService>();
 builder.Services.AddScoped<ActivityLogService>();
 builder.Services.AddHttpContextAccessor();

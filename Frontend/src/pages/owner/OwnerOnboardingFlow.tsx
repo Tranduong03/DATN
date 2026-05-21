@@ -247,14 +247,94 @@ function Step2({ data, onNext }: { data: any; onNext: (d: any) => void }) {
 /* ─── STEP 3 — Basic info ─── */
 function Step3({ data, onNext }: { data: any; onNext: (d: any) => void }) {
   const [venueName, setVenueName] = useState(data.venueName || '');
-  const [venueAddress, setVenueAddress] = useState(data.venueAddress || '');
+  
+  // Map API States
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
+
+  const [provinceCode, setProvinceCode] = useState(data.provinceCode || '');
+  const [districtCode, setDistrictCode] = useState(data.districtCode || '');
+  const [wardCode, setWardCode] = useState(data.wardCode || '');
+  const [street, setStreet] = useState(data.street || '');
+
   const [contactPhone, setContactPhone] = useState(data.contactPhone || '');
   const [description, setDescription] = useState(data.description || '');
   const [operatingStartHour, setOperatingStartHour] = useState(data.operatingStartHour || '06:00');
   const [operatingEndHour, setOperatingEndHour] = useState(data.operatingEndHour || '22:00');
-  const isValid = venueName.trim() && venueAddress.trim() && contactPhone.trim();
+
+  useEffect(() => {
+    // Lấy danh sách Tỉnh/Thành
+    fetch('https://esgoo.net/api-tinhthanh/1/0.htm')
+      .then(res => res.json())
+      .then(d => {
+        if (d.error === 0) setProvinces(d.data);
+      })
+      .catch(e => console.error(e));
+  }, []);
+
+  useEffect(() => {
+    if (provinceCode) {
+      // Lấy danh sách Quận/Huyện dựa trên Tỉnh/Thành
+      fetch(`https://esgoo.net/api-tinhthanh/2/${provinceCode}.htm`)
+        .then(res => res.json())
+        .then(d => {
+          if (d.error === 0) {
+            setDistricts(d.data);
+            if (!d.data.find((x: any) => x.id === districtCode)) {
+              setDistrictCode('');
+              setWardCode('');
+            }
+          }
+        });
+    } else {
+      setDistricts([]);
+      setDistrictCode('');
+      setWardCode('');
+    }
+  }, [provinceCode]);
+
+  useEffect(() => {
+    if (districtCode) {
+      // Lấy danh sách Phường/Xã dựa trên Quận/Huyện
+      fetch(`https://esgoo.net/api-tinhthanh/3/${districtCode}.htm`)
+        .then(res => res.json())
+        .then(d => {
+          if (d.error === 0) {
+            setWards(d.data);
+            if (!d.data.find((x: any) => x.id === wardCode)) {
+              setWardCode('');
+            }
+          }
+        });
+    } else {
+      setWards([]);
+      setWardCode('');
+    }
+  }, [districtCode]);
+
+  const isValid = venueName.trim() && provinceCode && districtCode && wardCode && street.trim() && contactPhone.trim();
+
+  const handleNext = () => {
+    const provinceName = provinces.find(x => x.id === provinceCode)?.full_name || '';
+    const districtName = districts.find(x => x.id === districtCode)?.full_name || '';
+    const wardName = wards.find(x => x.id === wardCode)?.full_name || '';
+    
+    // Nối chuỗi tạo ra địa chỉ hoàn chỉnh
+    const venueAddress = `${street.trim()}, ${wardName}, ${districtName}, ${provinceName}`;
+    
+    onNext({ 
+      venueName, 
+      provinceCode, districtCode, wardCode, street, 
+      venueAddress, 
+      contactPhone, description, operatingStartHour, operatingEndHour 
+    });
+  };
 
   const LabelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 };
+  
+  // Custom select style to match inputStyle
+  const selectStyle = { ...inputStyle, appearance: 'none', backgroundColor: '#1e293b' } as any;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -266,10 +346,30 @@ function Step3({ data, onNext }: { data: any; onNext: (d: any) => void }) {
         <label style={LabelStyle}>Tên sân *</label>
         <input placeholder="VD: Sân Cầu Lông Thành Công" value={venueName} onChange={e => setVenueName(e.target.value)} style={inputStyle} />
       </div>
-      <div>
-        <label style={LabelStyle}>Địa chỉ *</label>
-        <input placeholder="Số nhà, đường, phường, quận, TP" value={venueAddress} onChange={e => setVenueAddress(e.target.value)} style={inputStyle} />
+      
+      {/* ADDRESS SECTION */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <label style={{...LabelStyle, marginBottom: 0, color: '#f59e0b'}}>Địa chỉ khu vực *</label>
+        
+        <select value={provinceCode} onChange={e => setProvinceCode(e.target.value)} style={selectStyle}>
+          <option value="" disabled>-- Chọn Tỉnh / Thành phố --</option>
+          {provinces.map(p => <option key={p.id} value={p.id}>{p.full_name}</option>)}
+        </select>
+
+        <div style={{ display: 'flex', gap: 12 }}>
+          <select value={districtCode} onChange={e => setDistrictCode(e.target.value)} style={{...selectStyle, flex: 1}} disabled={!provinceCode}>
+            <option value="" disabled>-- Quận / Huyện --</option>
+            {districts.map(d => <option key={d.id} value={d.id}>{d.full_name}</option>)}
+          </select>
+          <select value={wardCode} onChange={e => setWardCode(e.target.value)} style={{...selectStyle, flex: 1}} disabled={!districtCode}>
+            <option value="" disabled>-- Phường / Xã --</option>
+            {wards.map(w => <option key={w.id} value={w.id}>{w.full_name}</option>)}
+          </select>
+        </div>
+
+        <input placeholder="Số nhà, Tên đường, Tòa nhà..." value={street} onChange={e => setStreet(e.target.value)} style={inputStyle} />
       </div>
+
       <div>
         <label style={LabelStyle}>Số điện thoại liên hệ *</label>
         <input placeholder="0901 234 567" value={contactPhone} onChange={e => setContactPhone(e.target.value)} style={inputStyle} type="tel" />
@@ -288,12 +388,13 @@ function Step3({ data, onNext }: { data: any; onNext: (d: any) => void }) {
           <input type="time" value={operatingEndHour} onChange={e => setOperatingEndHour(e.target.value)} style={inputStyle} />
         </div>
       </div>
-      <button style={isValid ? btnPrimary : btnDisabled} disabled={!isValid} onClick={() => onNext({ venueName, venueAddress, contactPhone, description, operatingStartHour, operatingEndHour })}>
+      <button style={isValid ? btnPrimary : btnDisabled} disabled={!isValid} onClick={handleNext}>
         Tiếp tục <ChevronRight size={18} />
       </button>
     </div>
   );
 }
+
 
 /* ─── STEP 4 — Scale ─── */
 function Step4({ data, onNext }: { data: any; onNext: (d: any) => void }) {

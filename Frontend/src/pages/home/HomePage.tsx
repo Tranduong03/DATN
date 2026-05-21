@@ -1,19 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, Search, Heart, Share2, Star, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
-import { usePublicVenues } from '../../hooks/queries/usePublicQueries';
+import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
+import { jwtDecode } from 'jwt-decode';
 
 export default function HomePage() {
   const [activeSport, setActiveSport] = useState('Pickleball');
-  const [searchTerm] = useState(''); // We can use it later
+  const [searchTerm] = useState(''); 
   const navigate = useNavigate();
+  
+  const [userName, setUserName] = useState('Khách');
+  const [userAvatar, setUserAvatar] = useState('');
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    // 1. Format Ngày (VD: Thứ năm, 14/05/2026)
+    const date = new Date();
+    const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+    const dayName = days[date.getDay()];
+    const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    setCurrentDate(`${dayName}, ${dateStr}`);
+
+    // 2. Decode Token lấy tên User & Avatar
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        // Kiểm tra token chưa hết hạn
+        if (decoded.exp * 1000 > Date.now()) {
+          setUserName(decoded.FullName || decoded.unique_name || 'Khách hàng');
+          setUserAvatar(decoded.AvatarUrl || '');
+        }
+      } catch (err) {
+        // Bỏ qua nếu lỗi decode
+      }
+    }
+  }, []);
 
   const { data: venues = [], isLoading } = usePublicVenues(searchTerm);
 
   const quickFilters = ['Cầu lông gần tôi', 'Pickleball gần tôi', 'Xé vé gần tôi', 'Bóng đá gần tôi'];
   
-  const sports = [
+  const { data: sportsData = [] } = useSportCategories();
+
+  // Dùng dữ liệu từ API nếu có, không thì dùng dữ liệu mẫu
+  const sports = sportsData.length > 0 ? sportsData : [
     { name: 'Pickleball', color: '#4A90E2', icon: '🎾' },
     { name: 'Cầu lông', color: '#50E3C2', icon: '🏸' },
     { name: 'Bóng đá', color: '#7ED321', icon: '⚽' },
@@ -33,10 +65,16 @@ export default function HomePage() {
         <div className="home-header">
           <div className="home-header-top">
             <div className="user-info">
-              <div className="user-avatar-placeholder"></div>
+              {userAvatar ? (
+                <img src={userAvatar} alt="Avatar" className="user-avatar-placeholder" style={{ objectFit: 'cover', padding: 0 }} />
+              ) : (
+                <div className="user-avatar-placeholder" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b', fontWeight: 'bold' }}>
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div className="user-text">
-                <div className="date-text">Thứ năm, 14/05/2026</div>
-                <div className="user-name">Phi Dương</div>
+                <div className="date-text">{currentDate}</div>
+                <div className="user-name">{userName}</div>
               </div>
             </div>
             <div className="header-actions">

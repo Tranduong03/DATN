@@ -18,6 +18,7 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
     public DbSet<VenueImage> VenueImages => Set<VenueImage>();
     public DbSet<OwnerProfile> OwnerProfiles => Set<OwnerProfile>();
+    public DbSet<SportCategory> SportCategories => Set<SportCategory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -472,6 +473,36 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .WithMany()
                 .HasForeignKey(e => e.ActorId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ==========================================
+        // 5. CẤU HÌNH BẢNG SPORT CATEGORY
+        // ==========================================
+        modelBuilder.Entity<SportCategory>(entity =>
+        {
+            entity.ToTable("SportCategories");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.Name)
+                .HasColumnName("name")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(e => e.Color)
+                .HasColumnName("color")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Icon)
+                .HasColumnName("icon")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasDefaultValue(true);
         });
     }
 }
