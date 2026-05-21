@@ -17,8 +17,9 @@ export default function AdminSportCategoriesPage() {
   });
 
   const { data: categories = [], isLoading } = useQuery({
-    queryKey: ['sportCategories'],
-    queryFn: () => publicService.getSportCategories()
+    queryKey: ['sportCategories', 'admin'], // Tách riêng queryKey cho Admin để luôn lấy mới nhất
+    queryFn: () => publicService.getSportCategories(),
+    refetchOnMount: true,
   });
 
   const createMutation = useMutation({
@@ -40,7 +41,7 @@ export default function AdminSportCategoriesPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => adminService.deleteSportCategory(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sportCategories'] });
+      queryClient.invalidateQueries({ queryKey: ['sportCategories'] }); // Invalidate all queries starting with 'sportCategories'
     }
   });
 

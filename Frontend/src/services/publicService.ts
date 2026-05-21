@@ -9,6 +9,6 @@ export const publicService = {
     return axiosClient.get(`/public/venues/${id}`).then(res => (res as any).data);
   },
   getSportCategories: () => {
-    return axiosClient.get('/SportCategories').then(res => (res as any).data);
+    return axiosClient.get('/SportCategories');
   }
 };
