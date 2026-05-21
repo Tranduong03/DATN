@@ -47,6 +47,13 @@ export default function VenueDetailPage() {
             price: selectedSlots.price + slot.price
           });
           return;
+        } else if (slot.endTime === selectedSlots.startTime) {
+          setSelectedSlots({
+            ...selectedSlots,
+            startTime: slot.startTime,
+            price: selectedSlots.price + slot.price
+          });
+          return;
         }
       }
       // Otherwise reset

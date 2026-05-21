@@ -20,8 +20,11 @@ public class BookingService : IBookingService
 
     private decimal CalculatePriceForBlock(TimeSpan blockStart, TimeSpan blockEnd, List<PriceRule> rules, int dayOfWeek)
     {
+        // Sort rules by duration so smaller ranges (specific hours) override larger ranges (all day)
+        var sortedRules = rules.OrderBy(r => r.EndHour - r.StartHour).ToList();
+
         // 1. Find exact match for the day
-        var applicableRule = rules.FirstOrDefault(r => 
+        var applicableRule = sortedRules.FirstOrDefault(r => 
             r.DayOfWeek == dayOfWeek && 
             r.StartHour <= blockStart && 
             r.EndHour >= blockEnd);
@@ -29,7 +32,7 @@ public class BookingService : IBookingService
         // 2. If no exact day, find "all days" rule (DayOfWeek == null)
         if (applicableRule == null)
         {
-            applicableRule = rules.FirstOrDefault(r => 
+            applicableRule = sortedRules.FirstOrDefault(r => 
                 r.DayOfWeek == null && 
                 r.StartHour <= blockStart && 
                 r.EndHour >= blockEnd);

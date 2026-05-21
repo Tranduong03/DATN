@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, Edit2, Check, X } from 'lucide-react';
 import OwnerLayout from './OwnerLayout';
@@ -29,10 +29,11 @@ export default function VenueConfigPage() {
   const [draftPrices, setDraftPrices] = useState<any[]>([]);
 
   // Init prices when loaded
-  if (priceRules && draftPrices.length === 0 && !loadingPrices) {
-    // Only init once or when reset
-    setDraftPrices(priceRules);
-  }
+  useEffect(() => {
+    if (priceRules && !loadingPrices) {
+      setDraftPrices(priceRules);
+    }
+  }, [priceRules, loadingPrices]);
 
   if (loadingVenue) {
     return (
@@ -52,12 +53,34 @@ export default function VenueConfigPage() {
 
   const handleAddCourt = async () => {
     if (!newCourtName.trim()) return;
+
+    if (courts && courts.length >= venue.venueScale) {
+      const confirmAdd = window.confirm(`Cơ sở của bạn ban đầu chỉ đăng ký ${venue.venueScale} sân. Bạn có chắc chắn muốn thêm sân mới và cập nhật lại quy mô không?`);
+      if (!confirmAdd) return;
+    }
+
     try {
       await addCourtMutation.mutateAsync({ venueId: venueId!, data: { courtName: newCourtName, status: 'AVAILABLE' } });
       setNewCourtName('');
     } catch (error) {
       console.error(error);
       alert('Lỗi thêm sân con');
+    }
+  };
+
+  const handleAutoInitCourts = async () => {
+    if (courts && courts.length === 0 && venue) {
+      const confirmInit = window.confirm(`Bạn có muốn tự động khởi tạo ${venue.venueScale} sân mẫu không?`);
+      if (!confirmInit) return;
+      
+      try {
+        for (let i = 1; i <= venue.venueScale; i++) {
+          await addCourtMutation.mutateAsync({ venueId: venueId!, data: { courtName: `Sân ${i}`, status: 'AVAILABLE' } });
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Có lỗi khi khởi tạo tự động');
+      }
     }
   };
 
@@ -137,6 +160,21 @@ export default function VenueConfigPage() {
               </button>
             </div>
           </div>
+
+          {courts?.length === 0 && (
+            <div style={{ marginBottom: 16, padding: 16, backgroundColor: '#f3f4f6', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h4 style={{ margin: '0 0 4px 0' }}>Chưa có sân nào</h4>
+                <p style={{ margin: 0, fontSize: 14, color: '#4b5563' }}>Bạn đã đăng ký quy mô {venue.venueScale} sân. Bạn có thể tự động tạo các sân mẫu này.</p>
+              </div>
+              <button 
+                onClick={handleAutoInitCourts}
+                style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 500 }}
+              >
+                Khởi tạo {venue.venueScale} sân
+              </button>
+            </div>
+          )}
 
           {loadingCourts ? (
             <p>Đang tải danh sách sân...</p>
