@@ -98,12 +98,7 @@ export default function VenueConfigPage() {
       title={`Cấu hình: ${venue.name}`} 
       subtitle={`Quản lý Sân con và Bảng giá cho ${venue.name}`}
     >
-      <div style={{ marginBottom: 20 }}>
-        <button className="admin-btn-secondary" onClick={() => navigate('/owner/venues')} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <ChevronLeft size={16} /> Quay lại danh sách
-        </button>
-      </div>
-
+      {/* Back button removed as 1 Owner = 1 Venue */}
       <div className="admin-tabs" style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
         <button 
           className={`admin-tab-btn ${activeTab === 'courts' ? 'active' : ''}`}

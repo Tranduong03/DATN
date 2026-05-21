@@ -20,7 +20,7 @@ const navItems = [
     ),
   },
   {
-    label: 'Quản lý Sân',
+    label: 'Cấu hình Cơ sở',
     path: '/owner/venues',
     icon: (
       <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
