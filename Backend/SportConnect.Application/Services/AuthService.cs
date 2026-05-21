@@ -97,8 +97,15 @@ public class AuthService : IAuthService
 
     public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
+        if (string.IsNullOrEmpty(registerDto.Email) && string.IsNullOrEmpty(registerDto.Phone))
+        {
+            throw new Exception("Vui lòng nhập Email hoặc Số điện thoại.");
+        }
+
         var existingUsers = await _unitOfWork.Repository<User>().FindAsync(u => 
-            u.Username == registerDto.Username || u.Email == registerDto.Email || (u.Phone != null && u.Phone == registerDto.Phone));
+            u.Username == registerDto.Username || 
+            (!string.IsNullOrEmpty(registerDto.Email) && u.Email == registerDto.Email) || 
+            (!string.IsNullOrEmpty(registerDto.Phone) && u.Phone == registerDto.Phone));
             
         if (existingUsers.Any())
         {

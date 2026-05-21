@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, Edit2, Check, X } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Plus, Edit2, Check, X } from 'lucide-react';
 import OwnerLayout from './OwnerLayout';
 import { useVenueDetail, useCourts, usePriceRules } from '../../hooks/queries/useOwnerQueries';
 import { useAddCourt, useUpdateCourt, useUpsertPriceRules } from '../../hooks/mutations/useOwnerMutations';
 
 export default function VenueConfigPage() {
   const { id: venueId } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'courts' | 'pricing'>('courts');
 
   // Queries

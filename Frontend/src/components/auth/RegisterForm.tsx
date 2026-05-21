@@ -23,8 +23,8 @@ export default function RegisterForm() {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!email || !password || !fullName || !phone) {
-      setErrorMessage('Vui lòng nhập đầy đủ thông tin');
+    if ((!email && !phone) || !password || !fullName) {
+      setErrorMessage('Vui lòng nhập Email hoặc Số điện thoại, và các thông tin bắt buộc khác');
       return;
     }
 
@@ -35,11 +35,11 @@ export default function RegisterForm() {
 
     try {
       const data: any = await registerMutation.mutateAsync({
-        email,
-        username: email.split('@')[0] + Math.floor(1000 + Math.random() * 9000), // Randomize username
+        email: email || null,
+        username: (email ? email.split('@')[0] : phone) + Math.floor(1000 + Math.random() * 9000), // Randomize username
         password,
         fullName,
-        phone
+        phone: phone || null
       });
 
       localStorage.setItem('token', data.token);
@@ -61,9 +61,9 @@ export default function RegisterForm() {
               <span>+ 84</span>
               <span className="dropdown-arrow">▼</span>
             </div>
-            <input 
-              type="tel" 
-              placeholder="Nhập số điện thoại" 
+            <input
+              type="tel"
+              placeholder="Nhập số điện thoại"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
@@ -78,9 +78,9 @@ export default function RegisterForm() {
         <div className="form-group">
           <label>Email của bạn?</label>
           <div className="input-wrapper">
-            <input 
-              type="email" 
-              placeholder="Nhập email của bạn" 
+            <input
+              type="email"
+              placeholder="Nhập email của bạn"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -95,9 +95,9 @@ export default function RegisterForm() {
         <div className="form-group">
           <label>Tên đầy đủ (*)</label>
           <div className="input-wrapper">
-            <input 
-              type="text" 
-              placeholder="Nhập họ và tên" 
+            <input
+              type="text"
+              placeholder="Nhập họ và tên"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
@@ -112,9 +112,9 @@ export default function RegisterForm() {
         <div className="form-group">
           <label>Mật khẩu (*)</label>
           <div className="input-wrapper">
-            <input 
-              type={showPassword ? "text" : "password"} 
-              placeholder="Nhập mật khẩu (*)" 
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Nhập mật khẩu (*)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -127,9 +127,9 @@ export default function RegisterForm() {
         <div className="form-group">
           <label>Nhập mật khẩu</label>
           <div className="input-wrapper">
-            <input 
-              type={showConfirmPassword ? "text" : "password"} 
-              placeholder="Nhập lại mật khẩu" 
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Nhập lại mật khẩu"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />

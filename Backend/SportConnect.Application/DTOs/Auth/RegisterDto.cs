@@ -4,9 +4,8 @@ namespace SportConnect.Application.DTOs.Auth;
 
 public class RegisterDto
 {
-    [Required]
     [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
     [Required]
     public string Username { get; set; } = string.Empty;
