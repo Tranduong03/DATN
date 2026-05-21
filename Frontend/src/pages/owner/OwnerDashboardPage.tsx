@@ -1,6 +1,29 @@
+import { Link } from 'react-router-dom';
 import OwnerLayout from './OwnerLayout';
+import { useOwnerStats, useOwnerBookings } from '../../hooks/queries/useBookingQueries';
+import { useUpdateBookingStatus } from '../../hooks/mutations/useBookingMutations';
 
 export default function OwnerDashboardPage() {
+  const { data: statsData } = useOwnerStats();
+  const { data: bookingsData } = useOwnerBookings();
+  const updateStatusMutation = useUpdateBookingStatus();
+
+  const stats = statsData?.data || { todayBookings: 0, weeklyRevenue: 0, newReviews: 0 };
+  const bookings = bookingsData?.data || [];
+
+  const upcomingBookings = bookings
+    .filter((b: any) => new Date(b.startTime) >= new Date() && b.status !== 'CANCELLED')
+    .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+    .slice(0, 5); // Take top 5 upcoming
+
+  const handleUpdateStatus = (id: string, status: string) => {
+    if (confirm(`Bạn có chắc muốn cập nhật thành ${status}?`)) {
+      updateStatusMutation.mutate({ bookingId: id, status });
+    }
+  };
+
+  const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+
   return (
     <OwnerLayout title="Tổng quan" subtitle="Chào mừng trở lại! Dưới đây là thông tin hoạt động kinh doanh của bạn.">
       <div className="admin-stats-grid">
@@ -11,9 +34,9 @@ export default function OwnerDashboardPage() {
             </svg>
           </div>
           <div className="admin-stat-body">
-            <span className="admin-stat-value">0</span>
+            <span className="admin-stat-value">{stats.todayBookings}</span>
             <span className="admin-stat-label">Lượt đặt hôm nay</span>
-            <span className="admin-stat-trend">Chưa có dữ liệu</span>
+            <span className="admin-stat-trend" style={{ color: '#6366f1' }}>Cập nhật liên tục</span>
           </div>
         </div>
         <div className="admin-stat-card admin-stat-card--emerald">
@@ -23,9 +46,9 @@ export default function OwnerDashboardPage() {
             </svg>
           </div>
           <div className="admin-stat-body">
-            <span className="admin-stat-value">0 VNĐ</span>
+            <span className="admin-stat-value">{formatPrice(stats.weeklyRevenue)}</span>
             <span className="admin-stat-label">Doanh thu tuần này</span>
-            <span className="admin-stat-trend">Chưa có dữ liệu</span>
+            <span className="admin-stat-trend" style={{ color: '#10b981' }}>Đã xác nhận</span>
           </div>
         </div>
         <div className="admin-stat-card admin-stat-card--amber">
@@ -35,18 +58,68 @@ export default function OwnerDashboardPage() {
             </svg>
           </div>
           <div className="admin-stat-body">
-            <span className="admin-stat-value">0</span>
+            <span className="admin-stat-value">{stats.newReviews}</span>
             <span className="admin-stat-label">Đánh giá mới</span>
-            <span className="admin-stat-trend">Chưa có dữ liệu</span>
+            <span className="admin-stat-trend">Đang phát triển</span>
           </div>
         </div>
       </div>
 
       <div className="admin-section" style={{ marginTop: 24 }}>
-        <h2 className="admin-section-title">Lịch đặt sắp tới</h2>
-        <div style={{ padding: '24px', textAlign: 'center', color: '#6b7280', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb' }}>
-          Hiện chưa có lịch đặt nào.
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h2 className="admin-section-title" style={{ margin: 0 }}>Lịch đặt sắp tới</h2>
+          <Link to="/owner/bookings" className="admin-btn-secondary" style={{ fontSize: 13 }}>Xem tất cả</Link>
         </div>
+        
+        {upcomingBookings.length === 0 ? (
+          <div style={{ padding: '24px', textAlign: 'center', color: '#6b7280', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb' }}>
+            Hiện chưa có lịch đặt nào sắp diễn ra.
+          </div>
+        ) : (
+          <div className="admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Khách hàng</th>
+                  <th>Thời gian</th>
+                  <th>Sân</th>
+                  <th>Số tiền</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcomingBookings.map((b: any) => (
+                  <tr key={b.id}>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{b.bookerName}</div>
+                      <div style={{ fontSize: 12, color: '#6b7280' }}>{b.bookerPhone}</div>
+                    </td>
+                    <td>
+                      <div>{new Date(b.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date(b.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</div>
+                      <div style={{ fontSize: 12, color: '#6b7280' }}>{new Date(b.startTime).toLocaleDateString('vi-VN')}</div>
+                    </td>
+                    <td>{b.courtName}</td>
+                    <td style={{ fontWeight: 600, color: '#ef4444' }}>{formatPrice(b.totalPrice)}</td>
+                    <td>
+                      <span className={`admin-status-badge ${b.status === 'CONFIRMED' ? 'admin-status-badge--success' : b.status === 'PENDING' ? 'admin-status-badge--warning' : 'admin-status-badge--danger'}`}>
+                        {b.status}
+                      </span>
+                    </td>
+                    <td>
+                      {b.status === 'PENDING' && (
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button onClick={() => handleUpdateStatus(b.id, 'CONFIRMED')} style={{ padding: '4px 12px', background: '#10b981', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Nhận sân</button>
+                          <button onClick={() => handleUpdateStatus(b.id, 'CANCELLED')} style={{ padding: '4px 12px', background: '#ef4444', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Hủy</button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </OwnerLayout>
   );

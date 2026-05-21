@@ -12,3 +12,15 @@ export const useCreateBooking = () => {
     }
   });
 };
+
+export const useUpdateBookingStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ bookingId, status }: { bookingId: string, status: string }) => bookingService.updateOwnerBookingStatus(bookingId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ownerBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['ownerStats'] });
+      queryClient.invalidateQueries({ queryKey: ['venueAvailability'] });
+    }
+  });
+};

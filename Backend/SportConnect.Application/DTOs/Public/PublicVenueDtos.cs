@@ -72,4 +72,8 @@ public class BookingDto
     public decimal TotalPrice { get; set; }
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    
+    // For Owner view
+    public string BookerName { get; set; } = string.Empty;
+    public string BookerPhone { get; set; } = string.Empty;
 }

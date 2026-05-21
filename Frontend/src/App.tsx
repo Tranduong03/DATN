@@ -22,6 +22,7 @@ import AdminSportCategoriesPage from './pages/admin/AdminSportCategoriesPage';
 import ProfilePage from './pages/profile/ProfilePage';
 
 import AuthGuard from './pages/auth/AuthGuard';
+import OwnerBookingsPage from './pages/owner/OwnerBookingsPage';
 import OwnerGuard from './pages/owner/OwnerGuard';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
         {/* Owner Only Routes */}
         <Route element={<OwnerGuard />}>
           <Route path="/owner" element={<OwnerDashboardPage />} />
+          <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
           <Route path="/owner/venues" element={<OwnerVenuesPage />} />
           <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
         </Route>

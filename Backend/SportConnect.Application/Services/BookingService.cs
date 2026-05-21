@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SportConnect.Application.DTOs.Public;
+using SportConnect.Application.DTOs.Owner;
 using SportConnect.Application.Interfaces;
 using SportConnect.Core.Entities;
 
@@ -220,5 +221,102 @@ public class BookingService : IBookingService
                 CreatedAt = b.CreatedAt
             };
         }).ToList();
+    }
+
+    public async Task<IEnumerable<BookingDto>> GetOwnerBookingsAsync(Guid ownerId)
+    {
+        // Get all venues owned by this owner
+        var venues = (await _unitOfWork.Repository<Venue>().FindAsync(v => v.OwnerId == ownerId)).ToList();
+        var venueIds = venues.Select(v => v.Id).ToHashSet();
+
+        if (!venueIds.Any()) return new List<BookingDto>();
+
+        var courts = (await _unitOfWork.Repository<Court>().FindAsync(c => venueIds.Contains(c.VenueId))).ToList();
+        var courtIds = courts.Select(c => c.Id).ToHashSet();
+
+        var bookings = (await _unitOfWork.Repository<Booking>().FindAsync(b => courtIds.Contains(b.CourtId)))
+            .OrderByDescending(x => x.CreatedAt).ToList();
+
+        if (!bookings.Any()) return new List<BookingDto>();
+
+        var bookerIds = bookings.Select(b => b.BookerId).ToHashSet();
+        var bookers = (await _unitOfWork.Repository<User>().FindAsync(u => bookerIds.Contains(u.Id)))
+            .ToDictionary(u => u.Id);
+
+        var courtsDict = courts.ToDictionary(c => c.Id);
+        var venuesDict = venues.ToDictionary(v => v.Id);
+
+        return bookings.Select(b =>
+        {
+            courtsDict.TryGetValue(b.CourtId, out var court);
+            var venue = court != null && venuesDict.TryGetValue(court.VenueId, out var v) ? v : null;
+            bookers.TryGetValue(b.BookerId, out var booker);
+            
+            return new BookingDto
+            {
+                Id = b.Id,
+                VenueId = venue?.Id ?? Guid.Empty,
+                VenueName = venue?.Name ?? "N/A",
+                CourtId = court?.Id ?? Guid.Empty,
+                CourtName = court?.CourtName ?? "N/A",
+                StartTime = b.StartTime,
+                EndTime = b.EndTime,
+                TotalPrice = b.TotalPrice,
+                Status = b.Status,
+                CreatedAt = b.CreatedAt,
+                BookerName = booker?.FullName ?? booker?.Username ?? "Unknown",
+                BookerPhone = booker?.Phone ?? ""
+            };
+        }).ToList();
+    }
+
+    public async Task<bool> UpdateBookingStatusAsync(Guid bookingId, Guid ownerId, string status)
+    {
+        var booking = await _unitOfWork.Repository<Booking>().GetByIdAsync(bookingId);
+        if (booking == null) return false;
+
+        var court = await _unitOfWork.Repository<Court>().GetByIdAsync(booking.CourtId);
+        if (court == null) return false;
+
+        var venue = await _unitOfWork.Repository<Venue>().GetByIdAsync(court.VenueId);
+        if (venue == null || venue.OwnerId != ownerId) return false; // Unauthorized
+
+        booking.Status = status;
+        _unitOfWork.Repository<Booking>().Update(booking);
+        await _unitOfWork.CompleteAsync();
+        return true;
+    }
+
+    public async Task<OwnerDashboardStatsDto> GetOwnerDashboardStatsAsync(Guid ownerId)
+    {
+        var venues = (await _unitOfWork.Repository<Venue>().FindAsync(v => v.OwnerId == ownerId)).ToList();
+        var venueIds = venues.Select(v => v.Id).ToHashSet();
+
+        if (!venueIds.Any()) return new OwnerDashboardStatsDto();
+
+        var courts = (await _unitOfWork.Repository<Court>().FindAsync(c => venueIds.Contains(c.VenueId))).ToList();
+        var courtIds = courts.Select(c => c.Id).ToHashSet();
+
+        var now = DateTime.UtcNow;
+        var startOfDay = now.Date;
+        var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
+        
+        var startOfWeek = now.Date.AddDays(-(int)now.DayOfWeek + (int)DayOfWeek.Monday); // Assuming Monday is start of week
+        var endOfWeek = startOfWeek.AddDays(7).AddTicks(-1);
+
+        var allBookings = (await _unitOfWork.Repository<Booking>().FindAsync(b => courtIds.Contains(b.CourtId) && b.Status != "CANCELLED")).ToList();
+
+        var todayBookingsCount = allBookings.Count(b => b.StartTime >= startOfDay && b.StartTime <= endOfDay);
+        var weeklyRevenue = allBookings.Where(b => b.StartTime >= startOfWeek && b.StartTime <= endOfWeek && b.Status == "CONFIRMED").Sum(b => b.TotalPrice);
+        
+        // Mock new reviews since we don't have review entity yet
+        var newReviews = 0;
+
+        return new OwnerDashboardStatsDto
+        {
+            TodayBookings = todayBookingsCount,
+            WeeklyRevenue = weeklyRevenue,
+            NewReviews = newReviews
+        };
     }
 }

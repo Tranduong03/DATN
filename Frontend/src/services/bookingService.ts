@@ -9,5 +9,14 @@ export const bookingService = {
   },
   getMyBookings: () => {
     return axiosClient.get('/bookings/my-bookings').then(res => (res as any).data);
+  },
+  getOwnerBookings: () => {
+    return axiosClient.get('/bookings/owner').then(res => (res as any).data);
+  },
+  updateOwnerBookingStatus: (bookingId: string, status: string) => {
+    return axiosClient.put(`/bookings/owner/${bookingId}/status`, { status }).then(res => (res as any).data);
+  },
+  getOwnerStats: () => {
+    return axiosClient.get('/bookings/owner/stats').then(res => (res as any).data);
   }
 };

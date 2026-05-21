@@ -66,4 +66,56 @@ public class BookingController : ControllerBase
             return BadRequest(new { isSuccess = false, message = ex.Message });
         }
     }
+
+    // Owner endpoints
+    [HttpGet("owner")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> GetOwnerBookings()
+    {
+        try
+        {
+            var bookings = await _bookingService.GetOwnerBookingsAsync(GetUserId());
+            return Ok(new { isSuccess = true, data = bookings });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { isSuccess = false, message = ex.Message });
+        }
+    }
+
+    [HttpPut("owner/{id}/status")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> UpdateBookingStatus(Guid id, [FromBody] UpdateBookingStatusRequest req)
+    {
+        try
+        {
+            var success = await _bookingService.UpdateBookingStatusAsync(id, GetUserId(), req.Status);
+            if (!success) return BadRequest(new { isSuccess = false, message = "Không thể cập nhật trạng thái đơn đặt sân" });
+            return Ok(new { isSuccess = true, message = "Cập nhật thành công" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { isSuccess = false, message = ex.Message });
+        }
+    }
+
+    [HttpGet("owner/stats")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> GetOwnerStats()
+    {
+        try
+        {
+            var stats = await _bookingService.GetOwnerDashboardStatsAsync(GetUserId());
+            return Ok(new { isSuccess = true, data = stats });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { isSuccess = false, message = ex.Message });
+        }
+    }
+}
+
+public class UpdateBookingStatusRequest
+{
+    public string Status { get; set; } = string.Empty;
 }

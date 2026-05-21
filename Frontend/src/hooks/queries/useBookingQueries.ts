@@ -16,3 +16,17 @@ export const useMyBookings = () => {
     queryFn: () => bookingService.getMyBookings(),
   });
 };
+
+export const useOwnerBookings = () => {
+  return useQuery({
+    queryKey: ['ownerBookings'],
+    queryFn: () => bookingService.getOwnerBookings(),
+  });
+};
+
+export const useOwnerStats = () => {
+  return useQuery({
+    queryKey: ['ownerStats'],
+    queryFn: () => bookingService.getOwnerStats(),
+  });
+};
