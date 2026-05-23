@@ -62,7 +62,7 @@ Frontend là một **Single Page Application (SPA)** hiện đại, nhấn mạn
 ## 4. Các Luồng Nghiệp Vụ Chính (Business Flows đã hoàn thiện)
 
 ### A. Luồng Xác thực (Authentication Flow)
-- **Đăng ký / Đăng nhập:** Hệ thống xử lý token, lưu vào `localStorage`. Hỗ trợ đăng nhập qua Google (`@react-oauth/google`).
+- **Đăng ký / Đăng nhập:** Hệ thống xử lý linh hoạt (cho phép đăng ký bằng Email HOẶC Số điện thoại), quản lý phiên bằng JWT Token lưu ở Client. Hỗ trợ đăng nhập qua Google (`@react-oauth/google`).
 - **Bảo mật Tài khoản:** Cung cấp tính năng "Quên mật khẩu" (gửi email OTP/Link qua SMTP) và "Đổi mật khẩu" (xác thực mật khẩu cũ bằng BCrypt).
 
 ### B. Luồng Onboarding Chủ Sân (Owner Flow)
@@ -77,11 +77,22 @@ Bảng điều khiển dành cho Admin (`/admin`):
 - **Quản lý Users:** Bảng danh sách phân trang (Pagination), tìm kiếm (Search), hiển thị Trust Score, Status.
 - **Quản lý Owner Requests:** Nơi Admin xem chi tiết thông tin đơn đăng ký chủ sân. Admin có thể thực hiện Mutation **Duyệt (Approve)** hoặc **Từ chối (Reject - kèm lý do)**. Sau khi thao tác, hệ thống tự động `invalidateQueries` để cập nhật lại UI ngay lập tức mà không cần reload.
 
+### D. Luồng Cấu hình Sân (Venue Configuration)
+Dành cho Owner sau khi được duyệt:
+- **Quản lý Sân con (Courts):** Cho phép tự động khởi tạo danh sách sân mẫu dựa trên quy mô (Venue Scale) đã kê khai. Có cảnh báo khi tạo vượt quy mô.
+- **Cấu hình Bảng giá (Price Rules):** Thiết lập giá theo khung giờ và ngày trong tuần. Backend tự động áp dụng logic ưu tiên: **Khung giờ cụ thể/ngắn sẽ ghi đè khung giờ chung (All day)**, đảm bảo tính toán giá chính xác.
+
+### E. Luồng Đặt Sân (Booking Flow)
+Dành cho người dùng (Default User):
+- **Trải nghiệm chọn sân:** Hỗ trợ chọn và đặt **nhiều block trên nhiều sân khác nhau cùng lúc** (Multi-court Booking). Giao diện trực quan cho phép kéo chọn/click chọn linh hoạt.
+- **Xử lý đồng thời (Concurrency):** Backend kiểm tra chồng lặp thời gian (overlap validation) chặt chẽ, ngăn chặn triệt để tình trạng double-booking.
+
 ---
 
 ## 5. Định hướng cho tương lai (Next Steps)
-- Hoàn thiện tính năng Quản lý Sân (Venue Management) cho Owner sau khi được duyệt.
-- Xây dựng module Đặt lịch (Booking & Scheduling) và Thanh toán (Payment Integration).
-- Nâng cấp Frontend thành Progressive Web App (PWA) để có thể cài đặt như ứng dụng native trên mobile.
+- Tích hợp cổng thanh toán trực tuyến (VNPay / Momo) cho Booking.
+- Xây dựng tính năng "Tìm đối / Ghép đội" (Matchmaking) để tăng tính xã hội hóa.
+- Cải thiện hệ thống Đánh giá (Review & Rating) cho các cơ sở.
+- Nâng cấp Frontend thành Progressive Web App (PWA) đầy đủ để có thể cài đặt và gửi Push Notifications trên mobile.
 
 > Tài liệu này được thiết kế như nguồn chân lý (Source of Truth). Bất kỳ khi nào dự án mở rộng, kiến trúc hoặc luồng dữ liệu thay đổi, tài liệu này cần được cập nhật tương ứng.

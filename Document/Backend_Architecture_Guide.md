@@ -98,3 +98,23 @@ Dưới đây là các bước bạn cần làm và những nơi bạn cần t�
   - Viết các hàm `[HttpGet]`, `[HttpPost]` và gọi hàm tương ứng từ `IVenueService`. Trả về `Ok()` hoặc `BadRequest()`.
 
 > **Thực hành:** Mở `AuthController.cs` và `AuthService.cs` ra xem để lấy mẫu (Template). Toàn bộ luồng CRUD đều theo khuôn mẫu giống hệt như thế này!
+
+---
+
+## 4. Các Lưu ý Quan Trọng (Best Practices) khi Viết Logic
+Dựa trên những nghiệp vụ đã xây dựng (Booking, Pricing, Onboarding), hãy tuân thủ các quy tắc sau khi viết code trong tầng `Application`:
+
+1. **Xử lý Thời gian (Time & Date):** 
+   - Luôn sử dụng `DateTime.UtcNow` để lưu vào DB (tránh lỗi múi giờ).
+   - Khi làm việc với khung giờ (Giờ bắt đầu / kết thúc), hãy dùng `TimeSpan` (Ví dụ: `TimeSpan.Parse("17:00")`).
+
+2. **Logic Tính Giá (Pricing Logic):**
+   - Khi truy vấn các bảng giá (Price Rules), luôn ưu tiên áp dụng **quy tắc cụ thể/ngắn nhất** trước quy tắc chung.
+   - *Ví dụ:* Dùng `.OrderBy(r => r.EndHour - r.StartHour)` để đảm bảo khung Giờ Vàng (ngắn) đè lên khung Giá Cả Ngày (dài).
+
+3. **Chống Đặt Trùng (Double-booking Prevention):**
+   - Không được dùng `==` khi so sánh khoảng thời gian.
+   - Để kiểm tra 2 khoảng thời gian `(StartA, EndA)` và `(StartB, EndB)` có giao nhau (overlap) không, hãy dùng công thức: `StartA < EndB && EndA > StartB`.
+
+4. **Xử lý Dữ Liệu Rác (Null Safety):**
+   - Cẩn thận với các dữ liệu Frontend gửi lên (có thể `null`). Ví dụ với luồng Đăng ký (Register), hệ thống hỗ trợ đăng ký linh hoạt (Email HOẶC Số điện thoại), nên phải xử lý cẩn thận kiểu dữ liệu `string?` và thực hiện validate `if (string.IsNullOrEmpty(email) && string.IsNullOrEmpty(phone))` từ tầng Backend.
