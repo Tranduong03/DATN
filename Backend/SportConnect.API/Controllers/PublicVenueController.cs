@@ -17,30 +17,16 @@ public class PublicVenueController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetVenues([FromQuery] string? search)
     {
-        try
-        {
-            var venues = await _publicVenueService.GetActiveVenuesAsync(search);
-            return Ok(new { isSuccess = true, data = venues });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var venues = await _publicVenueService.GetActiveVenuesAsync(search);
+        return Ok(new { isSuccess = true, data = venues });
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetVenueDetail(Guid id)
     {
-        try
-        {
-            var venue = await _publicVenueService.GetVenueDetailAsync(id);
-            if (venue == null) return NotFound(new { isSuccess = false, message = "Venue not found" });
-            return Ok(new { isSuccess = true, data = venue });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var venue = await _publicVenueService.GetVenueDetailAsync(id);
+        if (venue == null) return NotFound(new { isSuccess = false, message = "Venue not found" });
+        return Ok(new { isSuccess = true, data = venue });
     }
 
     [HttpPost("seed-demo")]

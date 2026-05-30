@@ -24,3 +24,9 @@ export const useUpdateBookingStatus = () => {
     }
   });
 };
+
+export const useGetPaymentUrl = () => {
+  return useMutation({
+    mutationFn: (bookingId: string) => bookingService.getPaymentUrl(bookingId),
+  });
+};

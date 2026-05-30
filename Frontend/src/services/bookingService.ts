@@ -18,5 +18,8 @@ export const bookingService = {
   },
   getOwnerStats: () => {
     return axiosClient.get('/bookings/owner/stats').then(res => (res as any).data);
+  },
+  getPaymentUrl: (bookingId: string) => {
+    return axiosClient.get(`/payment/vnpay/${bookingId}`).then(res => (res as any).paymentUrl);
   }
 };

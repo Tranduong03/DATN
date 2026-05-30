@@ -5,13 +5,13 @@ using SportConnect.Core.Constants;
 using SportConnect.Core.Entities;
 using SportConnect.Infrastructure.Persistence.Context;
 
-namespace SportConnect.Infrastructure.Services;
+namespace SportConnect.Infrastructure.Persistence.Repositories;
 
-public class AdminService : IAdminService
+public class AdminRepository : IAdminRepository
 {
     private readonly MyDbContext _context;
 
-    public AdminService(MyDbContext context)
+    public AdminRepository(MyDbContext context)
     {
         _context = context;
     }
@@ -117,6 +117,7 @@ public class AdminService : IAdminService
                 .Select(vi => vi.ImageUrl)
                 .ToListAsync()
             : new List<string>();
+
         return new OwnerRequestDetailDto
         {
             UserId = profile.UserId,
@@ -153,7 +154,7 @@ public class AdminService : IAdminService
         // 1. Cập nhật OwnerProfile
         var profile = await _context.OwnerProfiles
             .FirstOrDefaultAsync(op => op.UserId == userId);
-        if (profile == null) throw new Exception("Owner profile not found.");
+        if (profile == null) return false;
 
         profile.VerificationStatus = "Verified";
         profile.UpdatedAt = DateTime.UtcNow;
@@ -191,7 +192,7 @@ public class AdminService : IAdminService
     {
         var profile = await _context.OwnerProfiles
             .FirstOrDefaultAsync(op => op.UserId == userId);
-        if (profile == null) throw new Exception("Owner profile not found.");
+        if (profile == null) return false;
 
         profile.VerificationStatus = "Rejected";
         profile.RejectReason = reason;

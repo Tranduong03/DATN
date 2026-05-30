@@ -22,15 +22,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
-        try
-        {
-            var token = await _authService.LoginAsync(loginDto);
-            return Ok(new { Token = token });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        var token = await _authService.LoginAsync(loginDto);
+        return Ok(new { Token = token });
     }
 
     /// <summary>
@@ -39,57 +32,32 @@ public class AuthController : ControllerBase
     [HttpPost("admin-login")]
     public async Task<IActionResult> AdminLogin([FromBody] AdminLoginDto dto)
     {
-        try
+        // 1. Kiểm tra AdminKey bí mật
+        var expectedKey = _config["AdminSettings:SecretKey"];
+        if (string.IsNullOrEmpty(dto.AdminKey) || dto.AdminKey != expectedKey)
         {
-            // 1. Kiểm tra AdminKey bí mật
-            var expectedKey = _config["AdminSettings:SecretKey"];
-            if (string.IsNullOrEmpty(dto.AdminKey) || dto.AdminKey != expectedKey)
-            {
-                return Unauthorized(new { isSuccess = false, message = "Admin key không hợp lệ." });
-            }
+            return Unauthorized(new { isSuccess = false, message = "Admin key không hợp lệ." });
+        }
 
-            // 2. Đăng nhập + kiểm tra role Admin (AdminLoginAsync throw nếu không phải Admin)
-            var loginDto = new LoginDto { UsernameOrEmail = dto.Username, Password = dto.Password };
-            var token = await _authService.AdminLoginAsync(loginDto);
+        // 2. Đăng nhập + kiểm tra role Admin (AdminLoginAsync throw nếu không phải Admin)
+        var loginDto = new LoginDto { UsernameOrEmail = dto.Username, Password = dto.Password };
+        var token = await _authService.AdminLoginAsync(loginDto);
 
-            return Ok(new { isSuccess = true, token });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { isSuccess = false, message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        return Ok(new { isSuccess = true, token });
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
     {
-        try
-        {
-            var token = await _authService.RegisterAsync(registerDto);
-            return Ok(new { Message = "User registered successfully!", Token = token });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        var token = await _authService.RegisterAsync(registerDto);
+        return Ok(new { Message = "User registered successfully!", Token = token });
     }
 
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleLoginDto)
     {
-        try
-        {
-            var token = await _authService.GoogleLoginAsync(googleLoginDto);
-            return Ok(new { Token = token });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        var token = await _authService.GoogleLoginAsync(googleLoginDto);
+        return Ok(new { Token = token });
     }
 
     [Authorize]
@@ -124,19 +92,12 @@ public class AuthController : ControllerBase
     [HttpPut("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {
-        try
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized(new { Message = "User is not authorized." });
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { Message = "User is not authorized." });
 
-            await _authService.ChangePasswordAsync(userId, dto);
-            return Ok(new { Message = "Đổi mật khẩu thành công!" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        await _authService.ChangePasswordAsync(userId, dto);
+        return Ok(new { Message = "Đổi mật khẩu thành công!" });
     }
 
     [HttpPost("forgot-password")]
@@ -145,14 +106,7 @@ public class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(dto.Email))
             return BadRequest(new { Message = "Email không được để trống." });
 
-        try
-        {
-            await _authService.ForgotPasswordAsync(dto);
-            return Ok(new { Message = "Mật khẩu mới đã được gửi vào email của bạn." });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        await _authService.ForgotPasswordAsync(dto);
+        return Ok(new { Message = "Mật khẩu mới đã được gửi vào email của bạn." });
     }
 }

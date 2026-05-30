@@ -27,29 +27,22 @@ public class AdminController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
-        try
-        {
-            if (page < 1) page = 1;
-            if (pageSize < 1 || pageSize > 100) pageSize = 20;
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 20;
 
-            var (items, total) = await _adminService.GetAllUsersAsync(search, page, pageSize);
-            return Ok(new
-            {
-                isSuccess = true,
-                data = new
-                {
-                    items,
-                    totalCount = total,
-                    page,
-                    pageSize,
-                    totalPages = (int)Math.Ceiling((double)total / pageSize)
-                }
-            });
-        }
-        catch (Exception ex)
+        var (items, total) = await _adminService.GetAllUsersAsync(search, page, pageSize);
+        return Ok(new
         {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+            isSuccess = true,
+            data = new
+            {
+                items,
+                totalCount = total,
+                page,
+                pageSize,
+                totalPages = (int)Math.Ceiling((double)total / pageSize)
+            }
+        });
     }
 
     /// <summary>
@@ -58,15 +51,8 @@ public class AdminController : ControllerBase
     [HttpGet("owner-requests")]
     public async Task<IActionResult> GetOwnerRequests([FromQuery] string? status = null)
     {
-        try
-        {
-            var requests = await _adminService.GetOwnerRequestsAsync(status);
-            return Ok(new { isSuccess = true, data = requests });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var requests = await _adminService.GetOwnerRequestsAsync(status);
+        return Ok(new { isSuccess = true, data = requests });
     }
 
     /// <summary>
@@ -75,18 +61,11 @@ public class AdminController : ControllerBase
     [HttpGet("owner-requests/{userId:guid}")]
     public async Task<IActionResult> GetOwnerRequestDetail(Guid userId)
     {
-        try
-        {
-            var detail = await _adminService.GetOwnerRequestDetailAsync(userId);
-            if (detail == null)
-                return NotFound(new { isSuccess = false, message = "Không tìm thấy yêu cầu." });
+        var detail = await _adminService.GetOwnerRequestDetailAsync(userId);
+        if (detail == null)
+            return NotFound(new { isSuccess = false, message = "Không tìm thấy yêu cầu." });
 
-            return Ok(new { isSuccess = true, data = detail });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        return Ok(new { isSuccess = true, data = detail });
     }
 
     /// <summary>
@@ -95,15 +74,8 @@ public class AdminController : ControllerBase
     [HttpPost("owner-requests/{userId:guid}/approve")]
     public async Task<IActionResult> ApproveOwner(Guid userId)
     {
-        try
-        {
-            await _adminService.ApproveOwnerAsync(userId);
-            return Ok(new { isSuccess = true, message = "Đã phê duyệt thành công. Người dùng đã được cấp quyền Owner." });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        await _adminService.ApproveOwnerAsync(userId);
+        return Ok(new { isSuccess = true, message = "Đã phê duyệt thành công. Người dùng đã được cấp quyền Owner." });
     }
 
     /// <summary>
@@ -112,18 +84,11 @@ public class AdminController : ControllerBase
     [HttpPost("owner-requests/{userId:guid}/reject")]
     public async Task<IActionResult> RejectOwner(Guid userId, [FromBody] RejectOwnerRequest request)
     {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(request.Reason))
-                return BadRequest(new { isSuccess = false, message = "Vui lòng nhập lý do từ chối." });
+        if (string.IsNullOrWhiteSpace(request.Reason))
+            return BadRequest(new { isSuccess = false, message = "Vui lòng nhập lý do từ chối." });
 
-            await _adminService.RejectOwnerAsync(userId, request.Reason);
-            return Ok(new { isSuccess = true, message = "Đã từ chối yêu cầu." });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        await _adminService.RejectOwnerAsync(userId, request.Reason);
+        return Ok(new { isSuccess = true, message = "Đã từ chối yêu cầu." });
     }
 }
 

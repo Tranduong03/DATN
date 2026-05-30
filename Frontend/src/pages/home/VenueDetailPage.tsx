@@ -4,7 +4,7 @@ import { ChevronLeft, MapPin, Clock, Star } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenueDetail } from '../../hooks/queries/usePublicQueries';
 import { useVenueAvailability } from '../../hooks/queries/useBookingQueries';
-import { useCreateBooking } from '../../hooks/mutations/useBookingMutations';
+import { useCreateBooking, useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
 
 export default function VenueDetailPage() {
   const { id: venueId } = useParams<{ id: string }>();
@@ -21,6 +21,7 @@ export default function VenueDetailPage() {
   const { data: courtsAvailability = [], isLoading: loadingAvailability } = useVenueAvailability(venueId!, selectedDate);
 
   const createBookingMutation = useCreateBooking();
+  const getPaymentUrlMutation = useGetPaymentUrl();
 
   const handleSlotClick = (courtId: string, slot: any) => {
     if (!slot.isAvailable) return;
@@ -75,16 +76,27 @@ export default function VenueDetailPage() {
     }
 
     try {
-      await Promise.all(selectedSlots.map(selection => 
-        createBookingMutation.mutateAsync({
-          courtId: selection.courtId,
-          startTime: selection.startTime,
-          endTime: selection.endTime
-        })
-      ));
-      alert('Đặt lịch thành công!');
+      const bookings = await Promise.all(
+        selectedSlots.map((selection) =>
+          createBookingMutation.mutateAsync({
+            courtId: selection.courtId,
+            startTime: selection.startTime,
+            endTime: selection.endTime,
+          })
+        )
+      );
+
       setSelectedSlots([]);
-      navigate('/me/bookings'); 
+
+      if (bookings.length > 0) {
+        // Lấy link thanh toán cho booking đầu tiên (hoặc xử lý thanh toán gộp)
+        const bookingId = bookings[0].id;
+        const paymentUrl = await getPaymentUrlMutation.mutateAsync(bookingId);
+        window.location.href = paymentUrl;
+      } else {
+        alert('Đặt lịch thành công!');
+        navigate('/me/bookings');
+      }
     } catch (error: any) {
       alert('Lỗi đặt lịch: ' + (error.response?.data?.message || error.message));
     }

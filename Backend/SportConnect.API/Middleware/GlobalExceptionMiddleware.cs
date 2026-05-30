@@ -1,4 +1,5 @@
 using System.Text.Json;
+using SportConnect.Core.Exceptions;
 
 namespace SportConnect.API.Middleware;
 
@@ -9,6 +10,12 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         try
         {
             await next(context);
+        }
+        catch (AppException ex)
+        {
+            logger.LogWarning(ex, "App exception at {Path}: {Message}", context.Request.Path, ex.Message);
+            await WriteJsonResponse(context, (int)ex.StatusCode,
+                new { isSuccess = false, message = ex.Message });
         }
         catch (UnauthorizedAccessException ex)
         {

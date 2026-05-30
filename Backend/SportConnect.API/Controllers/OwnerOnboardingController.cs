@@ -31,45 +31,24 @@ public class OwnerOnboardingController : ControllerBase
     [HttpGet("status")]
     public async Task<IActionResult> GetStatus()
     {
-        try
-        {
-            var userId = GetUserId();
-            var status = await _onboardingService.GetStatusAsync(userId);
-            return Ok(new { isSuccess = true, data = status });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var userId = GetUserId();
+        var status = await _onboardingService.GetStatusAsync(userId);
+        return Ok(new { isSuccess = true, data = status });
     }
 
     [HttpPost("save-draft")]
     public async Task<IActionResult> SaveDraft([FromBody] SaveDraftDto dto)
     {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _onboardingService.SaveDraftAsync(userId, dto);
-            return Ok(new { isSuccess = true, message = "Draft saved successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var userId = GetUserId();
+        await _onboardingService.SaveDraftAsync(userId, dto);
+        return Ok(new { isSuccess = true, message = "Draft saved successfully" });
     }
 
     [HttpPost("submit")]
     public async Task<IActionResult> Submit([FromBody] SaveDraftDto dto)
     {
-        try
-        {
-            var userId = GetUserId();
-            var result = await _onboardingService.SubmitAsync(userId, dto.DraftData);
-            return Ok(new { isSuccess = true, message = "Application submitted successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var userId = GetUserId();
+        await _onboardingService.SubmitAsync(userId, dto.DraftData);
+        return Ok(new { isSuccess = true, message = "Application submitted successfully" });
     }
 }

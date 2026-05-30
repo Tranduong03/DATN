@@ -27,30 +27,16 @@ public class OwnerVenueController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetMyVenues()
     {
-        try
-        {
-            var venues = await _ownerVenueService.GetMyVenuesAsync(GetUserId());
-            return Ok(new { isSuccess = true, data = venues });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var venues = await _ownerVenueService.GetMyVenuesAsync(GetUserId());
+        return Ok(new { isSuccess = true, data = venues });
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetVenueDetail(Guid id)
     {
-        try
-        {
-            var venue = await _ownerVenueService.GetVenueDetailAsync(id, GetUserId());
-            if (venue == null) return NotFound(new { isSuccess = false, message = "Venue not found or access denied." });
-            return Ok(new { isSuccess = true, data = venue });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var venue = await _ownerVenueService.GetVenueDetailAsync(id, GetUserId());
+        if (venue == null) return NotFound(new { isSuccess = false, message = "Venue not found or access denied." });
+        return Ok(new { isSuccess = true, data = venue });
     }
 
     // --- Courts Management ---
@@ -58,43 +44,22 @@ public class OwnerVenueController : ControllerBase
     [HttpGet("{id}/courts")]
     public async Task<IActionResult> GetCourts(Guid id)
     {
-        try
-        {
-            var courts = await _ownerVenueService.GetCourtsAsync(id, GetUserId());
-            return Ok(new { isSuccess = true, data = courts });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var courts = await _ownerVenueService.GetCourtsAsync(id, GetUserId());
+        return Ok(new { isSuccess = true, data = courts });
     }
 
     [HttpPost("{id}/courts")]
     public async Task<IActionResult> AddCourt(Guid id, [FromBody] CreateCourtDto dto)
     {
-        try
-        {
-            var court = await _ownerVenueService.AddCourtAsync(id, GetUserId(), dto);
-            return Ok(new { isSuccess = true, message = "Thêm sân con thành công.", data = court });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var court = await _ownerVenueService.AddCourtAsync(id, GetUserId(), dto);
+        return Ok(new { isSuccess = true, message = "Thêm sân con thành công.", data = court });
     }
 
     [HttpPut("{id}/courts/{courtId}")]
     public async Task<IActionResult> UpdateCourt(Guid id, Guid courtId, [FromBody] UpdateCourtDto dto)
     {
-        try
-        {
-            var court = await _ownerVenueService.UpdateCourtAsync(id, courtId, GetUserId(), dto);
-            return Ok(new { isSuccess = true, message = "Cập nhật trạng thái sân con thành công.", data = court });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var court = await _ownerVenueService.UpdateCourtAsync(id, courtId, GetUserId(), dto);
+        return Ok(new { isSuccess = true, message = "Cập nhật trạng thái sân con thành công.", data = court });
     }
 
     // --- Pricing Rules Management ---
@@ -102,28 +67,14 @@ public class OwnerVenueController : ControllerBase
     [HttpGet("{id}/pricerules")]
     public async Task<IActionResult> GetPriceRules(Guid id)
     {
-        try
-        {
-            var rules = await _ownerVenueService.GetPriceRulesAsync(id, GetUserId());
-            return Ok(new { isSuccess = true, data = rules });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var rules = await _ownerVenueService.GetPriceRulesAsync(id, GetUserId());
+        return Ok(new { isSuccess = true, data = rules });
     }
 
     [HttpPost("{id}/pricerules")]
     public async Task<IActionResult> UpsertPriceRules(Guid id, [FromBody] List<UpsertPriceRuleDto> dtos)
     {
-        try
-        {
-            await _ownerVenueService.UpsertPriceRulesAsync(id, GetUserId(), dtos);
-            return Ok(new { isSuccess = true, message = "Cập nhật bảng giá thành công." });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        await _ownerVenueService.UpsertPriceRulesAsync(id, GetUserId(), dtos);
+        return Ok(new { isSuccess = true, message = "Cập nhật bảng giá thành công." });
     }
 }

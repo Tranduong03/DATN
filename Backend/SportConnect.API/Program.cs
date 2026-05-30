@@ -21,6 +21,7 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 // Repositories & UnitOfWork
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
 // Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -34,6 +35,7 @@ builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
 builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<StaffPermissionService>();
 builder.Services.AddScoped<ActivityLogService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddHttpContextAccessor();
 
 // Controllers & Swagger

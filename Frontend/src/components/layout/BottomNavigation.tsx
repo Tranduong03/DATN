@@ -35,9 +35,9 @@ export default function BottomNavigation() {
         </div>
       </Link>
       
-      <Link to="/trending" className={`nav-item ${isActive('/trending')}`}>
+      <Link to="/matches" className={`nav-item ${isActive('/matches')}`}>
         <Flame size={24} />
-        <span>Nổi bật</span>
+        <span>Kèo đấu</span>
       </Link>
       
       <Link to={accountPath} className={`nav-item ${isActive('/account')}`}>

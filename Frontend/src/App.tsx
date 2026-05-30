@@ -13,6 +13,9 @@ import OwnerDashboardPage from './pages/owner/OwnerDashboardPage';
 import OwnerVenuesPage from './pages/owner/OwnerVenuesPage';
 import VenueConfigPage from './pages/owner/VenueConfigPage';
 import VenueDetailPage from './pages/home/VenueDetailPage';
+import PaymentResultPage from './pages/home/PaymentResultPage';
+import MatchListPage from './pages/home/MatchListPage';
+import MatchDetailPage from './pages/home/MatchDetailPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminOwnerRequestsPage from './pages/admin/AdminOwnerRequestsPage';
@@ -32,6 +35,9 @@ function App() {
         {/* Public routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/venue/:id" element={<VenueDetailPage />} />
+        <Route path="/payment-result" element={<PaymentResultPage />} />
+        <Route path="/matches" element={<MatchListPage />} />
+        <Route path="/matches/:id" element={<MatchDetailPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
