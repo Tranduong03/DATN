@@ -237,7 +237,7 @@ export default function MatchDetailPage() {
                 {/* Host Item */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#3b82f6', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContext: 'center', fontSize: '14px', fontWeight: 'bold', justifyContent: 'center' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#3b82f6', color: '#ffffff', display: 'flex', alignItems: 'center', fontSize: '14px', fontWeight: 'bold', justifyContent: 'center' }}>
                       H
                     </div>
                     <span style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>{match.hostName}</span>
@@ -251,7 +251,7 @@ export default function MatchDetailPage() {
                 {approvedPlayers.map((player) => (
                   <div key={player.userId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e2e8f0', color: '#475569', display: 'flex', alignItems: 'center', justifyContext: 'center', fontSize: '14px', fontWeight: 'bold', justifyContent: 'center' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e2e8f0', color: '#475569', display: 'flex', alignItems: 'center', fontSize: '14px', fontWeight: 'bold', justifyContent: 'center' }}>
                         {player.userName[0]?.toUpperCase() || 'U'}
                       </div>
                       <span style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>{player.userName}</span>

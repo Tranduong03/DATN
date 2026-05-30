@@ -2,7 +2,20 @@ import { useState } from 'react';
 import OwnerLayout from './OwnerLayout';
 import { useOwnerBookings } from '../../hooks/queries/useBookingQueries';
 import { useUpdateBookingStatus } from '../../hooks/mutations/useBookingMutations';
-import { Search, Filter, Calendar } from 'lucide-react';
+import { Search, Calendar } from 'lucide-react';
+
+interface BookingItem {
+  id: string;
+  bookerName?: string;
+  bookerPhone?: string;
+  status: string;
+  courtName: string;
+  totalPrice: number;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+}
+
 
 export default function OwnerBookingsPage() {
   const { data: bookingsData, isLoading } = useOwnerBookings();
@@ -19,7 +32,7 @@ export default function OwnerBookingsPage() {
     }
   };
 
-  const filteredBookings = bookings.filter((b: any) => {
+  const filteredBookings = bookings.filter((b: BookingItem) => {
     const matchStatus = filterStatus === 'ALL' || b.status === filterStatus;
     const matchSearch = (b.bookerName || '').toLowerCase().includes(search.toLowerCase()) || 
                         (b.bookerPhone || '').includes(search);
@@ -84,7 +97,7 @@ export default function OwnerBookingsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredBookings.map((b: any) => (
+                {filteredBookings.map((b: BookingItem) => (
                   <tr key={b.id}>
                     <td>
                       <div style={{ fontWeight: 600 }}>{b.bookerName}</div>
