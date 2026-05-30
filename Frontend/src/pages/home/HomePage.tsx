@@ -115,7 +115,7 @@ export default function HomePage() {
 
           {/* Sports Categories */}
           <div className="sports-categories">
-            {sports.map((sport, index) => (
+            {sports.map((sport: any, index: number) => (
               <div 
                 key={index} 
                 className={`sport-item ${activeSport === sport.name ? 'active' : ''}`}

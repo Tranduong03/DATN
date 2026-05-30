@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { MapPin, Phone, Clock, Users, Star, ChevronRight, Building2, Settings, Shield, Edit3, Calendar, Award } from 'lucide-react';
+import { MapPin, Clock, Users, Star, ChevronRight, Building2, Settings, Shield, Edit3, Calendar, Award } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { useMyVenues } from '../../hooks/queries/useOwnerQueries';
 import { useOnboardingStatus } from '../../hooks/queries/useOwnerQueries';
