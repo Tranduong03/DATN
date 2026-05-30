@@ -19,6 +19,8 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
     public DbSet<VenueImage> VenueImages => Set<VenueImage>();
     public DbSet<OwnerProfile> OwnerProfiles => Set<OwnerProfile>();
     public DbSet<SportCategory> SportCategories => Set<SportCategory>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<FavoriteVenue> FavoriteVenues => Set<FavoriteVenue>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -513,6 +515,52 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 new SportCategory { Id = 6, Name = "Bóng chuyền", Color = "#F8E71C", Icon = "🏐", Status = true },
                 new SportCategory { Id = 7, Name = "Bóng rổ", Color = "#FF9500", Icon = "🏀", Status = true }
             );
+        });
+
+        // ==========================================
+        // 6. CẤU HÌNH BẢNG NOTIFICATION & FAVORITE
+        // ==========================================
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("Notifications");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Title)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.Message)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Notifications)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<FavoriteVenue>(entity =>
+        {
+            entity.ToTable("FavoriteVenues");
+
+            entity.HasKey(e => new { e.UserId, e.VenueId });
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.FavoriteVenues)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Venue)
+                .WithMany(v => v.FavoritedByUsers)
+                .HasForeignKey(e => e.VenueId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

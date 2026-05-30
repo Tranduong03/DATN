@@ -36,6 +36,8 @@ builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<StaffPermissionService>();
 builder.Services.AddScoped<ActivityLogService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IFavoriteVenueService, FavoriteVenueService>();
 builder.Services.AddHttpContextAccessor();
 
 // Controllers & Swagger

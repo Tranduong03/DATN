@@ -21,4 +21,6 @@ public class User
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public ICollection<Match> HostedMatches { get; set; } = new List<Match>();
     public ICollection<MatchPlayer> MatchPlayers { get; set; } = new List<MatchPlayer>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public ICollection<FavoriteVenue> FavoriteVenues { get; set; } = new List<FavoriteVenue>();
 }

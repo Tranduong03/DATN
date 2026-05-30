@@ -1,4 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import { useRef } from 'react';
+import PageTransition from './components/layout/PageTransition';
+import BottomNavigation from './components/layout/BottomNavigation';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
@@ -28,50 +32,93 @@ import AuthGuard from './pages/auth/AuthGuard';
 import OwnerBookingsPage from './pages/owner/OwnerBookingsPage';
 import OwnerGuard from './pages/owner/OwnerGuard';
 
+const tabRoutes = ['/', '/map', '/explore', '/matches', '/account', '/me'];
+
+function AppRoutes() {
+  const location = useLocation();
+  const prevPathRef = useRef(location.pathname);
+  const directionRef = useRef(1);
+
+  if (location.pathname !== prevPathRef.current) {
+    const prevIndex = tabRoutes.indexOf(prevPathRef.current);
+    const nextIndex = tabRoutes.indexOf(location.pathname);
+    
+    // Chỉ tính hướng slide khi cả hai đều nằm trong danh sách các tab
+    if (prevIndex !== -1 && nextIndex !== -1) {
+      directionRef.current = nextIndex > prevIndex ? 1 : -1;
+    } else {
+      // Mặc định
+      directionRef.current = 1;
+    }
+    prevPathRef.current = location.pathname;
+  }
+
+  const direction = directionRef.current;
+
+  // Hàm bọc các component với PageTransition để tái sử dụng
+  const withTransition = (Component: any) => (
+    <PageTransition direction={direction}>
+      <Component />
+    </PageTransition>
+  );
+
+  // Hide bottom nav on certain pages
+  const hideBottomNav = ['/login', '/register', '/forgot-password', '/payment-result', '/admin', '/owner'].some(path => location.pathname.startsWith(path));
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+      <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+        <Routes location={location} key={location.pathname}>
+          {/* Public routes */}
+          <Route path="/" element={withTransition(HomePage)} />
+          <Route path="/venue/:id" element={withTransition(VenueDetailPage)} />
+          <Route path="/payment-result" element={withTransition(PaymentResultPage)} />
+          <Route path="/matches" element={withTransition(MatchListPage)} />
+          <Route path="/matches/:id" element={withTransition(MatchDetailPage)} />
+          <Route path="/register" element={withTransition(RegisterPage)} />
+          <Route path="/login" element={withTransition(LoginPage)} />
+          <Route path="/forgot-password" element={withTransition(ForgotPasswordPage)} />
+          <Route path="/account" element={withTransition(AccountPage)} />
+
+          {/* User Protected Routes */}
+          <Route element={<AuthGuard />}>
+            <Route path="/me" element={withTransition(MePage)} />
+            <Route path="/profile" element={withTransition(ProfilePage)} />
+            <Route path="/me/bookings" element={withTransition(MyBookingsPage)} />
+            <Route path="/settings" element={withTransition(SettingsPage)} />
+            <Route path="/settings/change-password" element={withTransition(ChangePasswordPage)} />
+            <Route path="/owner/onboarding" element={withTransition(OwnerOnboardingFlow)} />
+          </Route>
+
+          {/* Owner Only Routes */}
+          <Route element={<OwnerGuard />}>
+            <Route path="/owner" element={withTransition(OwnerDashboardPage)} />
+            <Route path="/owner/bookings" element={withTransition(OwnerBookingsPage)} />
+            <Route path="/owner/venues" element={withTransition(OwnerVenuesPage)} />
+            <Route path="/owner/venues/:id" element={withTransition(VenueConfigPage)} />
+          </Route>
+
+          {/* Admin login — public, không cần guard */}
+          <Route path="/admin/login" element={withTransition(AdminLoginPage)} />
+
+          {/* Admin routes — được bảo vệ bởi AdminGuard */}
+          <Route element={<AdminGuard />}>
+            <Route path="/admin" element={withTransition(AdminDashboardPage)} />
+            <Route path="/admin/users" element={withTransition(AdminUsersPage)} />
+            <Route path="/admin/owner-requests" element={withTransition(AdminOwnerRequestsPage)} />
+            <Route path="/admin/sport-categories" element={withTransition(AdminSportCategoriesPage)} />
+          </Route>
+        </Routes>
+      </AnimatePresence>
+      {!hideBottomNav && <BottomNavigation />}
+    </div>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/venue/:id" element={<VenueDetailPage />} />
-        <Route path="/payment-result" element={<PaymentResultPage />} />
-        <Route path="/matches" element={<MatchListPage />} />
-        <Route path="/matches/:id" element={<MatchDetailPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-
-        {/* User Protected Routes */}
-        <Route element={<AuthGuard />}>
-          <Route path="/account" element={<AccountPage />} />
-          <Route path="/me" element={<MePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/me/bookings" element={<MyBookingsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/settings/change-password" element={<ChangePasswordPage />} />
-          <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
-        </Route>
-
-        {/* Owner Only Routes */}
-        <Route element={<OwnerGuard />}>
-          <Route path="/owner" element={<OwnerDashboardPage />} />
-          <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
-          <Route path="/owner/venues" element={<OwnerVenuesPage />} />
-          <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
-        </Route>
-
-        {/* Admin login — public, không cần guard */}
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-
-        {/* Admin routes — được bảo vệ bởi AdminGuard */}
-        <Route element={<AdminGuard />}>
-          <Route path="/admin" element={<AdminDashboardPage />} />
-          <Route path="/admin/users" element={<AdminUsersPage />} />
-          <Route path="/admin/owner-requests" element={<AdminOwnerRequestsPage />} />
-          <Route path="/admin/sport-categories" element={<AdminSportCategoriesPage />} />
-        </Route>
-      </Routes>
+      <AppRoutes />
     </BrowserRouter>
   );
 }
