@@ -71,42 +71,42 @@ function AppRoutes() {
         <Routes location={location} key={location.pathname}>
           {/* Public routes */}
           <Route path="/" element={withTransition(HomePage)} />
-          <Route path="/venue/:id" element={withTransition(VenueDetailPage)} />
-          <Route path="/payment-result" element={withTransition(PaymentResultPage)} />
+          <Route path="/venue/:id" element={<VenueDetailPage />} />
+          <Route path="/payment-result" element={<PaymentResultPage />} />
           <Route path="/matches" element={withTransition(MatchListPage)} />
-          <Route path="/matches/:id" element={withTransition(MatchDetailPage)} />
-          <Route path="/register" element={withTransition(RegisterPage)} />
-          <Route path="/login" element={withTransition(LoginPage)} />
-          <Route path="/forgot-password" element={withTransition(ForgotPasswordPage)} />
+          <Route path="/matches/:id" element={<MatchDetailPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/account" element={withTransition(AccountPage)} />
 
           {/* User Protected Routes */}
           <Route element={<AuthGuard />}>
             <Route path="/me" element={withTransition(MePage)} />
-            <Route path="/profile" element={withTransition(ProfilePage)} />
-            <Route path="/me/bookings" element={withTransition(MyBookingsPage)} />
-            <Route path="/settings" element={withTransition(SettingsPage)} />
-            <Route path="/settings/change-password" element={withTransition(ChangePasswordPage)} />
-            <Route path="/owner/onboarding" element={withTransition(OwnerOnboardingFlow)} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/me/bookings" element={<MyBookingsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/change-password" element={<ChangePasswordPage />} />
+            <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
           </Route>
 
           {/* Owner Only Routes */}
           <Route element={<OwnerGuard />}>
-            <Route path="/owner" element={withTransition(OwnerDashboardPage)} />
-            <Route path="/owner/bookings" element={withTransition(OwnerBookingsPage)} />
-            <Route path="/owner/venues" element={withTransition(OwnerVenuesPage)} />
-            <Route path="/owner/venues/:id" element={withTransition(VenueConfigPage)} />
+            <Route path="/owner" element={<OwnerDashboardPage />} />
+            <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
+            <Route path="/owner/venues" element={<OwnerVenuesPage />} />
+            <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
           </Route>
 
           {/* Admin login — public, không cần guard */}
-          <Route path="/admin/login" element={withTransition(AdminLoginPage)} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
 
           {/* Admin routes — được bảo vệ bởi AdminGuard */}
           <Route element={<AdminGuard />}>
-            <Route path="/admin" element={withTransition(AdminDashboardPage)} />
-            <Route path="/admin/users" element={withTransition(AdminUsersPage)} />
-            <Route path="/admin/owner-requests" element={withTransition(AdminOwnerRequestsPage)} />
-            <Route path="/admin/sport-categories" element={withTransition(AdminSportCategoriesPage)} />
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+            <Route path="/admin/owner-requests" element={<AdminOwnerRequestsPage />} />
+            <Route path="/admin/sport-categories" element={<AdminSportCategoriesPage />} />
           </Route>
         </Routes>
       </AnimatePresence>
