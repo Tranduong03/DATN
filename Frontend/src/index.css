@@ -1171,15 +1171,7 @@ input[type="password"]::-ms-clear {
   position: relative;
   overflow: hidden;
 }
-.user-avatar-placeholder::after {
-  content: "A";
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-weight: 700;
-  font-size: 20px;
-}
+
 
 .user-text {
   color: white;
@@ -1457,16 +1449,9 @@ input[type="password"]::-ms-clear {
   height: 48px;
   border-radius: 8px;
   flex-shrink: 0;
-  position: relative;
-}
-.venue-logo-placeholder::after {
-  content: "Logo";
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .venue-details {

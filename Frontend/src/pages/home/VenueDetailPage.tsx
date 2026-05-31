@@ -113,18 +113,59 @@ export default function VenueDetailPage() {
         </button>
 
         {/* Venue Info */}
-        <div style={{ display: 'flex', gap: 24, marginBottom: 32 }}>
-          <div style={{ width: 300, height: 200, backgroundColor: '#A8DADC', borderRadius: 12 }}></div>
-          <div>
-            <h1 style={{ fontSize: 28, marginBottom: 8 }}>{venue.name}</h1>
-            <div style={{ display: 'flex', gap: 16, color: '#666', marginBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap' }}>
+          {venue.avatarUrl ? (
+            <img 
+              src={venue.avatarUrl} 
+              alt={venue.name} 
+              style={{ width: 300, height: 200, objectFit: 'cover', borderRadius: 12, border: '1px solid #e2e8f0' }} 
+            />
+          ) : (
+            <div style={{ width: 300, height: 200, backgroundColor: '#A8DADC', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1d3557', fontSize: 48, fontWeight: 'bold' }}>
+              {venue.name?.substring(0, 2).toUpperCase() || 'SC'}
+            </div>
+          )}
+          <div style={{ flex: 1, minWidth: 300 }}>
+            <h1 style={{ fontSize: 28, marginBottom: 8, fontWeight: 700 }}>{venue.name}</h1>
+            <div style={{ display: 'flex', gap: 16, color: '#666', marginBottom: 12, flexWrap: 'wrap' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={16} /> {venue.address}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={16} /> {venue.operatingStartHour} - {venue.operatingEndHour}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F5A623' }}><Star size={16} fill="#F5A623" /> {venue.rating}</span>
             </div>
-            <p>{venue.description}</p>
+            
+            {venue.sportTypes && venue.sportTypes.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                {venue.sportTypes.map((sport: string) => (
+                  <span 
+                    key={sport} 
+                    style={{ backgroundColor: '#fef3c7', color: '#d97706', padding: '4px 12px', borderRadius: 16, fontSize: 12, fontWeight: 600 }}
+                  >
+                    {sport}
+                  </span>
+                ))}
+              </div>
+            )}
+            
+            <p style={{ color: '#4b5563', lineHeight: '1.6' }}>{venue.description || 'Chưa có mô tả chi tiết cho sân này.'}</p>
           </div>
         </div>
+
+        {/* Venue Gallery */}
+        {venue.galleryImages && venue.galleryImages.length > 0 && (
+          <div style={{ marginBottom: 32 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: '#475569', marginBottom: 12 }}>Hình ảnh cơ sở</h3>
+            <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
+              {venue.galleryImages.map((img: string, idx: number) => (
+                <img 
+                  key={idx} 
+                  src={img} 
+                  alt={`Gallery ${idx}`} 
+                  style={{ width: 240, height: 160, objectFit: 'cover', borderRadius: 8, flexShrink: 0, border: '1px solid #e2e8f0' }} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Booking Section */}
         <h2 style={{ fontSize: 20, marginBottom: 16 }}>Đặt lịch sân</h2>

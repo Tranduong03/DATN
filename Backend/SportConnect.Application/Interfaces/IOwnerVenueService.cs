@@ -9,6 +9,11 @@ public interface IOwnerVenueService
 {
     Task<IEnumerable<VenueDto>> GetMyVenuesAsync(Guid ownerId);
     Task<VenueDto?> GetVenueDetailAsync(Guid venueId, Guid ownerId);
+    Task<VenueDto?> UpdateVenueAsync(Guid venueId, Guid ownerId, UpdateVenueDto dto);
+    
+    // Images
+    Task<VenueImageDto> AddVenueImageAsync(Guid venueId, Guid ownerId, AddVenueImageDto dto);
+    Task<bool> DeleteVenueImageAsync(Guid venueId, Guid ownerId, Guid imageId);
     
     // Courts
     Task<IEnumerable<CourtDto>> GetCourtsAsync(Guid venueId, Guid ownerId);

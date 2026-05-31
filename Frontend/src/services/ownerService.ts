@@ -22,6 +22,18 @@ export const ownerService = {
     return axiosClient.get(`/owner/venues/${venueId}`).then(res => (res as any).data);
   },
 
+  updateVenue: (venueId: string, data: any) => {
+    return axiosClient.put(`/owner/venues/${venueId}`, data).then(res => (res as any).data);
+  },
+
+  addVenueImage: (venueId: string, data: { imageUrl: string; imageType: string }) => {
+    return axiosClient.post(`/owner/venues/${venueId}/images`, data).then(res => (res as any).data);
+  },
+
+  deleteVenueImage: (venueId: string, imageId: string) => {
+    return axiosClient.delete(`/owner/venues/${venueId}/images/${imageId}`).then(res => (res as any).data);
+  },
+
   // --- Courts ---
   getCourts: (venueId: string) => {
     return axiosClient.get(`/owner/venues/${venueId}/courts`).then(res => (res as any).data);

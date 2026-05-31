@@ -51,3 +51,34 @@ export const useUpsertPriceRules = () => {
     },
   });
 };
+
+export const useUpdateVenue = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ venueId, data }: { venueId: string; data: any }) => ownerService.updateVenue(venueId, data),
+    onSuccess: (_, { venueId }) => {
+      queryClient.invalidateQueries({ queryKey: ['ownerVenues', venueId] });
+      queryClient.invalidateQueries({ queryKey: ['ownerVenues'] });
+    },
+  });
+};
+
+export const useAddVenueImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ venueId, data }: { venueId: string; data: { imageUrl: string; imageType: string } }) => ownerService.addVenueImage(venueId, data),
+    onSuccess: (_, { venueId }) => {
+      queryClient.invalidateQueries({ queryKey: ['ownerVenues', venueId] });
+    },
+  });
+};
+
+export const useDeleteVenueImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ venueId, imageId }: { venueId: string; imageId: string }) => ownerService.deleteVenueImage(venueId, imageId),
+    onSuccess: (_, { venueId }) => {
+      queryClient.invalidateQueries({ queryKey: ['ownerVenues', venueId] });
+    },
+  });
+};

@@ -25,7 +25,13 @@ public class OwnerVenueService : IOwnerVenueService
 
     public async Task<IEnumerable<VenueDto>> GetMyVenuesAsync(Guid ownerId)
     {
-        var venues = await _unitOfWork.Repository<Venue>().FindAsync(v => v.OwnerId == ownerId);
+        var venues = (await _unitOfWork.Repository<Venue>().FindAsync(v => v.OwnerId == ownerId)).ToList();
+        if (!venues.Any()) return new List<VenueDto>();
+
+        var venueIds = venues.Select(v => v.Id).ToList();
+        var allImages = await _unitOfWork.Repository<VenueImage>().FindAsync(vi => venueIds.Contains(vi.VenueId));
+        var imagesByVenue = allImages.GroupBy(vi => vi.VenueId).ToDictionary(g => g.Key, g => g.ToList());
+
         return venues.Select(v => new VenueDto
         {
             Id = v.Id,
@@ -35,7 +41,17 @@ public class OwnerVenueService : IOwnerVenueService
             OperatingStartHour = v.OperatingStartHour.ToString(@"hh\:mm"),
             OperatingEndHour = v.OperatingEndHour.ToString(@"hh\:mm"),
             Status = v.Status,
-            VenueScale = v.VenueScale
+            VenueScale = v.VenueScale,
+            ContactPhone = v.ContactPhone,
+            BankQrUrl = v.BankQrUrl,
+            SportTypes = v.SportTypes,
+            Images = imagesByVenue.GetValueOrDefault(v.Id, new List<VenueImage>())
+                .Select(img => new VenueImageDto
+                {
+                    Id = img.Id,
+                    ImageUrl = img.ImageUrl,
+                    ImageType = img.ImageType
+                }).ToList()
         });
     }
 
@@ -44,6 +60,8 @@ public class OwnerVenueService : IOwnerVenueService
         var venues = await _unitOfWork.Repository<Venue>().FindAsync(v => v.Id == venueId && v.OwnerId == ownerId);
         var v = venues.FirstOrDefault();
         if (v == null) return null;
+
+        var images = await _unitOfWork.Repository<VenueImage>().FindAsync(vi => vi.VenueId == venueId);
 
         return new VenueDto
         {
@@ -54,8 +72,76 @@ public class OwnerVenueService : IOwnerVenueService
             OperatingStartHour = v.OperatingStartHour.ToString(@"hh\:mm"),
             OperatingEndHour = v.OperatingEndHour.ToString(@"hh\:mm"),
             Status = v.Status,
-            VenueScale = v.VenueScale
+            VenueScale = v.VenueScale,
+            ContactPhone = v.ContactPhone,
+            BankQrUrl = v.BankQrUrl,
+            SportTypes = v.SportTypes,
+            Images = images.Select(img => new VenueImageDto
+            {
+                Id = img.Id,
+                ImageUrl = img.ImageUrl,
+                ImageType = img.ImageType
+            }).ToList()
         };
+    }
+
+    public async Task<VenueDto?> UpdateVenueAsync(Guid venueId, Guid ownerId, UpdateVenueDto dto)
+    {
+        var venue = await _unitOfWork.Repository<Venue>().GetByIdAsync(venueId);
+        if (venue == null || venue.OwnerId != ownerId)
+            throw new Exception("Venue not found or unauthorized access.");
+
+        venue.Name = dto.Name;
+        venue.Address = dto.Address;
+        venue.Description = dto.Description;
+        venue.ContactPhone = dto.ContactPhone;
+        venue.BankQrUrl = dto.BankQrUrl;
+        venue.OperatingStartHour = TimeSpan.Parse(dto.OperatingStartHour);
+        venue.OperatingEndHour = TimeSpan.Parse(dto.OperatingEndHour);
+        venue.SportTypes = dto.SportTypes;
+
+        _unitOfWork.Repository<Venue>().Update(venue);
+        await _unitOfWork.CompleteAsync();
+
+        return await GetVenueDetailAsync(venueId, ownerId);
+    }
+
+    public async Task<VenueImageDto> AddVenueImageAsync(Guid venueId, Guid ownerId, AddVenueImageDto dto)
+    {
+        if (!await IsOwnerOfVenue(venueId, ownerId))
+            throw new Exception("Unauthorized access to venue.");
+
+        var venueImage = new VenueImage
+        {
+            VenueId = venueId,
+            ImageUrl = dto.ImageUrl,
+            ImageType = string.IsNullOrWhiteSpace(dto.ImageType) ? "Gallery" : dto.ImageType
+        };
+
+        await _unitOfWork.Repository<VenueImage>().AddAsync(venueImage);
+        await _unitOfWork.CompleteAsync();
+
+        return new VenueImageDto
+        {
+            Id = venueImage.Id,
+            ImageUrl = venueImage.ImageUrl,
+            ImageType = venueImage.ImageType
+        };
+    }
+
+    public async Task<bool> DeleteVenueImageAsync(Guid venueId, Guid ownerId, Guid imageId)
+    {
+        if (!await IsOwnerOfVenue(venueId, ownerId))
+            throw new Exception("Unauthorized access to venue.");
+
+        var image = await _unitOfWork.Repository<VenueImage>().GetByIdAsync(imageId);
+        if (image == null || image.VenueId != venueId)
+            throw new Exception("Image not found in this venue.");
+
+        _unitOfWork.Repository<VenueImage>().Remove(image);
+        await _unitOfWork.CompleteAsync();
+
+        return true;
     }
 
     public async Task<IEnumerable<CourtDto>> GetCourtsAsync(Guid venueId, Guid ownerId)

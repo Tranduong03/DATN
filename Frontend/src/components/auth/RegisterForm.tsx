@@ -125,7 +125,7 @@ export default function RegisterForm() {
         </div>
 
         <div className="form-group">
-          <label>Nhập mật khẩu</label>
+          <label>Nhập lại mật khẩu (*)</label>
           <div className="input-wrapper">
             <input
               type={showConfirmPassword ? "text" : "password"}

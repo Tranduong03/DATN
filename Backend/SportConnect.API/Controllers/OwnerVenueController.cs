@@ -39,6 +39,29 @@ public class OwnerVenueController : ControllerBase
         return Ok(new { isSuccess = true, data = venue });
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateVenue(Guid id, [FromBody] UpdateVenueDto dto)
+    {
+        var venue = await _ownerVenueService.UpdateVenueAsync(id, GetUserId(), dto);
+        return Ok(new { isSuccess = true, message = "Cập nhật thông tin cơ sở thành công.", data = venue });
+    }
+
+    // --- Venue Images Management ---
+
+    [HttpPost("{id}/images")]
+    public async Task<IActionResult> AddVenueImage(Guid id, [FromBody] AddVenueImageDto dto)
+    {
+        var img = await _ownerVenueService.AddVenueImageAsync(id, GetUserId(), dto);
+        return Ok(new { isSuccess = true, message = "Thêm hình ảnh thành công.", data = img });
+    }
+
+    [HttpDelete("{id}/images/{imageId}")]
+    public async Task<IActionResult> DeleteVenueImage(Guid id, Guid imageId)
+    {
+        await _ownerVenueService.DeleteVenueImageAsync(id, GetUserId(), imageId);
+        return Ok(new { isSuccess = true, message = "Xóa hình ảnh thành công." });
+    }
+
     // --- Courts Management ---
 
     [HttpGet("{id}/courts")]

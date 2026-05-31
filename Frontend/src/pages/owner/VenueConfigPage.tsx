@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Plus, Edit2, Check, X } from 'lucide-react';
+import { Plus, Edit2, Check, X, Trash2, Image, Camera, Save, Globe, Phone, MapPin, Clock } from 'lucide-react';
 import OwnerLayout from './OwnerLayout';
 import { useVenueDetail, useCourts, usePriceRules } from '../../hooks/queries/useOwnerQueries';
-import { useAddCourt, useUpdateCourt, useUpsertPriceRules } from '../../hooks/mutations/useOwnerMutations';
+import { useAddCourt, useUpdateCourt, useUpsertPriceRules, useUpdateVenue, useAddVenueImage, useDeleteVenueImage } from '../../hooks/mutations/useOwnerMutations';
 
 export default function VenueConfigPage() {
   const { id: venueId } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'courts' | 'pricing'>('courts');
+  const [activeTab, setActiveTab] = useState<'courts' | 'pricing' | 'profile'>('courts');
 
   // Queries
   const { data: venue, isLoading: loadingVenue } = useVenueDetail(venueId!);
@@ -18,6 +18,9 @@ export default function VenueConfigPage() {
   const addCourtMutation = useAddCourt();
   const updateCourtMutation = useUpdateCourt();
   const upsertPricesMutation = useUpsertPriceRules();
+  const updateVenueMutation = useUpdateVenue();
+  const addVenueImageMutation = useAddVenueImage();
+  const deleteVenueImageMutation = useDeleteVenueImage();
 
   // Court State
   const [newCourtName, setNewCourtName] = useState('');
@@ -28,12 +31,40 @@ export default function VenueConfigPage() {
   // Pricing State
   const [draftPrices, setDraftPrices] = useState<any[]>([]);
 
+  // Venue Profile State
+  const [profileName, setProfileName] = useState('');
+  const [profileAddress, setProfileAddress] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profileDesc, setProfileDesc] = useState('');
+  const [profileStart, setProfileStart] = useState('06:00');
+  const [profileEnd, setProfileEnd] = useState('22:00');
+  const [profileQr, setProfileQr] = useState('');
+  const [profileSports, setProfileSports] = useState<string[]>([]);
+  
+  // Image addition state
+  const [newImageUrl, setNewImageUrl] = useState('');
+  const [newImageType, setNewImageType] = useState<'Avatar' | 'Gallery'>('Gallery');
+
   // Init prices when loaded
   useEffect(() => {
     if (priceRules && !loadingPrices) {
       setDraftPrices(priceRules);
     }
   }, [priceRules, loadingPrices]);
+
+  // Init profile when loaded
+  useEffect(() => {
+    if (venue) {
+      setProfileName(venue.name || '');
+      setProfileAddress(venue.address || '');
+      setProfilePhone(venue.contactPhone || '');
+      setProfileDesc(venue.description || '');
+      setProfileStart(venue.operatingStartHour || '06:00');
+      setProfileEnd(venue.operatingEndHour || '22:00');
+      setProfileQr(venue.bankQrUrl || '');
+      setProfileSports(venue.sportTypes || []);
+    }
+  }, [venue]);
 
   if (loadingVenue) {
     return (
@@ -115,10 +146,80 @@ export default function VenueConfigPage() {
     }
   };
 
+  const handleSaveProfile = async () => {
+    if (!profileName.trim()) {
+      alert('Vui lòng nhập tên cơ sở!');
+      return;
+    }
+    if (!profileAddress.trim()) {
+      alert('Vui lòng nhập địa chỉ!');
+      return;
+    }
+    try {
+      await updateVenueMutation.mutateAsync({
+        venueId: venueId!,
+        data: {
+          name: profileName,
+          address: profileAddress,
+          description: profileDesc,
+          contactPhone: profilePhone,
+          bankQrUrl: profileQr,
+          operatingStartHour: profileStart,
+          operatingEndHour: profileEnd,
+          sportTypes: profileSports
+        }
+      });
+      alert('Cập nhật thông tin cơ sở thành công!');
+    } catch (e) {
+      console.error(e);
+      alert('Lỗi cập nhật thông tin cơ sở');
+    }
+  };
+
+  const handleAddImage = async () => {
+    if (!newImageUrl.trim()) return;
+    try {
+      await addVenueImageMutation.mutateAsync({
+        venueId: venueId!,
+        data: {
+          imageUrl: newImageUrl,
+          imageType: newImageType
+        }
+      });
+      setNewImageUrl('');
+      alert('Thêm hình ảnh thành công!');
+    } catch (e) {
+      console.error(e);
+      alert('Lỗi thêm hình ảnh');
+    }
+  };
+
+  const handleDeleteImage = async (imageId: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa hình ảnh này không?')) return;
+    try {
+      await deleteVenueImageMutation.mutateAsync({
+        venueId: venueId!,
+        imageId
+      });
+      alert('Xóa hình ảnh thành công!');
+    } catch (e) {
+      console.error(e);
+      alert('Lỗi xóa hình ảnh');
+    }
+  };
+
+  const handleSportToggle = (sport: string) => {
+    if (profileSports.includes(sport)) {
+      setProfileSports(profileSports.filter(s => s !== sport));
+    } else {
+      setProfileSports([...profileSports, sport]);
+    }
+  };
+
   return (
     <OwnerLayout 
       title={`Cấu hình: ${venue.name}`} 
-      subtitle={`Quản lý Sân con và Bảng giá cho ${venue.name}`}
+      subtitle={`Quản lý Sân con, Bảng giá và Hồ sơ cho ${venue.name}`}
     >
       {/* Back button removed as 1 Owner = 1 Venue */}
       <div className="admin-tabs" style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
@@ -135,6 +236,13 @@ export default function VenueConfigPage() {
           style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'pricing' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'pricing' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'pricing' ? 600 : 400, cursor: 'pointer' }}
         >
           Cấu hình Bảng giá
+        </button>
+        <button 
+          className={`admin-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
+          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'profile' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'profile' ? 600 : 400, cursor: 'pointer' }}
+        >
+          Thông tin cơ sở
         </button>
       </div>
 
@@ -341,6 +449,246 @@ export default function VenueConfigPage() {
           >
             <Plus size={16} /> Thêm khung giá mới
           </button>
+        </div>
+      )}
+
+      {activeTab === 'profile' && (
+        <div className="admin-section" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 32 }}>
+          {/* Section 1: Basic Information */}
+          <div style={{ backgroundColor: 'white', padding: 24, borderRadius: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <h2 className="admin-section-title" style={{ margin: '0 0 20px 0', borderBottom: '1px solid #f3f4f6', paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Globe size={20} color="#f59e0b" /> Thông tin chung cơ sở
+            </h2>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Tên cơ sở thể thao *</label>
+                <input 
+                  type="text" 
+                  value={profileName} 
+                  onChange={e => setProfileName(e.target.value)} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
+                  placeholder="VD: Sân Pickleball & Badminton Premium"
+                />
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Địa chỉ cơ sở *</label>
+                <div style={{ position: 'relative' }}>
+                  <MapPin size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+                  <input 
+                    type="text" 
+                    value={profileAddress} 
+                    onChange={e => setProfileAddress(e.target.value)} 
+                    style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
+                    placeholder="Số nhà, Tên đường, Quận, Thành phố..."
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Số điện thoại liên hệ *</label>
+                <div style={{ position: 'relative' }}>
+                  <Phone size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+                  <input 
+                    type="text" 
+                    value={profilePhone} 
+                    onChange={e => setProfilePhone(e.target.value)} 
+                    style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
+                    placeholder="09xx xxx xxx"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>QR Code thanh toán (Link ảnh nhận chuyển khoản)</label>
+                <input 
+                  type="text" 
+                  value={profileQr} 
+                  onChange={e => setProfileQr(e.target.value)} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
+                  placeholder="URL mã QR (Ví dụ VietQR, MoMo...)"
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Giờ mở cửa *</label>
+                <div style={{ position: 'relative' }}>
+                  <Clock size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+                  <input 
+                    type="time" 
+                    value={profileStart} 
+                    onChange={e => setProfileStart(e.target.value)} 
+                    style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Giờ đóng cửa *</label>
+                <div style={{ position: 'relative' }}>
+                  <Clock size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+                  <input 
+                    type="time" 
+                    value={profileEnd} 
+                    onChange={e => setProfileEnd(e.target.value)} 
+                    style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Môn thể thao kinh doanh</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 8 }}>
+                  {['Cầu lông', 'Tennis', 'Pickleball', 'Bóng đá', 'Bóng rổ', 'Khác'].map(sport => {
+                    const active = profileSports.includes(sport);
+                    return (
+                      <button
+                        key={sport}
+                        type="button"
+                        onClick={() => handleSportToggle(sport)}
+                        style={{
+                          padding: '8px 16px',
+                          borderRadius: 20,
+                          border: active ? '2px solid #f59e0b' : '1px solid #d1d5db',
+                          background: active ? '#fef3c7' : 'white',
+                          color: active ? '#d97706' : '#4b5563',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {sport}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Mô tả ngắn</label>
+                <textarea 
+                  value={profileDesc} 
+                  onChange={e => setProfileDesc(e.target.value)} 
+                  rows={4}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none', resize: 'vertical' }}
+                  placeholder="Giới thiệu về cơ sở của bạn (tiện ích đi kèm, dịch vụ nước uống, bãi đỗ xe...)"
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
+              <button 
+                onClick={handleSaveProfile} 
+                disabled={updateVenueMutation.isPending}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 8, 
+                  backgroundColor: '#f59e0b', 
+                  color: 'white', 
+                  border: 'none', 
+                  padding: '12px 24px', 
+                  borderRadius: 8, 
+                  fontWeight: 600, 
+                  cursor: 'pointer' 
+                }}
+              >
+                <Save size={18} /> Lưu thông tin cơ sở
+              </button>
+            </div>
+          </div>
+
+          {/* Section 2: Venue Images */}
+          <div style={{ backgroundColor: 'white', padding: 24, borderRadius: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <h2 className="admin-section-title" style={{ margin: '0 0 20px 0', borderBottom: '1px solid #f3f4f6', paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Image size={20} color="#f59e0b" /> Quản lý hình ảnh cơ sở
+            </h2>
+
+            <div style={{ background: '#f9fafb', padding: 20, borderRadius: 10, border: '1px dashed #d1d5db', marginBottom: 24 }}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: 14, fontWeight: 600, color: '#374151' }}>Thêm hình ảnh mới</h3>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <input 
+                  type="text" 
+                  value={newImageUrl} 
+                  onChange={e => setNewImageUrl(e.target.value)} 
+                  placeholder="Nhập URL hình ảnh (Ví dụ: https://example.com/image.jpg)"
+                  style={{ flex: 1, minWidth: 200, padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
+                />
+                <select 
+                  value={newImageType} 
+                  onChange={e => setNewImageType(e.target.value as any)}
+                  style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: 'white' }}
+                >
+                  <option value="Gallery">Ảnh thư viện (Gallery)</option>
+                  <option value="Avatar">Ảnh Đại diện (Avatar)</option>
+                </select>
+                <button 
+                  onClick={handleAddImage}
+                  disabled={addVenueImageMutation.isPending}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 4, 
+                    backgroundColor: '#10b981', 
+                    color: 'white', 
+                    border: 'none', 
+                    padding: '10px 20px', 
+                    borderRadius: 8, 
+                    fontWeight: 600, 
+                    cursor: 'pointer' 
+                  }}
+                >
+                  <Plus size={16} /> Thêm
+                </button>
+              </div>
+              <p style={{ margin: '6px 0 0 0', fontSize: 12, color: '#6b7280' }}>
+                Gợi ý: Bạn có thể upload ảnh lên Imgur, Cloudinary rồi dán link URL vào đây.
+              </p>
+            </div>
+
+            {/* Images Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 20 }}>
+              {/* Avatar (nếu có) */}
+              {venue.images?.filter((img: any) => img.imageType === 'Avatar').map((img: any) => (
+                <div key={img.id} style={{ position: 'relative', borderRadius: 8, overflow: 'hidden', border: '3px solid #f59e0b', height: 180 }}>
+                  <img src={img.imageUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#f59e0b', color: 'white', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>
+                    AVATAR
+                  </div>
+                  <button 
+                    onClick={() => handleDeleteImage(img.id)}
+                    style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+
+              {/* Gallery Images */}
+              {venue.images?.filter((img: any) => img.imageType === 'Gallery' || img.imageType === 'Cover').map((img: any) => (
+                <div key={img.id} style={{ position: 'relative', borderRadius: 8, overflow: 'hidden', border: '1px solid #e5e7eb', height: 180 }}>
+                  <img src={img.imageUrl} alt="Gallery" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#3b82f6', color: 'white', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>
+                    THƯ VIỆN
+                  </div>
+                  <button 
+                    onClick={() => handleDeleteImage(img.id)}
+                    style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+
+              {(!venue.images || venue.images.length === 0) && (
+                <div style={{ gridColumn: 'span 10', textAlign: 'center', padding: '40px 0', color: '#9ca3af' }}>
+                  <Camera size={36} style={{ marginBottom: 8 }} />
+                  <p style={{ margin: 0 }}>Cơ sở chưa có hình ảnh nào. Hãy thêm ảnh Đại diện và ảnh Thư viện của sân.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </OwnerLayout>

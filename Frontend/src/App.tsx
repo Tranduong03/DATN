@@ -20,6 +20,8 @@ import VenueDetailPage from './pages/home/VenueDetailPage';
 import PaymentResultPage from './pages/home/PaymentResultPage';
 import MatchListPage from './pages/home/MatchListPage';
 import MatchDetailPage from './pages/home/MatchDetailPage';
+import MapPage from './pages/home/MapPage';
+import ExplorePage from './pages/home/ExplorePage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminOwnerRequestsPage from './pages/admin/AdminOwnerRequestsPage';
@@ -71,6 +73,8 @@ function AppRoutes() {
         <Routes location={location} key={location.pathname}>
           {/* Public routes */}
           <Route path="/" element={withTransition(HomePage)} />
+          <Route path="/map" element={withTransition(MapPage)} />
+          <Route path="/explore" element={withTransition(ExplorePage)} />
           <Route path="/venue/:id" element={<VenueDetailPage />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
           <Route path="/matches" element={withTransition(MatchListPage)} />

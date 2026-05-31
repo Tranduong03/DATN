@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, Search, Heart, Share2, Star, Clock } from 'lucide-react';
+import { Bell, Search, Heart, Share2, Star, Clock, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
@@ -91,7 +91,9 @@ export default function HomePage() {
           {/* Search Bar */}
           <div className="search-section">
             <div className="search-bar">
-              <div className="search-logo-icon"></div>
+              <div className="search-logo-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MapPin size={14} color="#fff" />
+              </div>
               <input type="text" placeholder="Tìm kiếm" />
               <button className="search-submit">
                 <Search size={20} color="#666" />
@@ -136,7 +138,16 @@ export default function HomePage() {
               <p>Không tìm thấy sân nào.</p>
             ) : venues.map((venue: any) => (
               <div key={venue.id} className="venue-card">
-                <div className="venue-cover" style={{ backgroundColor: '#A8DADC' }}>
+                <div 
+                  className="venue-cover" 
+                  style={{ 
+                    backgroundImage: venue.avatarUrl ? `url(${venue.avatarUrl})` : 'none', 
+                    backgroundColor: venue.avatarUrl ? 'transparent' : '#A8DADC',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    position: 'relative'
+                  }}
+                >
                   <div className="venue-badges">
                     <span className="badge badge-rating">
                       <Star size={12} fill="#F5A623" color="#F5A623" /> {venue.rating}
@@ -150,8 +161,12 @@ export default function HomePage() {
                 </div>
                 
                 <div className="venue-info">
-                  <div className="venue-logo-placeholder" style={{ backgroundColor: '#F5A623' }}>
-                    <span style={{ color: 'white', fontWeight: 'bold' }}>{venue.name.substring(0,2).toUpperCase()}</span>
+                  <div className="venue-logo-placeholder" style={{ backgroundColor: '#F5A623', overflow: 'hidden' }}>
+                    {venue.avatarUrl ? (
+                      <img src={venue.avatarUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ color: 'white', fontWeight: 'bold' }}>{venue.name.substring(0,2).toUpperCase()}</span>
+                    )}
                   </div>
                   <div className="venue-details">
                     <h3 className="venue-name">{venue.name}</h3>

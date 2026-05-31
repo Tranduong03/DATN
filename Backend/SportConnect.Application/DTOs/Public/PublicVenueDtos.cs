@@ -15,10 +15,15 @@ public class PublicVenueDto
     public string? Distance { get; set; } // For future geolocation
     public decimal MinPrice { get; set; } // Tự động tính giá min để show ra
     public double Rating { get; set; } = 5.0; // Mock rating for now
+    public string? AvatarUrl { get; set; }
+    public List<string> SportTypes { get; set; } = new();
 }
 
 public class PublicVenueDetailDto : PublicVenueDto
 {
+    public string? BankQrUrl { get; set; }
+    public string? ContactPhone { get; set; }
+    public List<string> GalleryImages { get; set; } = new();
     public List<PublicCourtDto> Courts { get; set; } = new();
     public List<PublicPriceRuleDto> PriceRules { get; set; } = new();
 }
