@@ -4,7 +4,8 @@ import MainLayout from '../../components/layout/MainLayout';
 import { useMyBookings } from '../../hooks/queries/useBookingQueries';
 import { useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
 import { useCreateMatch } from '../../hooks/mutations/useMatchMutations';
-import { CircleDollarSign, Trophy, CreditCard } from 'lucide-react';
+import { useCreateReview } from '../../hooks/mutations/useReviewMutations';
+import { CircleDollarSign, Trophy, CreditCard, Star } from 'lucide-react';
 
 export default function MyBookingsPage() {
   const navigate = useNavigate();
@@ -20,6 +21,12 @@ export default function MyBookingsPage() {
   const [skillLevel, setSkillLevel] = useState('Intermediate');
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [feePerPlayer, setFeePerPlayer] = useState(0);
+
+  // State quản lý Modal Đánh giá
+  const [reviewBooking, setReviewBooking] = useState<any | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const createReviewMutation = useCreateReview();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -79,6 +86,28 @@ export default function MyBookingsPage() {
       navigate('/matches');
     } catch (error: any) {
       alert('Lỗi tạo kèo đấu: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleOpenReviewModal = (booking: any) => {
+    setReviewBooking(booking);
+    setReviewRating(5);
+    setReviewComment('');
+  };
+
+  const handleCreateReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewBooking) return;
+    try {
+      await createReviewMutation.mutateAsync({
+        bookingId: reviewBooking.id,
+        rating: reviewRating,
+        comment: reviewComment
+      });
+      alert('Cảm ơn bạn đã đánh giá!');
+      setReviewBooking(null);
+    } catch (error: any) {
+      alert('Lỗi gửi đánh giá: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -172,6 +201,28 @@ export default function MyBookingsPage() {
                       >
                         <Trophy size={14} />
                         Tạo kèo (Tìm đối)
+                      </button>
+                    )}
+                    
+                    {booking.status === 'CONFIRMED' && (
+                      <button
+                        onClick={() => handleOpenReviewModal(booking)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 12px',
+                          border: 'none',
+                          borderRadius: '8px',
+                          backgroundColor: '#10b981',
+                          color: '#ffffff',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Star size={14} />
+                        Đánh giá
                       </button>
                     )}
                   </div>
@@ -331,6 +382,108 @@ export default function MyBookingsPage() {
                   </button>
                 </div>
 
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Đánh giá */}
+        {reviewBooking && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.6)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 999
+            }}
+          >
+            <div 
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '24px',
+                padding: '32px',
+                maxWidth: '400px',
+                width: '100%',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e2e8f0',
+                margin: '0 20px'
+              }}
+            >
+              <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', marginBottom: '8px' }}>
+                Đánh giá sân
+              </h2>
+              <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>
+                Chia sẻ trải nghiệm của bạn tại {reviewBooking.venueName} nhé!
+              </p>
+
+              <form onSubmit={handleCreateReviewSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star 
+                      key={star}
+                      size={32} 
+                      fill={star <= reviewRating ? "#f59e0b" : "transparent"} 
+                      color={star <= reviewRating ? "#f59e0b" : "#cbd5e1"}
+                      onClick={() => setReviewRating(star)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  ))}
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                    Nhận xét (không bắt buộc)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Sân sạch đẹp, anh chủ nhiệt tình..."
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', resize: 'vertical' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setReviewBooking(null)}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      borderRadius: '10px',
+                      border: '1px solid #cbd5e1',
+                      backgroundColor: 'transparent',
+                      color: '#475569',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={createReviewMutation.isPending}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      backgroundColor: '#10b981',
+                      color: '#ffffff',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {createReviewMutation.isPending ? 'Đang gửi...' : 'Gửi đánh giá'}
+                  </button>
+                </div>
               </form>
             </div>
           </div>

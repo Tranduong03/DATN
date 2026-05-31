@@ -9,10 +9,12 @@ namespace SportConnect.Infrastructure.Services;
 public class NotificationService : INotificationService
 {
     private readonly MyDbContext _context;
+    private readonly INotificationPublisher _publisher;
 
-    public NotificationService(MyDbContext context)
+    public NotificationService(MyDbContext context, INotificationPublisher publisher)
     {
         _context = context;
+        _publisher = publisher;
     }
 
     public async Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(Guid userId)
@@ -80,5 +82,8 @@ public class NotificationService : INotificationService
 
         _context.Notifications.Add(notif);
         await _context.SaveChangesAsync();
+        
+        // Push notification in real-time
+        await _publisher.SendNotificationToUserAsync(userId, title);
     }
 }

@@ -21,6 +21,7 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
     public DbSet<SportCategory> SportCategories => Set<SportCategory>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<FavoriteVenue> FavoriteVenues => Set<FavoriteVenue>();
+    public DbSet<Review> Reviews => Set<Review>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -561,6 +562,40 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .WithMany(v => v.FavoritedByUsers)
                 .HasForeignKey(e => e.VenueId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ==========================================
+        // 7. CẤU HÌNH BẢNG REVIEW ĐÁNH GIÁ
+        // ==========================================
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.ToTable("Reviews");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Rating)
+                .IsRequired();
+
+            entity.Property(e => e.Comment)
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Venue)
+                .WithMany(v => v.Reviews)
+                .HasForeignKey(e => e.VenueId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.Booking)
+                .WithOne(b => b.Review)
+                .HasForeignKey<Review>(e => e.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

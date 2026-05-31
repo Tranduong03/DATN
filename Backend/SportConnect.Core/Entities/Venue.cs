@@ -15,10 +15,13 @@ public class Venue
     public int VenueScale { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string Status { get; set; } = "ACTIVE"; // ACTIVE, INACTIVE, PENDING_APPROVAL
+    public double AverageRating { get; set; } = 5.0;
+    public int ReviewCount { get; set; } = 0;
 
     // Navigation properties
     public User Owner { get; set; } = null!;
     public ICollection<Court> Courts { get; set; } = new List<Court>();
     public ICollection<PriceRule> PriceRules { get; set; } = new List<PriceRule>();
     public ICollection<FavoriteVenue> FavoritedByUsers { get; set; } = new List<FavoriteVenue>();
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

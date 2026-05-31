@@ -21,4 +21,5 @@ public class Booking
     public User Booker { get; set; } = null!;
     public Court Court { get; set; } = null!;
     public Match? Match { get; set; }
+    public Review? Review { get; set; }
 }

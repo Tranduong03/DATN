@@ -9,6 +9,8 @@ using SportConnect.Infrastructure.Persistence.Repositories;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using SportConnect.API.Middleware;
+using SportConnect.API.Services;
+using SportConnect.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +40,12 @@ builder.Services.AddScoped<ActivityLogService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFavoriteVenueService, FavoriteVenueService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddSingleton<INotificationPublisher, SignalRNotificationPublisher>();
 builder.Services.AddHttpContextAccessor();
+
+// SignalR
+builder.Services.AddSignalR();
 
 // Controllers & Swagger
 builder.Services.AddControllers();
@@ -133,6 +140,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication(); // ← phải trước UseAuthorization
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notification");
 
 // ==================== RUN ====================
 app.Run();
