@@ -87,12 +87,32 @@ Dành cho người dùng (Default User):
 - **Trải nghiệm chọn sân:** Hỗ trợ chọn và đặt **nhiều block trên nhiều sân khác nhau cùng lúc** (Multi-court Booking). Giao diện trực quan cho phép kéo chọn/click chọn linh hoạt.
 - **Xử lý đồng thời (Concurrency):** Backend kiểm tra chồng lặp thời gian (overlap validation) chặt chẽ, ngăn chặn triệt để tình trạng double-booking.
 
+### F. Luồng Bản Đồ Tìm Sân (Map Flow — Google Maps API)
+Dành cho người dùng tìm sân thể thao gần vị trí hiện tại:
+- **Google Maps JavaScript API:** Tải động script Google Maps tại runtime. API Key được cấu hình qua biến môi trường `VITE_GOOGLE_MAPS_API_KEY`.
+- **GPS Định vị:** Truy cập HTML5 Geolocation API để xác định tọa độ người dùng. Nút GPS Locate cho phép pan camera về vị trí hiện tại.
+- **Bộ lọc động (Dynamic Filters):** Danh sách môn thể thao được truy vấn từ API `/api/SportCategories` (cơ sở dữ liệu), hiển thị dưới dạng các filter pills có màu sắc và emoji tương ứng. Hỗ trợ lọc theo bán kính 1–10km.
+- **Custom Markers:** Ghim teardrop SVG tùy chỉnh có mã màu theo môn thể thao, chứa emoji bên trong vòng tròn trắng.
+- **Bottom Sheet Chi tiết:** Click vào marker hiển thị thẻ thông tin sân (tên, đánh giá, địa chỉ, giá, nút đặt sân).
+- **Fullscreen Map Layout:** Map container sử dụng `position: fixed` để phủ toàn bộ viewport, cho phép bản đồ tràn vào phần bo tròn của thanh navigation.
+
+### G. Luồng Bảng Tin Khám Phá (Explore / Social Feed Flow)
+Không gian mạng xã hội thể thao dạng Facebook/Zalo:
+- **Bảng tin (Feed Tab):** Cho phép đăng bài, lọc theo danh mục, like/comment tương tác.
+- **Giải đấu (Tournaments Tab):** Hiển thị giải đấu sắp tới với phí, giải thưởng, timeline, nút đăng ký.
+- **Lớp học (Classes Tab):** Quảng bá lớp huấn luyện với thông tin HLV, giá, lịch học.
+- **Ưu đãi (Promotions Tab):** Mã coupon khuyến mãi từ các sân, hỗ trợ sao chép mã tự động.
+
 ---
 
 ## 5. Định hướng cho tương lai (Next Steps)
-- Tích hợp cổng thanh toán trực tuyến (VNPay / Momo) cho Booking.
-- Xây dựng tính năng "Tìm đối / Ghép đội" (Matchmaking) để tăng tính xã hội hóa.
+- ~~Tích hợp cổng thanh toán trực tuyến (VNPay / Momo) cho Booking.~~ ✅ Đã tích hợp VNPay.
+- ~~Xây dựng tính năng "Tìm đối / Ghép đội" (Matchmaking).~~ ✅ Đã triển khai hệ thống Match/Kèo đấu.
+- ~~Tích hợp bản đồ tìm sân (Google Maps API).~~ ✅ Đã hoàn thành.
+- ~~Xây dựng bảng tin khám phá (Social Feed).~~ ✅ Đã hoàn thành.
 - Cải thiện hệ thống Đánh giá (Review & Rating) cho các cơ sở.
 - Nâng cấp Frontend thành Progressive Web App (PWA) đầy đủ để có thể cài đặt và gửi Push Notifications trên mobile.
+- Tích hợp hệ thống thông báo realtime (SignalR / WebSocket).
+- Tối ưu hóa SEO và hiệu năng tải trang.
 
 > Tài liệu này được thiết kế như nguồn chân lý (Source of Truth). Bất kỳ khi nào dự án mở rộng, kiến trúc hoặc luồng dữ liệu thay đổi, tài liệu này cần được cập nhật tương ứng.

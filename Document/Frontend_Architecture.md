@@ -42,9 +42,14 @@ src/
 ├── pages/                      # Các trang (Pages) tương ứng với từng Route
 │   ├── admin/                  # Giao diện cho Admin (Dashboard, Duyệt chủ sân, Quản lý user...)
 │   ├── auth/                   # Giao diện Đăng nhập, Đăng ký, Quên mật khẩu
-│   ├── home/                   # Giao diện chính (Khách hàng xem sân, tạo kèo, đặt lịch)
-│   ├── owner/                  # Giao diện cho Chủ sân (Quản lý sân, Quản lý lịch đặt, Cấu hình sân)
-│   └── profile/                # Giao diện cá nhân người dùng (Thông tin, Lịch sử đặt, Đổi mật khẩu)
+│   ├── home/                   # Giao diện chính (Trang chủ, Bản đồ, Khám phá, Chi tiết sân, Đặt sân)
+│   │   ├── HomePage.tsx        # Trang chủ - Danh sách sân nổi bật, tìm kiếm nhanh
+│   │   ├── MapPage.tsx         # Bản đồ tìm sân - Google Maps JavaScript API, GPS, lọc môn thể thao
+│   │   ├── ExplorePage.tsx     # Bảng tin xã hội - Feed, Giải đấu, Lớp học, Ưu đãi
+│   │   ├── VenueDetailPage.tsx # Chi tiết sân - Thông tin, ảnh, đặt lịch, thanh toán
+│   │   ├── MatchListPage.tsx   # Danh sách kèo đấu
+│   │   ├── MatchDetailPage.tsx # Chi tiết kèo - Tham gia/rời kèo
+│   │   └── PaymentResultPage.tsx # Kết quả thanh toán VNPay
 │
 └── services/                   # Lớp giao tiếp trực tiếp với Backend API (Gọi axios)
     ├── adminService.ts         # Gọi API phần Admin
@@ -74,3 +79,12 @@ src/
 
 4. **Quản lý khóa Query (Query Keys Management):**
    - File `queryKeys.ts` tập trung toàn bộ các định danh key (VD: `['venues', 'public']`). Điều này giúp tránh gõ sai key và dễ dàng `invalidateQueries` (làm mới dữ liệu) sau khi người dùng thực hiện cập nhật.
+
+5. **Tích hợp API bên ngoài (External API Integration):**
+   - **Google Maps JavaScript API** được tải động trong `MapPage.tsx` thông qua `useEffect` (tạo script tag tại runtime). Không sử dụng thư viện wrapper React bên thứ ba để tránh xung đột phiên bản với React 19.
+   - API Key được cấu hình an toàn qua Vite environment variable: `import.meta.env.VITE_GOOGLE_MAPS_API_KEY`.
+   - Dữ liệu môn thể thao cho bộ lọc bản đồ được truy vấn trực tiếp từ Backend API `/api/SportCategories` thông qua hook `useSportCategories()`, đảm bảo đồng bộ với cơ sở dữ liệu.
+
+6. **Fullscreen Layout Pattern:**
+   - Component `MainLayout` hỗ trợ prop `noPaddingBottom` để cho phép các trang như MapPage sử dụng toàn bộ viewport mà không bị cắt bởi padding dành cho bottom navigation.
+   - MapPage sử dụng `position: fixed` cho map container để bản đồ hiển thị xuyên qua các góc bo tròn của thanh điều hướng.

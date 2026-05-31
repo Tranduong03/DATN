@@ -16,6 +16,8 @@ graph TD
     subgraph BottomNav ["Menu Điều Hướng Dưới (Bottom Navigation)"]
         direction LR
         Home["Trang Chủ ( / )"]:::tab
+        MapPage["Bản Đồ ( /map )"]:::tab
+        Explore["Khám Phá ( /explore )"]:::tab
         Matches["Kèo Đấu ( /matches )"]:::tab
         Account["Tài Khoản ( /account )"]:::tab
         Me["Cá Nhân ( /me )"]:::tab
@@ -31,11 +33,22 @@ graph TD
         Login -- "Đăng nhập thành công" --> Home
     end
 
-    %% === BOOKING & EXPLORE FLOW ===
-    subgraph ExploreFlow ["Luồng Tìm Kiếm & Đặt Sân"]
+    %% === BOOKING & VENUE DETAIL FLOW ===
+    subgraph BookingFlow ["Luồng Tìm Kiếm & Đặt Sân"]
         Home --> VenueDetail["Chi Tiết Sân ( /venue/:id )"]:::detail
+        MapPage -- "Chọn sân trên bản đồ" --> VenueDetail
         VenueDetail -- "Đặt lịch & Thanh toán" --> PaymentResult["Kết Quả Thanh Toán ( /payment-result )"]:::detail
         PaymentResult -- "Hoàn tất" --> Home
+    end
+
+    %% === MAP & EXPLORE FLOW ===
+    subgraph MapExploreFlow ["Luồng Bản Đồ & Khám Phá"]
+        MapPage -- "Tìm sân gần đây" --> MapSearch["Tìm kiếm & Lọc theo môn"]:::detail
+        MapSearch -- "Chọn marker sân" --> VenueDetail
+        Explore -- "Đọc bảng tin" --> ExploreFeed["Bảng Tin Xã Hội"]:::detail
+        Explore -- "Giải đấu" --> ExploreTournaments["Danh Sách Giải Đấu"]:::detail
+        Explore -- "Lớp học" --> ExploreClasses["Lớp Huấn Luyện"]:::detail
+        Explore -- "Ưu đãi" --> ExplorePromos["Khuyến Mãi & Coupon"]:::detail
     end
 
     %% === MATCHMAKING FLOW ===
@@ -77,9 +90,13 @@ graph TD
 ```
 
 ## Chú giải màn hình (Legend):
-- **Màu Xanh Lá (Khung viền):** Các tab điều hướng chính (luôn hiển thị thanh menu bên dưới).
+- **Màu Xanh Lá (Khung viền):** Các tab điều hướng chính (luôn hiển thị thanh menu bên dưới). Bao gồm: Trang chủ, Bản đồ, Khám phá, Kèo đấu, Tài khoản.
 - **Màu Vàng:** Màn hình xác thực (Đăng nhập, Đăng ký).
-- **Màu Xanh Dương:** Luồng tương tác chính của khách hàng (Xem chi tiết, thanh toán).
+- **Màu Xanh Dương:** Luồng tương tác chính của khách hàng (Xem chi tiết sân, bản đồ tìm sân, bảng tin khám phá, thanh toán).
 - **Màu Tím Nhạt:** Quản lý cá nhân của người dùng đã đăng nhập.
 - **Màu Tím Đậm:** Cổng quản lý dành riêng cho Chủ Sân.
 - **Màu Đỏ Hồng:** Cổng quản trị dành riêng cho Admin hệ thống.
+
+## Ghi chú kỹ thuật:
+- **Bản đồ (`/map`):** Sử dụng Google Maps JavaScript API, hỗ trợ GPS định vị, lọc theo môn thể thao (dữ liệu từ DB), bán kính tìm kiếm 1-10km.
+- **Khám phá (`/explore`):** Bảng tin xã hội dạng Facebook/Zalo với 4 tab: Bảng tin, Giải đấu, Lớp học, Ưu đãi.
