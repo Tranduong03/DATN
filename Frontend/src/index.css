@@ -493,6 +493,12 @@ input[type="password"]::-ms-clear {
   overflow-x: hidden;
 }
 
+.main-layout.no-padding-bottom {
+  padding-bottom: 0 !important;
+  background-color: transparent !important;
+  overflow: hidden;
+}
+
 .bottom-nav {
   position: fixed;
   bottom: 0;
