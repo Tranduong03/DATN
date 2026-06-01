@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronRight, CalendarDays, Info, ShieldCheck, Sparkles, Languages } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
+import { useTranslation } from 'react-i18next';
+import LanguageSelectModal from '../../components/common/LanguageSelectModal';
 
 export default function AccountPage() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -70,16 +74,19 @@ export default function AccountPage() {
               <span className="menu-text">Ứng dụng có gì mới</span>
               <ChevronRight className="menu-chevron" size={20} />
             </Link>
-            <Link to="/language" className="menu-item">
+            <div className="menu-item" onClick={() => setIsLangModalOpen(true)} style={{ cursor: 'pointer' }}>
               <div className="menu-icon">
                 <Languages size={20} />
               </div>
-              <span className="menu-text">Ngôn ngữ - Tiếng Việt</span>
+              <span className="menu-text">
+                {i18n.language.startsWith('vi') ? 'Ngôn ngữ - Tiếng Việt' : 'Language - English'}
+              </span>
               <ChevronRight className="menu-chevron" size={20} />
-            </Link>
+            </div>
           </div>
         </div>
       </div>
+      <LanguageSelectModal isOpen={isLangModalOpen} onClose={() => setIsLangModalOpen(false)} />
     </MainLayout>
   );
 }

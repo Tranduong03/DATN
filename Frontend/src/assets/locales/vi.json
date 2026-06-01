@@ -1,0 +1,26 @@
+{
+  "common": {
+    "vietnamese": "Tiếng Việt",
+    "english": "English",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "continue": "Tiếp tục",
+    "loading": "Đang xử lý...",
+    "error": "Lỗi",
+    "success": "Thành công"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "forgotPassword": "Quên mật khẩu",
+    "changePassword": "Đổi mật khẩu",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "password": "Mật khẩu"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "logout": "Đăng xuất"
+  }
+}

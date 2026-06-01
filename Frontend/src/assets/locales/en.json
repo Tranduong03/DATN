@@ -1,0 +1,26 @@
+{
+  "common": {
+    "vietnamese": "Tiếng Việt",
+    "english": "English",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "loading": "Processing...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "changePassword": "Change Password",
+    "email": "Email",
+    "phone": "Phone Number",
+    "password": "Password"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "logout": "Logout"
+  }
+}
