@@ -65,61 +65,54 @@ export default function OwnerDashboardPage() {
         </div>
       </div>
 
-      <div className="admin-section" style={{ marginTop: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h2 className="admin-section-title" style={{ margin: 0 }}>Lịch đặt sắp tới</h2>
-          <Link to="/owner/bookings" className="admin-btn-secondary" style={{ fontSize: 13 }}>Xem tất cả</Link>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginTop: '24px' }}>
+        {/* Biểu đồ doanh thu giả lập (CSS) */}
+        <div className="admin-section" style={{ margin: 0 }}>
+          <h2 className="admin-section-title">Biểu đồ doanh thu (7 ngày qua)</h2>
+          <div style={{ height: '240px', display: 'flex', alignItems: 'flex-end', gap: '12px', padding: '16px 0 0 0', borderBottom: '1px solid #e2e8f0' }}>
+            {[12, 18, 15, 25, 20, 35, 45].map((val, idx) => (
+              <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '100%', backgroundColor: '#e0e7ff', borderRadius: '4px 4px 0 0', position: 'relative', height: '180px', display: 'flex', alignItems: 'flex-end' }}>
+                  <div style={{ width: '100%', backgroundColor: '#6366f1', borderRadius: '4px 4px 0 0', height: `${val * 2}%`, transition: 'height 0.5s ease-in-out' }}></div>
+                  <span style={{ position: 'absolute', top: '-24px', width: '100%', textAlign: 'center', fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>{val}k</span>
+                </div>
+                <span style={{ fontSize: '12px', color: '#64748b' }}>T{idx + 2}</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>Doanh thu tính theo (k VND)</p>
         </div>
-        
-        {upcomingBookings.length === 0 ? (
-          <div style={{ padding: '24px', textAlign: 'center', color: '#6b7280', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb' }}>
-            Hiện chưa có lịch đặt nào sắp diễn ra.
+
+        {/* Lịch đặt gần đây */}
+        <div className="admin-section" style={{ margin: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h2 className="admin-section-title" style={{ margin: 0 }}>Lịch đặt sắp tới</h2>
+            <Link to="/owner/bookings" className="admin-btn-secondary" style={{ fontSize: 13 }}>Xem tất cả</Link>
           </div>
-        ) : (
-          <div className="admin-table-container">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Khách hàng</th>
-                  <th>Thời gian</th>
-                  <th>Sân</th>
-                  <th>Số tiền</th>
-                  <th>Trạng thái</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {upcomingBookings.map((b: any) => (
-                  <tr key={b.id}>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{b.bookerName}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280' }}>{b.bookerPhone}</div>
-                    </td>
-                    <td>
-                      <div>{new Date(b.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date(b.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280' }}>{new Date(b.startTime).toLocaleDateString('vi-VN')}</div>
-                    </td>
-                    <td>{b.courtName}</td>
-                    <td style={{ fontWeight: 600, color: '#ef4444' }}>{formatPrice(b.totalPrice)}</td>
-                    <td>
-                      <span className={`admin-status-badge ${b.status === 'CONFIRMED' ? 'admin-status-badge--success' : b.status === 'PENDING' ? 'admin-status-badge--warning' : 'admin-status-badge--danger'}`}>
-                        {b.status}
-                      </span>
-                    </td>
-                    <td>
-                      {b.status === 'PENDING' && (
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <button onClick={() => handleUpdateStatus(b.id, 'CONFIRMED')} style={{ padding: '4px 12px', background: '#10b981', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Nhận sân</button>
-                          <button onClick={() => handleUpdateStatus(b.id, 'CANCELLED')} style={{ padding: '4px 12px', background: '#ef4444', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Hủy</button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+          
+          {upcomingBookings.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: '#6b7280', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb' }}>
+              Hiện chưa có lịch đặt nào sắp diễn ra.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {upcomingBookings.map((b: any) => (
+                <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: '#fff' }}>
+                  <div>
+                    <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '14px' }}>{b.bookerName}</div>
+                    <div style={{ fontSize: '13px', color: '#64748b' }}>{b.courtName} • {new Date(b.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontWeight: '700', color: '#ef4444', fontSize: '14px' }}>{formatPrice(b.totalPrice)}</div>
+                    <span className={`admin-status-badge ${b.status === 'CONFIRMED' ? 'admin-status-badge--success' : b.status === 'PENDING' ? 'admin-status-badge--warning' : 'admin-status-badge--danger'}`} style={{ marginTop: '4px', fontSize: '10px', padding: '2px 6px' }}>
+                      {b.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </OwnerLayout>
   );

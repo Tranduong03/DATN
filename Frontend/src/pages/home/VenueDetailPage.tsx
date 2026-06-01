@@ -5,6 +5,7 @@ import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenueDetail } from '../../hooks/queries/usePublicQueries';
 import { useVenueAvailability } from '../../hooks/queries/useBookingQueries';
 import { useCreateBooking, useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
+import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
 
 export default function VenueDetailPage() {
   const { id: venueId } = useParams<{ id: string }>();
@@ -19,6 +20,8 @@ export default function VenueDetailPage() {
   const { data: venue, isLoading: loadingVenue } = usePublicVenueDetail(venueId!);
 
   const { data: courtsAvailability = [], isLoading: loadingAvailability } = useVenueAvailability(venueId!, selectedDate);
+
+  const { data: reviews = [] } = useVenueReviews(venueId!);
 
   const createBookingMutation = useCreateBooking();
   const getPaymentUrlMutation = useGetPaymentUrl();
@@ -166,6 +169,43 @@ export default function VenueDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <div style={{ marginBottom: 32 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 600, color: '#0f172a', marginBottom: 16 }}>Đánh giá từ người chơi</h3>
+          {reviews.length === 0 ? (
+            <p style={{ color: '#64748b', fontStyle: 'italic' }}>Chưa có đánh giá nào cho sân này.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {reviews.map((review: any) => (
+                <div key={review.id} style={{ padding: 16, border: '1px solid #e2e8f0', borderRadius: 12, backgroundColor: '#f8fafc' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {review.userAvatar ? (
+                        <img src={review.userAvatar} alt={review.userName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#475569' }}>
+                          {review.userName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#0f172a' }}>{review.userName}</div>
+                        <div style={{ fontSize: 12, color: '#64748b' }}>{new Date(review.createdAt).toLocaleDateString('vi-VN')}</div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, backgroundColor: '#fef3c7', padding: '4px 8px', borderRadius: 8 }}>
+                      <Star size={14} fill="#d97706" color="#d97706" />
+                      <span style={{ fontWeight: 'bold', color: '#b45309', fontSize: 14 }}>{review.rating}</span>
+                    </div>
+                  </div>
+                  {review.comment && (
+                    <p style={{ color: '#475569', margin: '8px 0 0 0', lineHeight: 1.5 }}>{review.comment}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Booking Section */}
         <h2 style={{ fontSize: 20, marginBottom: 16 }}>Đặt lịch sân</h2>

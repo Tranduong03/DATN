@@ -8,9 +8,20 @@ import MainLayout from '../../components/layout/MainLayout';
 export default function MatchListPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string>('OPEN');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   
-  const { data: matches = [], isLoading } = useAllMatches(statusFilter);
+  const { data: matchesData = [], isLoading } = useAllMatches(statusFilter);
   const joinMutation = useJoinMatch();
+
+  const filteredMatches = matchesData.filter((match: any) => {
+    if (!searchTerm) return true;
+    const lowerSearch = searchTerm.toLowerCase();
+    return (
+      match.title.toLowerCase().includes(lowerSearch) ||
+      match.venueName.toLowerCase().includes(lowerSearch) ||
+      match.courtName.toLowerCase().includes(lowerSearch)
+    );
+  });
 
   const handleJoin = async (matchId: string) => {
     const token = localStorage.getItem('token');
@@ -58,8 +69,30 @@ export default function MatchListPage() {
             </p>
           </div>
           
-          {/* Filters */}
-          <div style={{ display: 'flex', gap: '8px', backgroundColor: '#e2e8f0', padding: '4px', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Search Bar */}
+            <div style={{ position: 'relative' }}>
+              <input 
+                type="text" 
+                placeholder="Tìm tên kèo, tên sân..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  padding: '10px 16px 10px 40px',
+                  borderRadius: '12px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '14px',
+                  outline: 'none',
+                  minWidth: '250px'
+                }}
+              />
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+
+            {/* Filters */}
+            <div style={{ display: 'flex', gap: '8px', backgroundColor: '#e2e8f0', padding: '4px', borderRadius: '12px' }}>
             {['OPEN', 'FULL', ''].map((status) => (
               <button
                 key={status}
@@ -86,7 +119,7 @@ export default function MatchListPage() {
         {/* Matches Grid */}
         {isLoading ? (
           <div style={{ padding: '80px', textAlign: 'center', color: '#64748b' }}>Đang tải danh sách kèo đấu...</div>
-        ) : matches.length === 0 ? (
+        ) : filteredMatches.length === 0 ? (
           <div 
             style={{
               padding: '80px 40px',
@@ -111,7 +144,7 @@ export default function MatchListPage() {
               gap: '24px'
             }}
           >
-            {matches.map((match) => {
+            {filteredMatches.map((match: any) => {
               const startVal = new Date(match.startTime);
               const dateStr = startVal.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit' });
               const timeStr = `${startVal.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - ${new Date(match.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
