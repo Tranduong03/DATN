@@ -13,8 +13,8 @@ export const authService = {
     return axiosClient.post('/Auth/google-login', { token });
   },
 
-  forgotPassword: (email: string) => {
-    return axiosClient.post('/Auth/forgot-password', { email });
+  forgotPassword: (data: { email?: string; phone?: string }) => {
+    return axiosClient.post('/Auth/forgot-password', data);
   },
 
   changePassword: (data: any) => {

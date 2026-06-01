@@ -21,7 +21,7 @@ export const useGoogleAuth = () => {
 
 export const useForgotPassword = () => {
   return useMutation({
-    mutationFn: (email: string) => authService.forgotPassword(email),
+    mutationFn: (data: { email?: string; phone?: string }) => authService.forgotPassword(data),
   });
 };
 

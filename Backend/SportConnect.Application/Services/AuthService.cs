@@ -240,31 +240,57 @@ public class AuthService : IAuthService
 
     public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto)
     {
-        var users = await _unitOfWork.Repository<User>().FindAsync(u => u.Email == dto.Email);
-        var user = users.FirstOrDefault();
-        if (user == null)
+        User? user = null;
+        if (!string.IsNullOrEmpty(dto.Email))
         {
-            // Do not reveal that the user does not exist for security reasons, just return true or throw a general error.
-            // But the user requested "Nếu bạn không nhận được email..." so maybe just returning true is best.
-            // Let's throw an exception for simplicity to show error in UI if needed, but standard practice is to return success.
-            throw new AppException("Không tìm thấy tài khoản với email này.");
+            var users = await _unitOfWork.Repository<User>().FindAsync(u => u.Email == dto.Email);
+            user = users.FirstOrDefault();
+            if (user == null)
+            {
+                throw new AppException("Không tìm thấy tài khoản với email này.");
+            }
+        }
+        else if (!string.IsNullOrEmpty(dto.Phone))
+        {
+            var users = await _unitOfWork.Repository<User>().FindAsync(u => u.Phone == dto.Phone);
+            user = users.FirstOrDefault();
+            if (user == null)
+            {
+                throw new AppException("Không tìm thấy tài khoản với số điện thoại này.");
+            }
+        }
+        else
+        {
+            throw new AppException("Vui lòng cung cấp Email hoặc Số điện thoại.");
         }
 
         // Generate a random 8-character password
         var newPassword = GenerateRandomPassword(8);
 
-        // Send email FIRST
-        string subject = "Cấp lại mật khẩu - SportConnect";
-        string body = $@"
-            <h3>Xin chào {user.FullName ?? user.Username},</h3>
-            <p>Bạn đã yêu cầu cấp lại mật khẩu. Dưới đây là mật khẩu mới của bạn:</p>
-            <p><strong>{newPassword}</strong></p>
-            <p>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi nhận được email này.</p>
-            <p>Trân trọng,<br>Đội ngũ SportConnect</p>";
+        if (!string.IsNullOrEmpty(dto.Email))
+        {
+            // Send email FIRST
+            string subject = "Cấp lại mật khẩu - SportConnect";
+            string body = $@"
+                <h3>Xin chào {user.FullName ?? user.Username},</h3>
+                <p>Bạn đã yêu cầu cấp lại mật khẩu. Dưới đây là mật khẩu mới của bạn:</p>
+                <p><strong>{newPassword}</strong></p>
+                <p>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi nhận được email này.</p>
+                <p>Trân trọng,<br>Đội ngũ SportConnect</p>";
 
-        await _emailService.SendEmailAsync(user.Email, subject, body);
+            await _emailService.SendEmailAsync(user.Email, subject, body);
+        }
+        else if (!string.IsNullOrEmpty(dto.Phone))
+        {
+            // Do not use SMS, print to console as requested by the user
+            Console.WriteLine("==================================================");
+            Console.WriteLine($"[SMS MOCK] Reset Password for Phone: {dto.Phone}");
+            Console.WriteLine($"[SMS MOCK] User: {user.Username} ({user.FullName})");
+            Console.WriteLine($"[SMS MOCK] New Password: {newPassword}");
+            Console.WriteLine("==================================================");
+        }
 
-        // Update database only if email succeeds
+        // Update database only if email/sms mock succeeds
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
         _unitOfWork.Repository<User>().Update(user);
         await _unitOfWork.CompleteAsync();

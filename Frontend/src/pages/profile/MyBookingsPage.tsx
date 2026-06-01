@@ -124,49 +124,52 @@ export default function MyBookingsPage() {
       <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         
         {/* Filter Dropdown Area */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px', position: 'relative' }}>
-          <button 
-            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-            style={{ 
-              display: 'flex', alignItems: 'center', gap: '8px', 
-              padding: '10px 16px', border: '1px solid #14532d', 
-              borderRadius: '6px', backgroundColor: '#f1f5f9',
-              color: '#1e293b', fontSize: '14px', cursor: 'pointer',
-              minWidth: '150px', justifyContent: 'space-between'
-            }}
-          >
-            <span>Xem tất cả</span>
-            <Calendar size={18} color="#0f172a" />
-          </button>
-          
-          {showFilterDropdown && (
-            <div style={{ 
-              position: 'absolute', top: '100%', right: 0, marginTop: '4px',
-              backgroundColor: '#fef3c7', borderRadius: '6px', border: '1px solid #fde68a',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', zIndex: 20,
-              minWidth: '180px', overflow: 'hidden'
-            }}>
-              {['Chọn khoảng ngày', 'Chọn tháng', 'Chọn năm', 'Xem tất cả'].map((item, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => setShowFilterDropdown(false)}
-                  style={{
-                    padding: '12px 16px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#064e3b',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    borderBottom: idx < 3 ? '1px solid #fde68a' : 'none'
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#fde68a')}
-                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          )}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+          <div style={{ position: 'relative', width: '200px' }}>
+            <button 
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '8px', 
+                padding: '10px 16px', border: '1px solid #94a3b8', 
+                borderRadius: '6px', backgroundColor: '#ffffff',
+                color: '#1e293b', fontSize: '14px', cursor: 'pointer',
+                width: '100%', justifyContent: 'space-between',
+                boxSizing: 'border-box'
+              }}
+            >
+              <span style={{ fontWeight: '500' }}>Xem tất cả</span>
+              <Calendar size={18} color="#0f172a" />
+            </button>
+            
+            {showFilterDropdown && (
+              <div style={{ 
+                position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px',
+                backgroundColor: '#fef3c7', borderRadius: '6px', border: '1px solid #d97706',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', zIndex: 20,
+                boxSizing: 'border-box', overflow: 'hidden'
+              }}>
+                {['Chọn khoảng ngày', 'Chọn tháng', 'Chọn năm', 'Xem tất cả'].map((item, idx) => (
+                  <div 
+                    key={idx}
+                    onClick={() => setShowFilterDropdown(false)}
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#064e3b',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      borderBottom: idx < 3 ? '1px solid #d97706' : 'none'
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#fde68a')}
+                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Content */}

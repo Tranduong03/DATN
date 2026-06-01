@@ -40,6 +40,7 @@ public class EmailService : IEmailService
 
         var client = new SmtpClient(host, port)
         {
+            UseDefaultCredentials = false,
             Credentials = new NetworkCredential(username, password),
             EnableSsl = enableSsl
         };
@@ -55,5 +56,6 @@ public class EmailService : IEmailService
         mailMessage.To.Add(toEmail);
 
         await client.SendMailAsync(mailMessage);
+
     }
 }
