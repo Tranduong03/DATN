@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 import PageTransition from './components/layout/PageTransition';
 import BottomNavigation from './components/layout/BottomNavigation';
+import GlobalNotification from './components/common/GlobalNotification';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
@@ -117,6 +118,7 @@ function AppRoutes() {
         </Routes>
       </AnimatePresence>
       {!hideBottomNav && <BottomNavigation />}
+      <GlobalNotification />
     </div>
   );
 }

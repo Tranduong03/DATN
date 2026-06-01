@@ -1,26 +1,17 @@
 import { Link } from 'react-router-dom';
 import OwnerLayout from './OwnerLayout';
 import { useOwnerStats, useOwnerBookings } from '../../hooks/queries/useBookingQueries';
-import { useUpdateBookingStatus } from '../../hooks/mutations/useBookingMutations';
 
 export default function OwnerDashboardPage() {
   const { data: statsData } = useOwnerStats();
   const { data: bookingsData } = useOwnerBookings();
-  const updateStatusMutation = useUpdateBookingStatus();
-
   const stats = statsData?.data || { todayBookings: 0, weeklyRevenue: 0, newReviews: 0 };
   const bookings = bookingsData?.data || [];
 
   const upcomingBookings = bookings
-    .filter((b: any) => new Date(b.startTime) >= new Date() && b.status !== 'CANCELLED')
-    .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+    .filter((b: { startTime: string; status: string; id: string; bookerName: string; courtName: string; totalPrice: number; }) => new Date(b.startTime) >= new Date() && b.status !== 'CANCELLED')
+    .sort((a: { startTime: string }, b: { startTime: string }) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
     .slice(0, 5); // Take top 5 upcoming
-
-  const handleUpdateStatus = (id: string, status: string) => {
-    if (confirm(`Bạn có chắc muốn cập nhật thành ${status}?`)) {
-      updateStatusMutation.mutate({ bookingId: id, status });
-    }
-  };
 
   const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price) + ' đ';
 
@@ -60,7 +51,7 @@ export default function OwnerDashboardPage() {
           <div className="admin-stat-body">
             <span className="admin-stat-value">{stats.newReviews}</span>
             <span className="admin-stat-label">Đánh giá mới</span>
-            <span className="admin-stat-trend">Đang phát triển</span>
+            <span className="admin-stat-trend">Tuần này</span>
           </div>
         </div>
       </div>
@@ -96,7 +87,7 @@ export default function OwnerDashboardPage() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {upcomingBookings.map((b: any) => (
+              {upcomingBookings.map((b: { id: string; bookerName: string; courtName: string; startTime: string; totalPrice: number; status: string; }) => (
                 <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: '#fff' }}>
                   <div>
                     <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '14px' }}>{b.bookerName}</div>

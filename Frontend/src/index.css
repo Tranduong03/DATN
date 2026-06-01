@@ -1,4 +1,5 @@
 @import url('./assets/fonts/montserrat.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   --primary-color: #326441;
@@ -1590,8 +1591,6 @@ input[type="password"]::-ms-clear {
 /* =====================================================
    ADMIN DASHBOARD — DESKTOP LAYOUT
    ===================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 /* Reset overflow for admin pages */
 .admin-layout {
   font-family: 'Inter', sans-serif;

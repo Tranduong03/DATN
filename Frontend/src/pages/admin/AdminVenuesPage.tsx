@@ -7,7 +7,7 @@ export default function AdminVenuesPage() {
   const [searchInput, setSearchInput] = useState('');
 
   const { data: venuesData, isLoading: loading } = usePublicVenues(search);
-  const venues = venuesData?.data || [];
+  const venues = venuesData || [];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

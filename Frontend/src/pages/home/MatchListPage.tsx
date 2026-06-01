@@ -115,6 +115,7 @@ export default function MatchListPage() {
             ))}
           </div>
         </div>
+      </div>
 
         {/* Matches Grid */}
         {isLoading ? (

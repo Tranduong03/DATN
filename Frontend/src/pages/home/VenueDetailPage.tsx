@@ -133,7 +133,7 @@ export default function VenueDetailPage() {
             <div style={{ display: 'flex', gap: 16, color: '#666', marginBottom: 12, flexWrap: 'wrap' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={16} /> {venue.address}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={16} /> {venue.operatingStartHour} - {venue.operatingEndHour}</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F5A623' }}><Star size={16} fill="#F5A623" /> {venue.rating}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F5A623' }}><Star size={16} fill="#F5A623" /> {venue.rating} ({venue.reviewCount} đánh giá)</span>
             </div>
             
             {venue.sportTypes && venue.sportTypes.length > 0 && (

@@ -14,7 +14,8 @@ public class PublicVenueDto
     public int VenueScale { get; set; }
     public string? Distance { get; set; } // For future geolocation
     public decimal MinPrice { get; set; } // Tự động tính giá min để show ra
-    public double Rating { get; set; } = 5.0; // Mock rating for now
+    public double Rating { get; set; }
+    public int ReviewCount { get; set; }
     public string? AvatarUrl { get; set; }
     public List<string> SportTypes { get; set; } = new();
 }

@@ -312,8 +312,8 @@ public class BookingService : IBookingService
         var todayBookingsCount = allBookings.Count(b => b.StartTime >= startOfDay && b.StartTime <= endOfDay);
         var weeklyRevenue = allBookings.Where(b => b.StartTime >= startOfWeek && b.StartTime <= endOfWeek && b.Status == "CONFIRMED").Sum(b => b.TotalPrice);
         
-        // Mock new reviews since we don't have review entity yet
-        var newReviews = 0;
+        var allReviews = (await _unitOfWork.Repository<Review>().FindAsync(r => venueIds.Contains(r.VenueId))).ToList();
+        var newReviews = allReviews.Count(r => r.CreatedAt >= startOfWeek && r.CreatedAt <= endOfWeek);
 
         return new OwnerDashboardStatsDto
         {
