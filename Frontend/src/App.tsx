@@ -86,11 +86,12 @@ function AppRoutes() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/account" element={withTransition(AccountPage)} />
 
+          <Route path="/reservedBooking" element={<MyBookingsPage />} />
+
           {/* User Protected Routes */}
           <Route element={<AuthGuard />}>
             <Route path="/me" element={withTransition(MePage)} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/me/bookings" element={<MyBookingsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/change-password" element={<ChangePasswordPage />} />
             <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />

@@ -9,6 +9,7 @@ using SportConnect.Application.DTOs.Auth;
 using SportConnect.Application.Interfaces;
 using SportConnect.Core.Entities;
 using SportConnect.Core.Constants;
+using SportConnect.Core.Exceptions;
 
 namespace SportConnect.Application.Services;
 
@@ -34,17 +35,17 @@ public class AuthService : IAuthService
 
         if (user == null)
         {
-            throw new Exception("Invalid username/email or password.");
+            throw new AppException("Invalid username/email or password.");
         }
 
         if (string.IsNullOrEmpty(user.PasswordHash))
         {
-            throw new Exception("Vui lòng đăng nhập bằng Google hoặc thiết lập mật khẩu qua Quên mật khẩu.");
+            throw new AppException("Vui lòng đăng nhập bằng Google hoặc thiết lập mật khẩu qua Quên mật khẩu.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
         {
-            throw new Exception("Invalid username/email or password.");
+            throw new AppException("Invalid username/email or password.");
         }
 
         return await GenerateJwtTokenAsync(user);
@@ -59,17 +60,17 @@ public class AuthService : IAuthService
 
         if (user == null)
         {
-            throw new Exception("Tài khoản hoặc mật khẩu không đúng.");
+            throw new AppException("Tài khoản hoặc mật khẩu không đúng.");
         }
 
         if (string.IsNullOrEmpty(user.PasswordHash))
         {
-            throw new Exception("Tài khoản không có mật khẩu hợp lệ.");
+            throw new AppException("Tài khoản không có mật khẩu hợp lệ.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
         {
-            throw new Exception("Tài khoản hoặc mật khẩu không đúng.");
+            throw new AppException("Tài khoản hoặc mật khẩu không đúng.");
         }
 
         // Kiểm tra Role Admin
@@ -79,7 +80,7 @@ public class AuthService : IAuthService
         bool isAdmin = false;
         foreach (var userRole in user.UserRoles)
         {
-            userRole.Role = await _unitOfWork.Repository<Role>().GetByIdAsync(userRole.RoleId);
+            userRole.Role = (await _unitOfWork.Repository<Role>().GetByIdAsync(userRole.RoleId))!;
             if (userRole.Role != null && userRole.Role.RoleName == AppRoles.Admin)
             {
                 isAdmin = true;
@@ -88,7 +89,7 @@ public class AuthService : IAuthService
 
         if (!isAdmin)
         {
-            throw new Exception("Bạn không có quyền truy cập trang quản trị.");
+            throw new AppException("Bạn không có quyền truy cập trang quản trị.");
         }
 
         return await GenerateJwtTokenAsync(user);
@@ -99,7 +100,7 @@ public class AuthService : IAuthService
     {
         if (string.IsNullOrEmpty(registerDto.Email) && string.IsNullOrEmpty(registerDto.Phone))
         {
-            throw new Exception("Vui lòng nhập Email hoặc Số điện thoại.");
+            throw new AppException("Vui lòng nhập Email hoặc Số điện thoại.");
         }
 
         var existingUsers = await _unitOfWork.Repository<User>().FindAsync(u => 
@@ -109,13 +110,13 @@ public class AuthService : IAuthService
             
         if (existingUsers.Any())
         {
-            throw new Exception("Username, Email hoặc Số điện thoại đã tồn tại.");
+            throw new AppException("Username, Email hoặc Số điện thoại đã tồn tại.");
         }
 
         var user = new User
         {
             Username = registerDto.Username,
-            Email = registerDto.Email,
+            Email = registerDto.Email ?? string.Empty,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
             FullName = registerDto.FullName,
             Phone = registerDto.Phone
@@ -150,7 +151,7 @@ public class AuthService : IAuthService
         var response = await httpClient.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception("Invalid Google token.");
+            throw new AppException("Invalid Google token.");
         }
 
         var content = await response.Content.ReadAsStringAsync();
@@ -163,7 +164,7 @@ public class AuthService : IAuthService
 
         if (string.IsNullOrEmpty(email))
         {
-            throw new Exception("Google token did not contain an email.");
+            throw new AppException("Google token did not contain an email.");
         }
 
         var existingUsers = await _unitOfWork.Repository<User>().FindAsync(u => u.Email == email);
@@ -218,7 +219,7 @@ public class AuthService : IAuthService
         var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new AppException("User not found.");
         }
 
         // If user does not have a password (e.g. Google Login only), allow them to set one without OldPassword
@@ -226,7 +227,7 @@ public class AuthService : IAuthService
         {
             if (string.IsNullOrEmpty(changePasswordDto.OldPassword) || !BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, user.PasswordHash))
             {
-                throw new Exception("Mật khẩu cũ không chính xác.");
+                throw new AppException("Mật khẩu cũ không chính xác.");
             }
         }
 
@@ -246,7 +247,7 @@ public class AuthService : IAuthService
             // Do not reveal that the user does not exist for security reasons, just return true or throw a general error.
             // But the user requested "Nếu bạn không nhận được email..." so maybe just returning true is best.
             // Let's throw an exception for simplicity to show error in UI if needed, but standard practice is to return success.
-            throw new Exception("Không tìm thấy tài khoản với email này.");
+            throw new AppException("Không tìm thấy tài khoản với email này.");
         }
 
         // Generate a random 8-character password
@@ -282,7 +283,7 @@ public class AuthService : IAuthService
     public async Task<string> RefreshTokenAsync(Guid userId)
     {
         var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId);
-        if (user == null) throw new Exception("User not found.");
+        if (user == null) throw new AppException("User not found.");
         // GenerateJwtTokenAsync sẽ load roles mới nhất từ DB
         return await GenerateJwtTokenAsync(user);
     }

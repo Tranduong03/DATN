@@ -18,6 +18,6 @@ export const authService = {
   },
 
   changePassword: (data: any) => {
-    return axiosClient.post('/Auth/change-password', data);
+    return axiosClient.put('/Auth/change-password', data);
   }
 };

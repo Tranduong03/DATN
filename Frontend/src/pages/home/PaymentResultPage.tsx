@@ -106,7 +106,7 @@ export default function PaymentResultPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button
-              onClick={() => navigate('/me/bookings')}
+              onClick={() => navigate('/reservedBooking')}
               style={{
                 display: 'flex',
                 alignItems: 'center',

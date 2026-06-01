@@ -98,7 +98,7 @@ export default function VenueDetailPage() {
         window.location.href = paymentUrl;
       } else {
         alert('Đặt lịch thành công!');
-        navigate('/me/bookings');
+        navigate('/reservedBooking');
       }
     } catch (error: any) {
       alert('Lỗi đặt lịch: ' + (error.response?.data?.message || error.message));

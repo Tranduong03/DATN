@@ -36,7 +36,7 @@ export default function AccountPage() {
         <div className="menu-section">
           <h3 className="menu-section-title">Hoạt động</h3>
           <div className="menu-list">
-            <Link to="/bookings" className="menu-item">
+            <Link to="/reservedBooking" className="menu-item">
               <div className="menu-icon">
                 <CalendarDays size={20} />
               </div>

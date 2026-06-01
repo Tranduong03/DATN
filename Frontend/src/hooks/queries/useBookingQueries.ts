@@ -11,9 +11,11 @@ export const useVenueAvailability = (venueId: string, date: string) => {
 };
 
 export const useMyBookings = () => {
+  const token = localStorage.getItem('token');
   return useQuery({
     queryKey: ['myBookings'],
     queryFn: () => bookingService.getMyBookings(),
+    enabled: !!token,
   });
 };
 

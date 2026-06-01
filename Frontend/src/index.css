@@ -962,7 +962,7 @@ input[type="password"]::-ms-clear {
 
 .settings-header {
   height: 53px;
-  background: linear-gradient(to right, #033e23, #01b863);
+  background: linear-gradient(to right, #02703f, #01b863);
   display: flex;
   align-items: center;
   justify-content: space-between;

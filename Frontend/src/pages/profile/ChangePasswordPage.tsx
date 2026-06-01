@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { ChevronLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useChangePassword } from '../../hooks/mutations/useAuthMutations';
+import SubPageHeader from '../../components/common/SubPageHeader';
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -60,13 +61,7 @@ export default function ChangePasswordPage() {
 
   return (
     <div className="settings-page-wrapper">
-      <div className="settings-header">
-        <button className="settings-back-btn" onClick={() => navigate(-1)}>
-          <ChevronLeft color="#fff" size={24} />
-        </button>
-        <h1 className="settings-title">Đổi mật khẩu</h1>
-        <div style={{ width: 24 }}></div>
-      </div>
+      <SubPageHeader title="Đổi mật khẩu" />
 
       <div className="settings-content">
         <form className="form-container" onSubmit={handleSubmit} style={{ borderRadius: '12px', marginTop: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>

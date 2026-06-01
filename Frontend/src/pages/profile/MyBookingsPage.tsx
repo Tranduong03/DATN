@@ -5,12 +5,17 @@ import { useMyBookings } from '../../hooks/queries/useBookingQueries';
 import { useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
 import { useCreateMatch } from '../../hooks/mutations/useMatchMutations';
 import { useCreateReview } from '../../hooks/mutations/useReviewMutations';
-import { CircleDollarSign, Trophy, CreditCard, Star } from 'lucide-react';
+import { CircleDollarSign, Trophy, CreditCard, Star, Calendar } from 'lucide-react';
+import SubPageHeader from '../../components/common/SubPageHeader';
 
 export default function MyBookingsPage() {
   const navigate = useNavigate();
-  const { data: bookingsData, isLoading } = useMyBookings();
-  const bookings = bookingsData?.data || [];
+  const token = localStorage.getItem('token');
+  const { data: bookingsData, isLoading: queryLoading } = useMyBookings();
+  const bookings = token ? (bookingsData?.data || []) : [];
+  const isLoading = token ? queryLoading : false;
+
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
   const getPaymentUrlMutation = useGetPaymentUrl();
   const createMatchMutation = useCreateMatch();
@@ -54,10 +59,10 @@ export default function MyBookingsPage() {
 
   const handlePayNow = async (bookingId: string) => {
     try {
-      const url = await getPaymentUrlMutation.mutateAsync(bookingId);
-      window.location.href = url;
+      const paymentUrl = await getPaymentUrlMutation.mutateAsync(bookingId);
+      window.location.href = paymentUrl;
     } catch (error: any) {
-      alert('Lỗi khởi tạo thanh toán: ' + (error.response?.data?.message || error.message));
+      alert('Lỗi lấy link thanh toán: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -98,13 +103,14 @@ export default function MyBookingsPage() {
   const handleCreateReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reviewBooking) return;
+
     try {
       await createReviewMutation.mutateAsync({
         bookingId: reviewBooking.id,
         rating: reviewRating,
         comment: reviewComment
       });
-      alert('Cảm ơn bạn đã đánh giá!');
+      alert('Gửi đánh giá thành công! Cảm ơn nhận xét của bạn.');
       setReviewBooking(null);
     } catch (error: any) {
       alert('Lỗi gửi đánh giá: ' + (error.response?.data?.message || error.message));
@@ -112,18 +118,63 @@ export default function MyBookingsPage() {
   };
 
   return (
-    <MainLayout>
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px', minHeight: '80vh' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', marginBottom: '24px' }}>Lịch sử đặt sân</h1>
+    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      <SubPageHeader title="Danh sách đặt lịch" />
+
+      <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         
+        {/* Filter Dropdown Area */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px', position: 'relative' }}>
+          <button 
+            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', 
+              padding: '10px 16px', border: '1px solid #14532d', 
+              borderRadius: '6px', backgroundColor: '#f1f5f9',
+              color: '#1e293b', fontSize: '14px', cursor: 'pointer',
+              minWidth: '150px', justifyContent: 'space-between'
+            }}
+          >
+            <span>Xem tất cả</span>
+            <Calendar size={18} color="#0f172a" />
+          </button>
+          
+          {showFilterDropdown && (
+            <div style={{ 
+              position: 'absolute', top: '100%', right: 0, marginTop: '4px',
+              backgroundColor: '#fef3c7', borderRadius: '6px', border: '1px solid #fde68a',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', zIndex: 20,
+              minWidth: '180px', overflow: 'hidden'
+            }}>
+              {['Chọn khoảng ngày', 'Chọn tháng', 'Chọn năm', 'Xem tất cả'].map((item, idx) => (
+                <div 
+                  key={idx}
+                  onClick={() => setShowFilterDropdown(false)}
+                  style={{
+                    padding: '12px 16px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#064e3b',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    borderBottom: idx < 3 ? '1px solid #fde68a' : 'none'
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#fde68a')}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Content */}
         {isLoading ? (
-          <p style={{ textAlign: 'center', color: '#64748b' }}>Đang tải lịch sử đặt sân...</p>
+          <p style={{ textAlign: 'center', color: '#64748b', marginTop: '40px' }}>Đang tải lịch sử đặt sân...</p>
         ) : bookings.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 40px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px' }}>
-            <p style={{ color: '#64748b', marginBottom: 16 }}>Bạn chưa có lượt đặt sân nào.</p>
-            <Link to="/" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              Khám phá sân ngay
-            </Link>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <p style={{ color: '#064e3b', fontSize: '15px', fontWeight: '500' }}>Bạn chưa có lịch đặt</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -490,6 +541,6 @@ export default function MyBookingsPage() {
         )}
 
       </div>
-    </MainLayout>
+    </div>
   );
 }

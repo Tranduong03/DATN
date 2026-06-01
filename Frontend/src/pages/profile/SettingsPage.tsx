@@ -1,6 +1,7 @@
-import { ChevronLeft, ChevronRight, BellRing, Globe, RectangleEllipsis, LogOut, ArrowRightLeft } from 'lucide-react';
+import { ChevronRight, BellRing, Globe, RectangleEllipsis, LogOut, ArrowRightLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import SubPageHeader from '../../components/common/SubPageHeader';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -13,13 +14,7 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page-wrapper">
-      <div className="settings-header">
-        <button className="settings-back-btn" onClick={() => navigate(-1)}>
-          <ChevronLeft color="#fff" size={24} />
-        </button>
-        <h1 className="settings-title">Cài đặt</h1>
-        <div style={{ width: 24 }}></div> {/* Placeholder for centering */}
-      </div>
+      <SubPageHeader title="Cài đặt" />
 
       <div className="settings-content">
         <div className="settings-menu-item">

@@ -41,7 +41,7 @@ function getAvatarColor(id: string) {
 // ─────────────────────────────────────────────
 function DefaultProfile({ user }: { user: UserInfo }) {
   const quickLinks = [
-    { icon: <Calendar size={20} />, label: 'Lịch đã đặt', to: '/me/bookings', color: '#6366f1' },
+    { icon: <Calendar size={20} />, label: 'Lịch đã đặt', to: '/reservedBooking', color: '#6366f1' },
     { icon: <Star size={20} />, label: 'Đánh giá của tôi', to: '/me/reviews', color: '#f59e0b' },
     { icon: <Award size={20} />, label: 'Hạng thành viên', to: '/me/membership', color: '#10b981' },
   ];
@@ -247,7 +247,7 @@ function OwnerProfile({ user }: { user: UserInfo }) {
             <span className="profile-menu-label">Cấu hình sân & giá</span>
             <ChevronRight size={18} className="profile-menu-chevron" />
           </Link>
-          <Link to="/me/bookings" className="profile-menu-item">
+          <Link to="/reservedBooking" className="profile-menu-item">
             <span className="profile-menu-icon" style={{ background: '#f59e0b20', color: '#f59e0b' }}><Calendar size={20} /></span>
             <span className="profile-menu-label">Lịch đặt của tôi</span>
             <ChevronRight size={18} className="profile-menu-chevron" />
