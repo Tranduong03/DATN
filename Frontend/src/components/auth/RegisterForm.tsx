@@ -4,6 +4,7 @@ import { X, EyeOff, Eye, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 import { useRegister } from '../../hooks/mutations/useAuthMutations';
+import vnFlag from '../../assets/vn-flag.png';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
@@ -57,7 +58,7 @@ export default function RegisterForm() {
           <label>Số điện thoại của bạn?</label>
           <div className="phone-input-wrapper">
             <div className="country-code">
-              <img src="https://flagcdn.com/w20/vn.png" alt="VN" />
+              <img src={vnFlag} alt="VN" />
               <span>+ 84</span>
               <span className="dropdown-arrow">▼</span>
             </div>

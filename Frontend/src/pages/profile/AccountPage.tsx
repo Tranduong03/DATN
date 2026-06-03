@@ -7,7 +7,7 @@ import LanguageSelectModal from '../../components/common/LanguageSelectModal';
 
 export default function AccountPage() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
   useEffect(() => {

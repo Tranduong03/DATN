@@ -5,6 +5,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
 import { useGoogleAuth } from '../../hooks/mutations/useAuthMutations';
+import googleLogo from '../../assets/google-logo.svg';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ export default function LoginPage() {
           {error && <div style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
 
           <button className="google-btn" onClick={() => googleLogin()}>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" />
+            <img src={googleLogo} alt="Google" />
             <span>Google</span>
           </button>
         </main>
