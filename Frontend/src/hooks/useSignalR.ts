@@ -9,12 +9,11 @@ export const useSignalR = () => {
     if (!token) return;
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7196/hubs/notification', {
+      .withUrl('/hubs/notification', {
         accessTokenFactory: () => token,
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets
       })
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Warning)
       .build();
 
     setConnection(newConnection);

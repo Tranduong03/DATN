@@ -67,6 +67,7 @@ export default function LoginForm() {
               <input 
                 type="email" 
                 placeholder="Nhập email của bạn (*)" 
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -89,6 +90,7 @@ export default function LoginForm() {
               <input 
                 type="tel" 
                 placeholder="Nhập số điện thoại" 
+                autoComplete="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />

@@ -11,7 +11,6 @@ export default function GlobalNotification() {
     if (connection) {
       connection.start()
         .then(() => {
-          console.log('SignalR Connected globally');
           connection.on('ReceiveNotification', (message: string) => {
             setNotification(message);
             // Hide after 5 seconds

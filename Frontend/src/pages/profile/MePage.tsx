@@ -66,7 +66,7 @@ export default function MePage() {
         <div className="me-content">
           <Link to="/profile" className="me-profile-card" style={{ textDecoration: 'none' }}>
             <div className="me-avatar-container">
-              <img src={userInfo.avatar} alt="Avatar" className="me-avatar" />
+              <img src={userInfo.avatar || undefined} alt="Avatar" className="me-avatar" />
             </div>
             <div className="me-info">
               <h2 className="me-name">{userInfo.name}</h2>
