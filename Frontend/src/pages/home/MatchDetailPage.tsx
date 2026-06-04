@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMatchDetail } from '../../hooks/queries/useMatchQueries';
-import { useJoinMatch, useApproveJoinRequest, useRejectJoinRequest, useLeaveMatch, useCancelMatch, useUpdateAttendance } from '../../hooks/mutations/useMatchMutations';
+import { useJoinMatch, useApproveJoinRequest, useRejectJoinRequest, useLeaveMatch, useCancelMatch, useUpdateAttendance, useAddExternalPlayer } from '../../hooks/mutations/useMatchMutations';
 import { ChevronLeft, User, Users, MapPin, Calendar, CircleDollarSign, Check, Info } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 
@@ -15,6 +16,20 @@ export default function MatchDetailPage() {
   const leaveMutation = useLeaveMatch();
   const cancelMutation = useCancelMatch();
   const attendanceMutation = useUpdateAttendance();
+  const addExternalMutation = useAddExternalPlayer();
+
+  const [externalName, setExternalName] = useState('');
+
+  const handleAddExternal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!externalName.trim()) return;
+    try {
+      await addExternalMutation.mutateAsync({ matchId: matchId!, playerName: externalName.trim() });
+      setExternalName('');
+    } catch (error: any) {
+      alert('Lỗi: ' + (error.response?.data?.message || error.message));
+    }
+  };
 
   // Get current logged-in user id (decode JWT from localStorage if needed)
   const token = localStorage.getItem('token');
@@ -345,10 +360,17 @@ export default function MatchDetailPage() {
                 {approvedPlayers.map((player) => (
                   <div key={player.userId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e2e8f0', color: '#475569', display: 'flex', alignItems: 'center', fontSize: '14px', fontWeight: 'bold', justifyContent: 'center' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: player.isGuest ? '#ffedd5' : '#e2e8f0', color: player.isGuest ? '#ea580c' : '#475569', display: 'flex', alignItems: 'center', fontSize: '14px', fontWeight: 'bold', justifyContent: 'center' }}>
                         {player.userName[0]?.toUpperCase() || 'U'}
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>{player.userName}</span>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>
+                        {player.userName}
+                        {player.isGuest && (
+                          <span style={{ fontSize: '11px', color: '#ea580c', fontWeight: '700', backgroundColor: '#fff7ed', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>
+                            Ngoài
+                          </span>
+                        )}
+                      </span>
                     </div>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -412,6 +434,47 @@ export default function MatchDetailPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Add External Player (Host view only) */}
+              {isHost && match.status !== 'CANCELLED' && (
+                <div style={{ marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: '#64748b', marginBottom: '8px' }}>
+                    Thêm thành viên đăng ký bên ngoài (không dùng App):
+                  </div>
+                  <form onSubmit={handleAddExternal} style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="text"
+                      placeholder="Nhập tên người chơi..."
+                      value={externalName}
+                      onChange={(e) => setExternalName(e.target.value)}
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        outline: 'none'
+                      }}
+                      required
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#3b82f6',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Thêm
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
 
             {/* Pending Requests Card (Host view only) */}

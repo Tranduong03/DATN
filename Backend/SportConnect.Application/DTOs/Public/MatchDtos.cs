@@ -32,6 +32,7 @@ public class MatchPlayerDto
     public string UserName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public DateTime JoinedAt { get; set; }
+    public bool IsGuest { get; set; }
 }
 
 public class CreateMatchDto

@@ -92,4 +92,12 @@ public class MatchController : ControllerBase
         var success = await _matchService.UpdateAttendanceAsync(id, GetUserId(), userId, status);
         return Ok(new { isSuccess = true, message = $"Cập nhật trạng thái điểm danh thành công: {status}!" });
     }
+
+    [HttpPost("{id}/external-player")]
+    [Authorize]
+    public async Task<IActionResult> AddExternalPlayer(Guid id, [FromQuery] string playerName)
+    {
+        var result = await _matchService.AddExternalPlayerAsync(id, GetUserId(), playerName);
+        return Ok(new { isSuccess = true, message = "Thêm thành viên ngoài thành công!", data = result });
+    }
 }

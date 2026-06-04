@@ -5,6 +5,7 @@ export interface MatchPlayerDto {
   userName: string;
   status: string;
   joinedAt: string;
+  isGuest?: boolean;
 }
 
 export interface MatchDto {
@@ -67,5 +68,9 @@ export const matchService = {
   
   updateAttendance: (matchId: string, userId: string, status: string) => {
     return axiosClient.put(`/matches/${matchId}/attendance/${userId}`, null, { params: { status } }).then(res => (res as any).message as string);
+  },
+
+  addExternalPlayer: (matchId: string, playerName: string) => {
+    return axiosClient.post(`/matches/${matchId}/external-player`, null, { params: { playerName } }).then(res => (res as any).data as MatchPlayerDto);
   }
 };

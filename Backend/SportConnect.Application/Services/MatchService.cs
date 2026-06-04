@@ -55,7 +55,8 @@ public class MatchService : IMatchService
                     UserId = mp.UserId,
                     UserName = pUser?.FullName ?? pUser?.Username ?? "Unknown",
                     Status = mp.Status,
-                    JoinedAt = mp.JoinedAt
+                    JoinedAt = mp.JoinedAt,
+                    IsGuest = pUser?.Email?.EndsWith("@sportconnect.guest") ?? false
                 };
             }).ToList();
 
@@ -108,7 +109,8 @@ public class MatchService : IMatchService
                 UserId = mp.UserId,
                 UserName = pUser?.FullName ?? pUser?.Username ?? "Unknown",
                 Status = mp.Status,
-                JoinedAt = mp.JoinedAt
+                JoinedAt = mp.JoinedAt,
+                IsGuest = pUser?.Email?.EndsWith("@sportconnect.guest") ?? false
             };
         }).ToList();
 
@@ -291,5 +293,61 @@ public class MatchService : IMatchService
         _unitOfWork.Repository<MatchPlayer>().Update(matchPlayer);
         await _unitOfWork.CompleteAsync();
         return true;
+    }
+
+    public async Task<MatchPlayerDto> AddExternalPlayerAsync(Guid matchId, Guid hostId, string playerName)
+    {
+        var match = await _unitOfWork.Repository<Match>().GetByIdAsync(matchId);
+        if (match == null) throw new Exception("Match not found");
+        if (match.HostId != hostId) throw new Exception("Unauthorized");
+        if (match.Status == "CANCELLED") throw new Exception("Match is cancelled");
+
+        // Check if match is full
+        var playersCount = (await _unitOfWork.Repository<MatchPlayer>().FindAsync(mp => mp.MatchId == matchId && (mp.Status == "APPROVED" || mp.Status == "ATTENDED" || mp.Status == "NO_SHOW"))).Count();
+        if (playersCount + 1 >= match.MaxPlayers)
+        {
+            throw new Exception("Match is already full");
+        }
+
+        // Create guest user
+        var guestUser = new User
+        {
+            Id = Guid.NewGuid(),
+            Username = "guest_" + Guid.NewGuid().ToString("N").Substring(0, 8),
+            Email = "guest_" + Guid.NewGuid().ToString("N").Substring(0, 8) + "@sportconnect.guest",
+            FullName = playerName,
+            PasswordHash = "",
+            CreatedAt = DateTime.UtcNow
+        };
+        
+        await _unitOfWork.Repository<User>().AddAsync(guestUser);
+        
+        var matchPlayer = new MatchPlayer
+        {
+            MatchId = matchId,
+            UserId = guestUser.Id,
+            Status = "APPROVED",
+            JoinedAt = DateTime.UtcNow
+        };
+
+        await _unitOfWork.Repository<MatchPlayer>().AddAsync(matchPlayer);
+        await _unitOfWork.CompleteAsync();
+
+        // Check if full now
+        if (playersCount + 2 >= match.MaxPlayers)
+        {
+            match.Status = "FULL";
+            _unitOfWork.Repository<Match>().Update(match);
+            await _unitOfWork.CompleteAsync();
+        }
+
+        return new MatchPlayerDto
+        {
+            UserId = guestUser.Id,
+            UserName = guestUser.FullName,
+            Status = matchPlayer.Status,
+            JoinedAt = matchPlayer.JoinedAt,
+            IsGuest = true
+        };
     }
 }

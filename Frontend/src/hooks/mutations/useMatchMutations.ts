@@ -85,3 +85,15 @@ export const useUpdateAttendance = () => {
     }
   });
 };
+
+export const useAddExternalPlayer = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ matchId, playerName }: { matchId: string; playerName: string }) => 
+      matchService.addExternalPlayer(matchId, playerName),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['matches'] });
+      queryClient.invalidateQueries({ queryKey: ['matchDetail', variables.matchId] });
+    }
+  });
+};
