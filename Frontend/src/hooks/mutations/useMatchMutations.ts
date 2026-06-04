@@ -39,3 +39,37 @@ export const useApproveJoinRequest = () => {
     }
   });
 };
+
+export const useRejectJoinRequest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ matchId, userId }: { matchId: string, userId: string }) => 
+      matchService.rejectJoinRequest(matchId, userId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['matches'] });
+      queryClient.invalidateQueries({ queryKey: ['matchDetail', variables.matchId] });
+    }
+  });
+};
+
+export const useLeaveMatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (matchId: string) => matchService.leaveMatch(matchId),
+    onSuccess: (_, matchId) => {
+      queryClient.invalidateQueries({ queryKey: ['matches'] });
+      queryClient.invalidateQueries({ queryKey: ['matchDetail', matchId] });
+    }
+  });
+};
+
+export const useCancelMatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (matchId: string) => matchService.cancelMatch(matchId),
+    onSuccess: (_, matchId) => {
+      queryClient.invalidateQueries({ queryKey: ['matches'] });
+      queryClient.invalidateQueries({ queryKey: ['matchDetail', matchId] });
+    }
+  });
+};

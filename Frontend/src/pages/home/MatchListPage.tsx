@@ -184,11 +184,11 @@ export default function MatchListPage() {
                           borderRadius: '6px',
                           fontSize: '12px',
                           fontWeight: '700',
-                          backgroundColor: match.status === 'OPEN' ? '#e6f4ea' : '#f1f5f9',
-                          color: match.status === 'OPEN' ? '#137333' : '#475569'
+                          backgroundColor: match.status === 'OPEN' ? '#e6f4ea' : match.status === 'CANCELLED' ? '#fee2e2' : '#f1f5f9',
+                          color: match.status === 'OPEN' ? '#137333' : match.status === 'CANCELLED' ? '#ef4444' : '#475569'
                         }}
                       >
-                        {match.status === 'OPEN' ? 'ĐANG TUYỂN' : 'ĐÃ ĐỦ'}
+                        {match.status === 'OPEN' ? 'ĐANG TUYỂN' : match.status === 'CANCELLED' ? 'ĐÃ HỦY' : 'ĐÃ ĐỦ'}
                       </span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#64748b' }}>
                         <Award size={14} />
@@ -280,7 +280,7 @@ export default function MatchListPage() {
                           cursor: 'not-allowed'
                         }}
                       >
-                        Đầy chỗ
+                        {match.status === 'CANCELLED' ? 'Đã hủy' : 'Đầy chỗ'}
                       </button>
                     )}
                   </div>

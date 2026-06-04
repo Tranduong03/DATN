@@ -163,6 +163,7 @@ export default function VenueDetailPage() {
                   key={idx} 
                   src={img} 
                   alt={`Gallery ${idx}`} 
+                  loading="lazy"
                   style={{ width: 240, height: 160, objectFit: 'cover', borderRadius: 8, flexShrink: 0, border: '1px solid #e2e8f0' }} 
                 />
               ))}
@@ -182,7 +183,7 @@ export default function VenueDetailPage() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       {review.userAvatar ? (
-                        <img src={review.userAvatar} alt={review.userName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+                        <img src={review.userAvatar} alt={review.userName} loading="lazy" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
                       ) : (
                         <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#475569' }}>
                           {review.userName.charAt(0).toUpperCase()}

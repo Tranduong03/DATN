@@ -12,4 +12,7 @@ public interface IMatchService
     Task<MatchDto> CreateMatchAsync(Guid userId, CreateMatchDto dto);
     Task<bool> JoinMatchAsync(Guid matchId, Guid userId);
     Task<bool> ApproveJoinRequestAsync(Guid matchId, Guid hostId, Guid joinUserId);
+    Task<bool> RejectJoinRequestAsync(Guid matchId, Guid hostId, Guid joinUserId);
+    Task<bool> LeaveMatchAsync(Guid matchId, Guid userId);
+    Task<bool> CancelMatchAsync(Guid matchId, Guid hostId);
 }

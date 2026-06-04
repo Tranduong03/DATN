@@ -205,4 +205,65 @@ public class MatchService : IMatchService
 
         return true;
     }
+
+    public async Task<bool> RejectJoinRequestAsync(Guid matchId, Guid hostId, Guid joinUserId)
+    {
+        var match = await _unitOfWork.Repository<Match>().GetByIdAsync(matchId);
+        if (match == null) throw new Exception("Match not found");
+        if (match.HostId != hostId) throw new Exception("Unauthorized");
+
+        var existing = await _unitOfWork.Repository<MatchPlayer>().FindAsync(mp => mp.MatchId == matchId && mp.UserId == joinUserId);
+        var matchPlayer = existing.FirstOrDefault();
+        if (matchPlayer == null) throw new Exception("Request not found");
+
+        matchPlayer.Status = "REJECTED";
+        _unitOfWork.Repository<MatchPlayer>().Update(matchPlayer);
+        await _unitOfWork.CompleteAsync();
+        return true;
+    }
+
+    public async Task<bool> LeaveMatchAsync(Guid matchId, Guid userId)
+    {
+        var match = await _unitOfWork.Repository<Match>().GetByIdAsync(matchId);
+        if (match == null) throw new Exception("Match not found");
+        if (match.HostId == userId) throw new Exception("Host cannot leave their own match. Use Cancel instead.");
+
+        var existing = await _unitOfWork.Repository<MatchPlayer>().FindAsync(mp => mp.MatchId == matchId && mp.UserId == userId);
+        var matchPlayer = existing.FirstOrDefault();
+        if (matchPlayer == null) throw new Exception("You are not part of this match");
+
+        var wasApproved = matchPlayer.Status == "APPROVED";
+
+        _unitOfWork.Repository<MatchPlayer>().Remove(matchPlayer);
+        await _unitOfWork.CompleteAsync();
+
+        if (wasApproved && match.Status == "FULL")
+        {
+            match.Status = "OPEN";
+            _unitOfWork.Repository<Match>().Update(match);
+            await _unitOfWork.CompleteAsync();
+        }
+
+        return true;
+    }
+
+    public async Task<bool> CancelMatchAsync(Guid matchId, Guid hostId)
+    {
+        var match = await _unitOfWork.Repository<Match>().GetByIdAsync(matchId);
+        if (match == null) throw new Exception("Match not found");
+        if (match.HostId != hostId) throw new Exception("Unauthorized");
+
+        match.Status = "CANCELLED";
+        _unitOfWork.Repository<Match>().Update(match);
+
+        var matchPlayers = await _unitOfWork.Repository<MatchPlayer>().FindAsync(mp => mp.MatchId == matchId);
+        foreach (var mp in matchPlayers)
+        {
+            mp.Status = "REJECTED";
+            _unitOfWork.Repository<MatchPlayer>().Update(mp);
+        }
+
+        await _unitOfWork.CompleteAsync();
+        return true;
+    }
 }

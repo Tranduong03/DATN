@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { 
-  Navigation, 
   Search, 
   SlidersHorizontal, 
   Star, 
@@ -43,7 +42,6 @@ export default function MapPage() {
   // 1. Coordinates and Location States (Default: HCMC Center)
   const [userCoords, setUserCoords] = useState({ lat: 10.8231, lng: 106.6297 });
   const [locating, setLocating] = useState(false);
-  const [locationName, setLocationName] = useState("Trung tâm Thành phố Hồ Chí Minh");
 
   // 2. Google Maps API States
   const [mapApiLoaded, setMapApiLoaded] = useState(false);
@@ -111,7 +109,6 @@ export default function MapPage() {
         const { latitude, longitude } = position.coords;
         const newCoords = { lat: latitude, lng: longitude };
         setUserCoords(newCoords);
-        setLocationName(`Tọa độ: ${latitude.toFixed(4)}°N, ${longitude.toFixed(4)}°E`);
         setLocating(false);
 
         // Center map to new coordinates
@@ -462,7 +459,7 @@ export default function MapPage() {
             </button>
 
             {/* Sport Specific Pills */}
-            {allSports.map(sport => {
+            {allSports.map((sport: string) => {
               const active = selectedSport === sport;
               const color = getSportColor(sport);
               const emoji = getSportEmoji(sport);

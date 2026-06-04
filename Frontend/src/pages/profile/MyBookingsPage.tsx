@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import MainLayout from '../../components/layout/MainLayout';
 import { useMyBookings } from '../../hooks/queries/useBookingQueries';
 import { useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
 import { useCreateMatch } from '../../hooks/mutations/useMatchMutations';

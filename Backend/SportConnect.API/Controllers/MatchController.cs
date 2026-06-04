@@ -60,4 +60,28 @@ public class MatchController : ControllerBase
         var success = await _matchService.ApproveJoinRequestAsync(id, GetUserId(), userId);
         return Ok(new { isSuccess = true, message = "Đã duyệt yêu cầu tham gia!" });
     }
+
+    [HttpPut("{id}/reject/{userId}")]
+    [Authorize]
+    public async Task<IActionResult> RejectJoin(Guid id, Guid userId)
+    {
+        var success = await _matchService.RejectJoinRequestAsync(id, GetUserId(), userId);
+        return Ok(new { isSuccess = true, message = "Đã từ chối yêu cầu tham gia!" });
+    }
+
+    [HttpPost("{id}/leave")]
+    [Authorize]
+    public async Task<IActionResult> LeaveMatch(Guid id)
+    {
+        var success = await _matchService.LeaveMatchAsync(id, GetUserId());
+        return Ok(new { isSuccess = true, message = "Đã rời trận đấu thành công!" });
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public async Task<IActionResult> CancelMatch(Guid id)
+    {
+        var success = await _matchService.CancelMatchAsync(id, GetUserId());
+        return Ok(new { isSuccess = true, message = "Đã hủy trận đấu thành công!" });
+    }
 }

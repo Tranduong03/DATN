@@ -51,5 +51,17 @@ export const matchService = {
   
   approveJoinRequest: (matchId: string, userId: string) => {
     return axiosClient.put(`/matches/${matchId}/approve/${userId}`).then(res => (res as any).message as string);
+  },
+  
+  rejectJoinRequest: (matchId: string, userId: string) => {
+    return axiosClient.put(`/matches/${matchId}/reject/${userId}`).then(res => (res as any).message as string);
+  },
+  
+  leaveMatch: (matchId: string) => {
+    return axiosClient.post(`/matches/${matchId}/leave`).then(res => (res as any).message as string);
+  },
+  
+  cancelMatch: (matchId: string) => {
+    return axiosClient.delete(`/matches/${matchId}`).then(res => (res as any).message as string);
   }
 };

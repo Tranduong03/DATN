@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMatchDetail } from '../../hooks/queries/useMatchQueries';
-import { useJoinMatch, useApproveJoinRequest } from '../../hooks/mutations/useMatchMutations';
+import { useJoinMatch, useApproveJoinRequest, useRejectJoinRequest, useLeaveMatch, useCancelMatch } from '../../hooks/mutations/useMatchMutations';
 import { ChevronLeft, User, Users, MapPin, Calendar, CircleDollarSign, Check, Info } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 
@@ -11,6 +11,9 @@ export default function MatchDetailPage() {
   const { data: match, isLoading } = useMatchDetail(matchId!);
   const joinMutation = useJoinMatch();
   const approveMutation = useApproveJoinRequest();
+  const rejectMutation = useRejectJoinRequest();
+  const leaveMutation = useLeaveMatch();
+  const cancelMutation = useCancelMatch();
 
   // Get current logged-in user id (decode JWT from localStorage if needed)
   const token = localStorage.getItem('token');
@@ -46,6 +49,37 @@ export default function MatchDetailPage() {
       alert('Đã duyệt người chơi tham gia trận đấu!');
     } catch (error: any) {
       alert('Lỗi khi duyệt: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleReject = async (userId: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn từ chối yêu cầu tham gia này không?')) return;
+    try {
+      await rejectMutation.mutateAsync({ matchId: matchId!, userId });
+      alert('Đã từ chối yêu cầu tham gia!');
+    } catch (error: any) {
+      alert('Lỗi khi từ chối: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleLeave = async () => {
+    if (!window.confirm('Bạn có chắc chắn muốn rời kèo đấu này không?')) return;
+    try {
+      await leaveMutation.mutateAsync(matchId!);
+      alert('Bạn đã rời kèo đấu thành công!');
+    } catch (error: any) {
+      alert('Lỗi khi rời kèo: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!window.confirm('Cảnh báo: Bạn có chắc chắn muốn HỦY kèo đấu này không?')) return;
+    try {
+      await cancelMutation.mutateAsync(matchId!);
+      alert('Đã hủy kèo đấu thành công!');
+      navigate('/matches');
+    } catch (error: any) {
+      alert('Lỗi khi hủy kèo: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -105,11 +139,11 @@ export default function MatchDetailPage() {
                     borderRadius: '8px',
                     fontSize: '12px',
                     fontWeight: '700',
-                    backgroundColor: match.status === 'OPEN' ? '#e6f4ea' : '#f1f5f9',
-                    color: match.status === 'OPEN' ? '#137333' : '#475569'
+                    backgroundColor: match.status === 'OPEN' ? '#e6f4ea' : match.status === 'CANCELLED' ? '#fee2e2' : '#f1f5f9',
+                    color: match.status === 'OPEN' ? '#137333' : match.status === 'CANCELLED' ? '#ef4444' : '#475569'
                   }}
                 >
-                  {match.status === 'OPEN' ? 'ĐANG TUYỂN' : 'ĐÃ ĐỦ'}
+                  {match.status === 'OPEN' ? 'ĐANG TUYỂN' : match.status === 'CANCELLED' ? 'ĐÃ HỦY' : 'ĐÃ ĐỦ'}
                 </span>
                 <span style={{ fontSize: '14px', color: '#64748b' }}>
                   Trình độ: <strong>{match.skillLevel}</strong>
@@ -164,11 +198,62 @@ export default function MatchDetailPage() {
               </div>
 
               {/* Action Buttons */}
-              {!isHost && (
+              {isHost ? (
                 <div>
-                  {isPlayer ? (
-                    <div style={{ padding: '12px', backgroundColor: '#e6f4ea', color: '#137333', borderRadius: '12px', textAlign: 'center', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                      <Check size={18} /> Bạn đã tham gia kèo đấu này
+                  {match.status !== 'CANCELLED' ? (
+                    <button
+                      onClick={handleCancel}
+                      style={{
+                        width: '100%',
+                        padding: '14px',
+                        backgroundColor: '#ef4444',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '12px',
+                        fontSize: '15px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
+                      }}
+                    >
+                      Hủy kèo đấu
+                    </button>
+                  ) : (
+                    <div style={{ padding: '12px', backgroundColor: '#fee2e2', color: '#ef4444', borderRadius: '12px', textAlign: 'center', fontSize: '14px', fontWeight: '600' }}>
+                      Kèo đấu đã bị hủy
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  {match.status === 'CANCELLED' ? (
+                    <div style={{ padding: '12px', backgroundColor: '#fee2e2', color: '#ef4444', borderRadius: '12px', textAlign: 'center', fontSize: '14px', fontWeight: '600' }}>
+                      Kèo đấu này đã bị hủy bởi Host
+                    </div>
+                  ) : isPlayer ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ padding: '12px', backgroundColor: '#e6f4ea', color: '#137333', borderRadius: '12px', textAlign: 'center', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <Check size={18} /> Bạn đã tham gia kèo đấu này
+                      </div>
+                      <button
+                        onClick={handleLeave}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          backgroundColor: '#ffffff',
+                          color: '#ef4444',
+                          border: '1px solid #fee2e2',
+                          borderRadius: '12px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fef2f2'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
+                      >
+                        Rời kèo đấu
+                      </button>
                     </div>
                   ) : hasRequested ? (
                     <div style={{ padding: '12px', backgroundColor: '#fff7ed', color: '#c2410c', borderRadius: '12px', textAlign: 'center', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
@@ -301,24 +386,44 @@ export default function MatchDetailPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <span style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>{request.userName}</span>
                         </div>
-                        <button
-                          onClick={() => handleApprove(request.userId)}
-                          style={{
-                            padding: '6px 12px',
-                            backgroundColor: '#10b981',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
-                        >
-                          Duyệt
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => handleApprove(request.userId)}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: '#10b981',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
+                          >
+                            Duyệt
+                          </button>
+                          <button
+                            onClick={() => handleReject(request.userId)}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: '#ffffff',
+                              color: '#ef4444',
+                              border: '1px solid #fecaca',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fef2f2'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
+                          >
+                            Từ chối
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

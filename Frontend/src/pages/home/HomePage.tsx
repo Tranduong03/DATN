@@ -163,7 +163,7 @@ export default function HomePage() {
                 <div className="venue-info">
                   <div className="venue-logo-placeholder" style={{ backgroundColor: '#F5A623', overflow: 'hidden' }}>
                     {venue.avatarUrl ? (
-                      <img src={venue.avatarUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={venue.avatarUrl} alt="Logo" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <span style={{ color: 'white', fontWeight: 'bold' }}>{venue.name.substring(0,2).toUpperCase()}</span>
                     )}
