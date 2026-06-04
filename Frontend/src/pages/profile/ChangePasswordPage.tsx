@@ -71,6 +71,7 @@ export default function ChangePasswordPage() {
               <input 
                 type={showOldPassword ? "text" : "password"} 
                 placeholder="Nhập mật khẩu hiện tại" 
+                autoComplete="current-password"
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
               />
@@ -86,6 +87,7 @@ export default function ChangePasswordPage() {
               <input 
                 type={showNewPassword ? "text" : "password"} 
                 placeholder="Nhập mật khẩu mới" 
+                autoComplete="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
@@ -101,6 +103,7 @@ export default function ChangePasswordPage() {
               <input 
                 type={showConfirmPassword ? "text" : "password"} 
                 placeholder="Nhập lại mật khẩu mới" 
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />

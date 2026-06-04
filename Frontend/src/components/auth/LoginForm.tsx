@@ -107,6 +107,7 @@ export default function LoginForm() {
             <input 
               type={showPassword ? "text" : "password"} 
               placeholder="Nhập mật khẩu (*)" 
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

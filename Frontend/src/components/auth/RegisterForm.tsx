@@ -65,6 +65,7 @@ export default function RegisterForm() {
             <input
               type="tel"
               placeholder="Nhập số điện thoại"
+              autoComplete="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
@@ -82,6 +83,7 @@ export default function RegisterForm() {
             <input
               type="email"
               placeholder="Nhập email của bạn"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -99,6 +101,7 @@ export default function RegisterForm() {
             <input
               type="text"
               placeholder="Nhập họ và tên"
+              autoComplete="name"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
@@ -116,6 +119,7 @@ export default function RegisterForm() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Nhập mật khẩu (*)"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -131,6 +135,7 @@ export default function RegisterForm() {
             <input
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Nhập lại mật khẩu"
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
