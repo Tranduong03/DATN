@@ -84,4 +84,12 @@ public class MatchController : ControllerBase
         var success = await _matchService.CancelMatchAsync(id, GetUserId());
         return Ok(new { isSuccess = true, message = "Đã hủy trận đấu thành công!" });
     }
+
+    [HttpPut("{id}/attendance/{userId}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateAttendance(Guid id, Guid userId, [FromQuery] string status)
+    {
+        var success = await _matchService.UpdateAttendanceAsync(id, GetUserId(), userId, status);
+        return Ok(new { isSuccess = true, message = $"Cập nhật trạng thái điểm danh thành công: {status}!" });
+    }
 }

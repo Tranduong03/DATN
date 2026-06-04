@@ -63,5 +63,9 @@ export const matchService = {
   
   cancelMatch: (matchId: string) => {
     return axiosClient.delete(`/matches/${matchId}`).then(res => (res as any).message as string);
+  },
+  
+  updateAttendance: (matchId: string, userId: string, status: string) => {
+    return axiosClient.put(`/matches/${matchId}/attendance/${userId}`, null, { params: { status } }).then(res => (res as any).message as string);
   }
 };

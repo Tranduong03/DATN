@@ -68,7 +68,7 @@ public class MatchService : IMatchService
                 Title = m.Title,
                 SkillLevel = m.SkillLevel,
                 MaxPlayers = m.MaxPlayers,
-                CurrentPlayers = players.Count(p => p.Status == "APPROVED") + 1, // +1 for host
+                CurrentPlayers = players.Count(p => p.Status == "APPROVED" || p.Status == "ATTENDED" || p.Status == "NO_SHOW") + 1, // +1 for host
                 FeePerPlayer = m.FeePerPlayer,
                 Status = m.Status,
                 CreatedAt = m.CreatedAt,
@@ -121,7 +121,7 @@ public class MatchService : IMatchService
             Title = match.Title,
             SkillLevel = match.SkillLevel,
             MaxPlayers = match.MaxPlayers,
-            CurrentPlayers = players.Count(p => p.Status == "APPROVED") + 1,
+            CurrentPlayers = players.Count(p => p.Status == "APPROVED" || p.Status == "ATTENDED" || p.Status == "NO_SHOW") + 1,
             FeePerPlayer = match.FeePerPlayer,
             Status = match.Status,
             CreatedAt = match.CreatedAt,
@@ -195,7 +195,7 @@ public class MatchService : IMatchService
         await _unitOfWork.CompleteAsync();
 
         // Check if full
-        var players = await _unitOfWork.Repository<MatchPlayer>().FindAsync(mp => mp.MatchId == matchId && mp.Status == "APPROVED");
+        var players = await _unitOfWork.Repository<MatchPlayer>().FindAsync(mp => mp.MatchId == matchId && (mp.Status == "APPROVED" || mp.Status == "ATTENDED" || mp.Status == "NO_SHOW"));
         if (players.Count() + 1 >= match.MaxPlayers)
         {
             match.Status = "FULL";
@@ -232,7 +232,7 @@ public class MatchService : IMatchService
         var matchPlayer = existing.FirstOrDefault();
         if (matchPlayer == null) throw new Exception("You are not part of this match");
 
-        var wasApproved = matchPlayer.Status == "APPROVED";
+        var wasApproved = matchPlayer.Status == "APPROVED" || matchPlayer.Status == "ATTENDED" || matchPlayer.Status == "NO_SHOW";
 
         _unitOfWork.Repository<MatchPlayer>().Remove(matchPlayer);
         await _unitOfWork.CompleteAsync();
@@ -263,6 +263,32 @@ public class MatchService : IMatchService
             _unitOfWork.Repository<MatchPlayer>().Update(mp);
         }
 
+        await _unitOfWork.CompleteAsync();
+        return true;
+    }
+
+    public async Task<bool> UpdateAttendanceAsync(Guid matchId, Guid hostId, Guid playerUserId, string status)
+    {
+        var match = await _unitOfWork.Repository<Match>().GetByIdAsync(matchId);
+        if (match == null) throw new Exception("Match not found");
+        if (match.HostId != hostId) throw new Exception("Unauthorized");
+
+        var existing = await _unitOfWork.Repository<MatchPlayer>().FindAsync(mp => mp.MatchId == matchId && mp.UserId == playerUserId);
+        var matchPlayer = existing.FirstOrDefault();
+        if (matchPlayer == null) throw new Exception("Player not found in this match");
+
+        if (matchPlayer.Status != "APPROVED" && matchPlayer.Status != "ATTENDED" && matchPlayer.Status != "NO_SHOW")
+        {
+            throw new Exception("Only approved players can be checked in");
+        }
+
+        if (status != "ATTENDED" && status != "NO_SHOW" && status != "APPROVED")
+        {
+            throw new Exception("Invalid attendance status");
+        }
+
+        matchPlayer.Status = status;
+        _unitOfWork.Repository<MatchPlayer>().Update(matchPlayer);
         await _unitOfWork.CompleteAsync();
         return true;
     }

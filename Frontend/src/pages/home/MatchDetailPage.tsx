@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMatchDetail } from '../../hooks/queries/useMatchQueries';
-import { useJoinMatch, useApproveJoinRequest, useRejectJoinRequest, useLeaveMatch, useCancelMatch } from '../../hooks/mutations/useMatchMutations';
+import { useJoinMatch, useApproveJoinRequest, useRejectJoinRequest, useLeaveMatch, useCancelMatch, useUpdateAttendance } from '../../hooks/mutations/useMatchMutations';
 import { ChevronLeft, User, Users, MapPin, Calendar, CircleDollarSign, Check, Info } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 
@@ -14,6 +14,7 @@ export default function MatchDetailPage() {
   const rejectMutation = useRejectJoinRequest();
   const leaveMutation = useLeaveMatch();
   const cancelMutation = useCancelMatch();
+  const attendanceMutation = useUpdateAttendance();
 
   // Get current logged-in user id (decode JWT from localStorage if needed)
   const token = localStorage.getItem('token');
@@ -83,14 +84,22 @@ export default function MatchDetailPage() {
     }
   };
 
+  const handleAttendance = async (userId: string, status: string) => {
+    try {
+      await attendanceMutation.mutateAsync({ matchId: matchId!, userId, status });
+    } catch (error: any) {
+      alert('Lỗi khi điểm danh: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
   if (isLoading) return <MainLayout><div style={{ padding: 40, textAlign: 'center' }}>Đang tải thông tin kèo đấu...</div></MainLayout>;
   if (!match) return <MainLayout><div style={{ padding: 40, textAlign: 'center' }}>Không tìm thấy thông tin kèo đấu.</div></MainLayout>;
 
   const isHost = currentUserId === match.hostId;
-  const isPlayer = match.players.some(p => p.userId === currentUserId && p.status === 'APPROVED');
+  const isPlayer = match.players.some(p => p.userId === currentUserId && (p.status === 'APPROVED' || p.status === 'ATTENDED' || p.status === 'NO_SHOW'));
   const hasRequested = match.players.some(p => p.userId === currentUserId && p.status === 'PENDING');
 
-  const approvedPlayers = match.players.filter(p => p.status === 'APPROVED');
+  const approvedPlayers = match.players.filter(p => p.status === 'APPROVED' || p.status === 'ATTENDED' || p.status === 'NO_SHOW');
   const pendingRequests = match.players.filter(p => p.status === 'PENDING');
 
   const startVal = new Date(match.startTime);
@@ -341,9 +350,65 @@ export default function MatchDetailPage() {
                       </div>
                       <span style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>{player.userName}</span>
                     </div>
-                    <span style={{ fontSize: '12px', color: '#137333', fontWeight: '600', backgroundColor: '#e6f4ea', padding: '4px 8px', borderRadius: '6px' }}>
-                      Đã duyệt
-                    </span>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {/* Status Badge */}
+                      {player.status === 'APPROVED' && (
+                        <span style={{ fontSize: '12px', color: '#475569', fontWeight: '600', backgroundColor: '#e2e8f0', padding: '4px 8px', borderRadius: '6px' }}>
+                          Đã duyệt
+                        </span>
+                      )}
+                      {player.status === 'ATTENDED' && (
+                        <span style={{ fontSize: '12px', color: '#137333', fontWeight: '600', backgroundColor: '#e6f4ea', padding: '4px 8px', borderRadius: '6px' }}>
+                          Đã đến
+                        </span>
+                      )}
+                      {player.status === 'NO_SHOW' && (
+                        <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: '600', backgroundColor: '#fee2e2', padding: '4px 8px', borderRadius: '6px' }}>
+                          Vắng mặt
+                        </span>
+                      )}
+
+                      {/* Host Attendance Toggles */}
+                      {isHost && (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            onClick={() => handleAttendance(player.userId, player.status === 'ATTENDED' ? 'APPROVED' : 'ATTENDED')}
+                            style={{
+                              padding: '4px 8px',
+                              backgroundColor: player.status === 'ATTENDED' ? '#10b981' : '#ffffff',
+                              color: player.status === 'ATTENDED' ? '#ffffff' : '#10b981',
+                              border: '1px solid #10b981',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: '700',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            title="Đánh dấu đã đến"
+                          >
+                            Đã đến
+                          </button>
+                          <button
+                            onClick={() => handleAttendance(player.userId, player.status === 'NO_SHOW' ? 'APPROVED' : 'NO_SHOW')}
+                            style={{
+                              padding: '4px 8px',
+                              backgroundColor: player.status === 'NO_SHOW' ? '#ef4444' : '#ffffff',
+                              color: player.status === 'NO_SHOW' ? '#ffffff' : '#ef4444',
+                              border: '1px solid #ef4444',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: '700',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            title="Đánh dấu vắng mặt"
+                          >
+                            Vắng
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

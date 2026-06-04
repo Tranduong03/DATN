@@ -15,4 +15,5 @@ public interface IMatchService
     Task<bool> RejectJoinRequestAsync(Guid matchId, Guid hostId, Guid joinUserId);
     Task<bool> LeaveMatchAsync(Guid matchId, Guid userId);
     Task<bool> CancelMatchAsync(Guid matchId, Guid hostId);
+    Task<bool> UpdateAttendanceAsync(Guid matchId, Guid hostId, Guid playerUserId, string status);
 }

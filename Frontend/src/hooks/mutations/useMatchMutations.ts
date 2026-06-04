@@ -73,3 +73,15 @@ export const useCancelMatch = () => {
     }
   });
 };
+
+export const useUpdateAttendance = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ matchId, userId, status }: { matchId: string; userId: string; status: string }) => 
+      matchService.updateAttendance(matchId, userId, status),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['matches'] });
+      queryClient.invalidateQueries({ queryKey: ['matchDetail', variables.matchId] });
+    }
+  });
+};
