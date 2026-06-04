@@ -113,13 +113,23 @@ public class AuthService : IAuthService
             throw new AppException("Username, Email hoặc Số điện thoại đã tồn tại.");
         }
 
+        var defaultAvatars = new[]
+        {
+            "/src/assets/icon/avata_boy_1.avif",
+            "/src/assets/icon/avata_boy_2.jpg",
+            "/src/assets/icon/avata_girl_1.jpg",
+            "/src/assets/icon/avata_girl_2.avif"
+        };
+        var avatarIndex = Math.Abs(registerDto.Username.GetHashCode()) % defaultAvatars.Length;
+
         var user = new User
         {
             Username = registerDto.Username,
             Email = registerDto.Email ?? string.Empty,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
             FullName = registerDto.FullName,
-            Phone = registerDto.Phone
+            Phone = registerDto.Phone,
+            AvatarUrl = defaultAvatars[avatarIndex]
         };
 
         await _unitOfWork.Repository<User>().AddAsync(user);

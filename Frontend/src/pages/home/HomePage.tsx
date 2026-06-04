@@ -13,6 +13,9 @@ export default function HomePage() {
   const [userName, setUserName] = useState('Khách');
   const [userAvatar, setUserAvatar] = useState('');
   const [currentDate, setCurrentDate] = useState('');
+  const [showNotiPopover, setShowNotiPopover] = useState(false);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     // 1. Format Ngày (VD: Thứ năm, 14/05/2026)
@@ -30,13 +33,32 @@ export default function HomePage() {
         // Kiểm tra token chưa hết hạn
         if (decoded.exp * 1000 > Date.now()) {
           setUserName(decoded.FullName || decoded.unique_name || 'Khách hàng');
-          setUserAvatar(decoded.AvatarUrl || '');
+          setUserAvatar(decoded.AvatarUrl || '/src/assets/icon/avata_boy_1.avif');
         }
       } catch (err) {
         // Bỏ qua nếu lỗi decode
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  const toggleFavorite = (venueId: any) => {
+    if (favorites.includes(venueId)) {
+      setFavorites(favorites.filter(id => id !== venueId));
+      setToastMessage('Đã xóa khỏi danh sách yêu thích');
+    } else {
+      setFavorites([...favorites, venueId]);
+      setToastMessage('Đã thêm vào danh sách yêu thích');
+    }
+  };
 
   const { data: venues = [], isLoading } = usePublicVenues(searchTerm);
 
@@ -82,9 +104,47 @@ export default function HomePage() {
                 <Star size={18} fill="#FFD700" color="#FFD700" />
                 <span className="dot-indicator"></span>
               </button>
-              <button className="icon-btn">
-                <Bell size={20} color="#fff" />
-              </button>
+              <div style={{ position: 'relative' }}>
+                <button className="icon-btn" onClick={() => setShowNotiPopover(!showNotiPopover)}>
+                  <Bell size={20} color="#fff" />
+                </button>
+                {showNotiPopover && (
+                  <>
+                    <div 
+                      onClick={() => setShowNotiPopover(false)} 
+                      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }} 
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      top: '42px',
+                      right: '0',
+                      backgroundColor: '#ffffff',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+                      border: '1px solid #e2e8f0',
+                      zIndex: 100,
+                      minWidth: '160px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: '-6px',
+                        right: '12px',
+                        width: '10px',
+                        height: '10px',
+                        backgroundColor: '#ffffff',
+                        transform: 'rotate(45deg)',
+                        borderTop: '1px solid #e2e8f0',
+                        borderLeft: '1px solid #e2e8f0'
+                      }} />
+                      <span style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
+                        Chưa có thông báo
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -155,7 +215,23 @@ export default function HomePage() {
                     <span className="badge badge-green">Từ {formatPrice(venue.minPrice)}/h</span>
                   </div>
                   <div className="venue-cover-actions">
-                    <button className="action-btn"><Heart size={16} /></button>
+                    <button 
+                      className="action-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(venue.id);
+                      }}
+                      style={{ 
+                        color: favorites.includes(venue.id) ? '#ef4444' : undefined,
+                        backgroundColor: favorites.includes(venue.id) ? '#fee2e2' : undefined
+                      }}
+                    >
+                      <Heart 
+                        size={16} 
+                        fill={favorites.includes(venue.id) ? '#ef4444' : 'none'} 
+                        color={favorites.includes(venue.id) ? '#ef4444' : 'currentColor'}
+                      />
+                    </button>
                     <button className="action-btn"><Share2 size={16} /></button>
                   </div>
                 </div>
@@ -185,6 +261,30 @@ export default function HomePage() {
 
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '24px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#10b981',
+          color: '#ffffff',
+          padding: '12px 24px',
+          borderRadius: '30px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+          zIndex: 10000,
+          fontWeight: '600',
+          fontSize: '15px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <span>❤️</span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </MainLayout>
   );
 }

@@ -49,7 +49,8 @@ public static class AdminSeeder
                     Email = email,
                     FullName = "System Administrator",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-                    Status = true
+                    Status = true,
+                    AvatarUrl = "/src/assets/icon/avata_boy_1.avif"
                 };
                 context.Users.Add(adminUser);
                 await context.SaveChangesAsync();

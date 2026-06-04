@@ -3,12 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import avataBoy1 from '../../assets/icon/avata_boy_1.avif';
-import avataBoy2 from '../../assets/icon/avata_boy_2.jpg';
-import avataGirl1 from '../../assets/icon/avata_girl_1.jpg';
-import avataGirl2 from '../../assets/icon/avata_girl_2.avif';
-
-const defaultAvatars = [avataBoy1, avataBoy2, avataGirl1, avataGirl2];
 
 interface JwtPayload {
   sub: string;
@@ -43,13 +37,7 @@ export default function MePage() {
 
       let name = decoded.FullName || decoded.unique_name || 'Người dùng';
       let email = decoded.email || 'Chưa cập nhật email';
-      let avatar = decoded.AvatarUrl;
-
-      if (!avatar) {
-        // Pick a random avatar based on user ID or just random
-        const charCodeSum = (decoded.sub || 'a').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        avatar = defaultAvatars[charCodeSum % defaultAvatars.length];
-      }
+      let avatar = decoded.AvatarUrl || '/src/assets/icon/avata_boy_1.avif';
 
       setUserInfo({ name, email, avatar });
     } catch (err) {
