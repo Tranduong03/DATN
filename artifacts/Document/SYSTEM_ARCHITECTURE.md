@@ -39,23 +39,20 @@ Backend được xây dựng bằng **C# & ASP.NET Core 8 Web API**, sử dụng
 
 ---
 
-## 3. Kiến trúc Frontend (React 19 + Vite)
+## 3. Kiến trúc Frontend (Phân hệ độc lập)
 
-Frontend là một **Single Page Application (SPA)** hiện đại, nhấn mạnh vào trải nghiệm người dùng (UX) nhanh, mượt và thiết kế UI mang phong cách Premium, năng động (Glassmorphism, Vibrant colors).
+Frontend được cấu trúc thành hai phân hệ độc lập chạy song song:
 
-### Công nghệ lõi:
-- **Framework:** React 19, TypeScript, build bằng Vite.
-- **Routing:** React Router v7.
-- **State & Data Fetching:** **TanStack Query v5** kết hợp **Axios**.
-- **CSS:** Vanilla CSS với tư duy Design System Tokens tập trung (không dùng Tailwind).
+### A. Phân hệ User PWA (`Frontend/user`):
+- **Công nghệ**: React 19, TypeScript, Vite, React Router v7, TanStack Query v5, Axios.
+- **Phong cách UI**: Mobile-first, Vanilla CSS với Design System Tokens tập trung.
+- **Xử lý lỗi**: Tích hợp catch-all wildcard route hiển thị `NotFoundPage.tsx` di động.
 
-### Cấu trúc thư mục chuẩn Best Practices:
-- **`src/api/axiosClient.ts`**: Cấu hình Axios trung tâm. Tự động đính kèm `Authorization: Bearer <token>` vào request và xử lý logic response chung.
-- **`src/hooks/`**:
-  - `queryKeys.ts`: Quản lý tập trung mọi Query Keys dưới dạng object constants để tránh sai sót chính tả khi Invalidate Cache.
-  - `queries/` & `mutations/`: Custom hooks sử dụng TanStack Query (ví dụ: `useAdminUsers`, `useApproveOwnerRequest`). Gánh vác toàn bộ việc gọi API, quản lý `isLoading`, caching, tách bạch hoàn toàn khỏi UI Components.
-- **`src/services/`**: Chứa các hàm fetch raw (chỉ gọi `axiosClient`). Được chia module theo nghiệp vụ: `authService`, `adminService`, `ownerService`.
-- **`src/pages/`**: Nơi chứa giao diện phân trang (Auth, Admin, Owner, Profile).
+### B. Phân hệ Admin Portal (`Frontend/admin`):
+- **Công nghệ**: Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI.
+- **Tính năng nổi bật**:
+  - Breadcrumb động (`DashboardBreadcrumb`) hiển thị chỉ hướng tiếng Việt theo URL.
+  - Trang lỗi 404 tùy chỉnh (`app/not-found.tsx`), lỗi runtime (`app/error.tsx`) và lỗi 404 trong dashboard (`app/(main)/dashboard/[...not-found]/page.tsx`).
 
 ---
 
@@ -72,10 +69,11 @@ Là một luồng Multi-step form phức tạp (`OwnerOnboardingFlow.tsx`) cho p
 - Trạng thái duyệt (Pending, Verified, Rejected).
 
 ### C. Luồng Quản Trị (Admin Flow)
-Bảng điều khiển dành cho Admin (`/admin`):
-- **Admin Dashboard:** Thống kê tổng quan sử dụng `Promise.all` hoặc nhiều Query chạy song song.
-- **Quản lý Users:** Bảng danh sách phân trang (Pagination), tìm kiếm (Search), hiển thị Trust Score, Status.
-- **Quản lý Owner Requests:** Nơi Admin xem chi tiết thông tin đơn đăng ký chủ sân. Admin có thể thực hiện Mutation **Duyệt (Approve)** hoặc **Từ chối (Reject - kèm lý do)**. Sau khi thao tác, hệ thống tự động `invalidateQueries` để cập nhật lại UI ngay lập tức mà không cần reload.
+Bảng điều khiển dành cho Admin (Next.js Portal `/dashboard`):
+- **Admin Dashboard:** Thống kê tổng quan sử dụng nhiều query chạy song song kết nối qua endpoints `/api/admin/*`.
+- **Quản lý Users:** Bảng danh sách phân trang (Pagination), tìm kiếm (Search), khóa/mở khóa tài khoản vi phạm.
+- **Quản lý Owner Requests:** Nơi Admin xem chi tiết thông tin đơn đăng ký chủ sân. Admin có thể thực hiện Mutation **Duyệt (Approve)** hoặc **Từ chối (Reject - kèm lý do)**.
+- **Breadcrumb động & Xử lý lỗi**: Tích hợp dynamic breadcrumb định vị tiếng Việt và hệ thống các trang lỗi (404, runtime error) chuyên nghiệp giúp ứng dụng hoạt động ổn định và thân thiện.
 
 ### D. Luồng Cấu hình Sân (Venue Configuration)
 Dành cho Owner sau khi được duyệt:

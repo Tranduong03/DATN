@@ -45,16 +45,11 @@ graph TD
    * Chứa các API Controllers (`AuthController`, `BookingController`, `MatchController`, `AdminController`).
    * Xử lý xác thực JWT (Token Validation) và phân quyền phân cấp bằng ASP.NET Core Identity/Roles.
 
-### 2.2. Phía Frontend (React PWA)
-Mã nguồn Frontend tổ chức trong thư mục `/Frontend/src` theo mô hình Component-Driven kết hợp React Query để quản lý state bất đồng bộ:
+### 2.2. Phía Frontend (Phân tách hai Phân hệ)
 
-* **`/api`**: Cấu hình `axiosClient` tự động đính kèm JWT token từ localStorage vào header và xử lý lỗi tập trung.
-* **`/components`**: Các component tái sử dụng (Layout, Form xác thực, Notification toàn cục).
-* **`/hooks`**: 
-  * `/queries`: Các query hook tải dữ liệu (sử dụng React Query) giúp tự động lưu bộ nhớ đệm (caching) và tự động làm mới.
-  * `/mutations`: Các mutation hook gửi yêu cầu thay đổi dữ liệu (tạo sân, đặt lịch, duyệt yêu cầu).
-* **`/pages`**: Các trang giao diện chính chia theo nhóm chức năng: `auth/`, `home/`, `owner/`, `admin/`, `profile/`.
-* **`/services`**: Định nghĩa các hàm gọi API trực tiếp qua Axios.
+Mã nguồn Frontend được chia thành 2 phân hệ độc lập:
+1. **User PWA (`Frontend/user`)**: React 19, TypeScript, Vite. Chứa luồng người chơi và chủ sân, tối ưu PWA trên di động.
+2. **Admin Portal (`Frontend/admin`)**: Next.js 15, TypeScript, Tailwind CSS, Shadcn UI. Chứa bảng điều khiển của quản trị viên hệ thống.
 
 ---
 
@@ -127,45 +122,21 @@ Nơi tiếp nhận các yêu cầu HTTP Request từ Frontend, kiểm tra quyề
 
 ---
 
-### 2.3.2. Phía Frontend (React PWA)
+### 2.3.2. Phía Frontend
 
-Toàn bộ giao diện và luồng xử lý phía người dùng nằm trong `/Frontend/src`.
+#### A. Phân hệ User PWA (`Frontend/user`)
+Mã nguồn ứng dụng di động nằm trong thư mục `/Frontend/user/src`:
+* [main.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/user/src/main.tsx): Điểm khởi chạy React, cấu hình QueryClient và Google OAuth Provider.
+* [App.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/user/src/App.tsx): Bộ định tuyến chính của PWA. Có wildcard route `path="*"` dẫn tới `NotFoundPage.tsx`.
+* [index.css](file:///d:/IT/HK2_Y4/DATN/Frontend/user/src/index.css): Định nghĩa CSS toàn cục di động & biến màu chủ đạo.
+* [pages/error/NotFoundPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/user/src/pages/error/NotFoundPage.tsx): Trang lỗi 404 tùy chỉnh trên PWA di động.
 
-#### A. Cấu Hình & Cài Đặt Gốc
-* [main.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/main.tsx): Tệp tin gốc khởi chạy ứng dụng. Thiết lập React Query `QueryClientProvider` để quản lý bộ nhớ đệm dữ liệu API, nạp tệp CSS chung `index.css` và khởi chạy bộ định tuyến ứng dụng.
-* [App.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/App.tsx): Định nghĩa toàn bộ cây đường dẫn (Routes) của ứng dụng. Bao quanh các trang bằng các lớp bảo vệ phân quyền phù hợp (`AuthGuard`, `OwnerGuard`, `AdminGuard`).
-* [admin.css](file:///d:/IT/HK2_Y4/DATN/Frontend/src/admin.css): Chứa toàn bộ định dạng CSS giao diện máy tính dành riêng cho trang quản trị hệ thống (Admin Dashboard). Chỉ được nạp khi truy cập vào không gian Admin.
-* [index.css](file:///d:/IT/HK2_Y4/DATN/Frontend/src/index.css): Chứa định dạng CSS cốt lõi của PWA cho người dùng di động và chủ sân, được nạp ngay từ đầu để đảm bảo tốc độ hiển thị nhanh nhất.
-* [api/axiosClient.ts](file:///d:/IT/HK2_Y4/DATN/Frontend/src/api/axiosClient.ts): Định nghĩa instance gọi API bằng thư viện Axios. Cấu hình tự động lấy JWT token từ LocalStorage chèn vào header `Authorization: Bearer <token>` trước khi gửi lên Backend, đồng thời bắt các lỗi HTTP 401 để tự động đăng xuất người dùng nếu token hết hạn.
-
-#### B. Các Nhóm Trang Giao Diện (`pages/`)
-Được chia nhóm thư mục rõ ràng theo quyền hạn và mục đích sử dụng:
-
-* **Trang Xác Thực (`pages/auth/`)**:
-  * [LoginPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/auth/LoginPage.tsx) / [RegisterPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/auth/RegisterPage.tsx): Form nhập liệu đăng nhập/đăng ký người dùng thường, hỗ trợ tích hợp nút đăng nhập nhanh bằng tài khoản Google.
-  * [ForgotPasswordPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/auth/ForgotPasswordPage.tsx): Trang hỗ trợ lấy lại mật khẩu thông qua địa chỉ email đã đăng ký.
-  * [AuthGuard.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/auth/AuthGuard.tsx): Thành phần kiểm tra token bảo mật. Nếu chưa đăng nhập, tự động chuyển hướng người dùng về trang đăng nhập.
-
-* **Trang Người Dùng - PWA (`pages/home/` & `pages/profile/`)**:
-  * [HomePage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/home/HomePage.tsx): Trang chủ ứng dụng PWA, chứa banner chào mừng, tìm kiếm nhanh sân bóng và danh sách các môn thể thao nổi bật.
-  * [ExplorePage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/home/ExplorePage.tsx): Trang tìm kiếm chính. Cho phép tìm sân bóng gần vị trí hiện tại của thiết bị (sử dụng GPS API), lọc sân theo môn thể thao, hiển thị danh sách sân bóng kèm hình ảnh trực quan.
-  * [MapPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/home/MapPage.tsx): Tích hợp Google Maps JS SDK hiển thị bản đồ trực quan. Vẽ các ghim (Marker) vị trí sân bóng xung quanh người dùng, hỗ trợ công cụ kéo thả bán kính tìm kiếm (Radius Slider).
-  * [VenueDetailPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/home/VenueDetailPage.tsx): Hiển thị chi tiết sân bóng, danh sách các sân đấu con, nhận xét đánh giá từ cộng đồng, và đặc biệt là bảng chọn khung giờ trống trực quan để đặt lịch trực tuyến.
-  * [PaymentResultPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/home/PaymentResultPage.tsx): Trang đích hiển thị kết quả sau khi thanh toán từ VNPAY (Thành công/Thất bại), hướng dẫn người chơi bước tiếp theo.
-  * [MatchListPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/home/MatchListPage.tsx) & [MatchDetailPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/home/MatchDetailPage.tsx): Giao diện mạng xã hội tìm đối chơi thể thao. Hiển thị bảng tin các kèo bóng đang thiếu người, cho phép gửi yêu cầu gia nhập và trò chuyện/xem thông tin các người chơi cùng trận.
-  * [ProfilePage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/profile/ProfilePage.tsx) & [MyBookingsPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/profile/MyBookingsPage.tsx): Quản lý thông tin tài khoản cá nhân và theo dõi lịch sử các lần đặt sân của người chơi kèm mã QR vé vào sân để check-in tại quầy.
-
-* **Trang Chủ Sân (`pages/owner/`)**:
-  * [OwnerGuard.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/owner/OwnerGuard.tsx): Kiểm định quyền hạn. Chỉ cho phép các tài khoản có vai trò `Owner` đi qua.
-  * [OwnerOnboardingFlow.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/owner/OwnerOnboardingFlow.tsx): Quy trình đăng ký chủ sân nhiều bước (nhập hồ sơ pháp lý, chọn địa chỉ sân bóng qua gợi ý Google Places và ghim vị trí chính xác trên bản đồ số).
-  * [OwnerDashboardPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/owner/OwnerDashboardPage.tsx): Trang quản trị doanh thu của chủ sân với biểu đồ đường/cột thể hiện lượng đặt sân và dòng tiền thu về theo ngày/tháng/năm.
-  * [VenueConfigPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/owner/VenueConfigPage.tsx): Cung cấp giao diện thiết lập thông số sân: thêm bớt sân con, thiết lập khung giờ mở cửa, cài đặt bảng giá theo giờ cao điểm và tạo các lịch hoạt động định kỳ.
-
-* **Trang Admin Hệ Thống (`pages/admin/`)**:
-  * [AdminGuard.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/admin/AdminGuard.tsx): Bảo vệ không gian làm việc của Admin.
-  * [AdminLayout.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/admin/AdminLayout.tsx): Khung bố cục (Layout) với menu điều hướng bên trái (Sidebar) thích ứng với màn hình lớn.
-  * [AdminOwnerRequestsPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/admin/AdminOwnerRequestsPage.tsx): Danh sách các yêu cầu đăng ký làm chủ sân đang chờ duyệt. Admin có thể xem tài liệu đính kèm và ấn nút Duyệt hoặc Từ chối kèm lý do từ chối.
-  * [AdminUsersPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/admin/AdminUsersPage.tsx) & [AdminVenuesPage.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/src/pages/admin/AdminVenuesPage.tsx): Các bảng quản trị toàn bộ tài khoản người dùng và cơ sở thể thao trên hệ thống, cho phép khóa/mở khóa tài khoản hoặc hủy tư cách sân bãi vi phạm.
+#### B. Phân hệ Admin Portal (`Frontend/admin`)
+Mã nguồn ứng dụng quản lý nằm trong thư mục `/Frontend/admin/src`:
+* [app/not-found.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/admin/src/app/not-found.tsx): Trang lỗi 404 cho phân hệ Admin nói chung.
+* [app/error.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/admin/src/app/error.tsx): Error boundary bắt các lỗi runtime kết xuất giao diện.
+* [app/(main)/dashboard/[...not-found]/page.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/admin/src/app/(main)/dashboard/[...not-found]/page.tsx): Trang 404 lồng trong Dashboard để giữ nguyên khung layout (Sidebar/Header).
+* [app/(main)/dashboard/_components/sidebar/dashboard-breadcrumb.tsx](file:///d:/IT/HK2_Y4/DATN/Frontend/admin/src/app/(main)/dashboard/_components/sidebar/dashboard-breadcrumb.tsx): Breadcrumb tự động phân tích đường dẫn tiếng Việt.
 
 ---
 
@@ -335,17 +306,23 @@ Giao diện ứng dụng SportConnect được thiết kế mượt mà, tối �
    ```
 4. Truy cập Swagger UI tại: `http://localhost:5254/swagger/index.html` để kiểm tra các API hoạt động.
 
-#### Khởi chạy Frontend (ReactJS):
-1. Mở terminal tại thư mục `/Frontend`.
-2. Chạy lệnh cài đặt thư viện:
+#### Khởi chạy Frontend User PWA:
+1. Mở terminal tại thư mục `/Frontend/user`.
+2. Chạy các lệnh cài đặt và chạy dev server:
    ```bash
    npm install
-   ```
-3. Khởi chạy dev server:
-   ```bash
    npm run dev
    ```
-4. Mở trình duyệt truy cập `http://localhost:5173`.
+3. Truy cập trình duyệt: `http://localhost:5173`.
+
+#### Khởi chạy Frontend Admin Portal:
+1. Mở terminal tại thư mục `/Frontend/admin`.
+2. Chạy các lệnh cài đặt và chạy dev server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+3. Truy cập trình duyệt: `http://localhost:3000`.
 
 ---
 

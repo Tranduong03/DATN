@@ -1,90 +1,91 @@
 # Kiến trúc & Cấu trúc Thư mục Frontend (SportConnect)
 
-Dự án Frontend được xây dựng dựa trên **React 19**, **TypeScript** và **Vite**. Kiến trúc thư mục tuân thủ theo mô hình chia tách theo chức năng (Feature-based/Layer-based), giúp dễ dàng bảo trì và mở rộng trong tương lai. Hệ thống quản lý state và fetching data được giao cho **TanStack Query (React Query)** kết hợp với **Axios**.
+Dự án Frontend được phân chia độc lập thành hai phân hệ chuyên biệt để tối ưu hóa hiệu năng, bảo mật và trải nghiệm người dùng:
+1. **User PWA (React 19 + Vite)**: Ứng dụng PWA dành cho người chơi và chủ sân (Owner).
+2. **Admin Portal (Next.js 15 App Router)**: Trang quản trị hệ thống dành cho Quản trị viên (Admin).
 
-## Tổng quan sơ đồ thư mục (Thư mục `src`)
+---
 
+## 1. Phân hệ 1: User & Owner PWA (`Frontend/user`)
+
+Ứng dụng PWA di động được xây dựng trên nền tảng **React 19**, **TypeScript** và **Vite**, định hướng Mobile-first. Sử dụng **TanStack Query v5** và **Axios** để quản lý server state và truyền tải dữ liệu.
+
+### Cấu trúc Thư mục `Frontend/user/src`
 ```text
 src/
-├── App.tsx                     # Entry point chứa định tuyến (Routing) chính của ứng dụng
-├── index.css                   # File CSS toàn cục (Global CSS, biến màu, layout chung)
-├── main.tsx                    # File bootstrap React (Chứa Providers: QueryClient, Auth, GoogleOAuth)
+├── App.tsx                     # Định nghĩa bộ định tuyến chính (React Router v7) & wildcard catch-all route
+├── index.css                   # Định nghĩa CSS toàn cục di động & biến màu (Montserrat, Inter woff2)
+├── main.tsx                    # File khởi tạo React & các Providers (QueryClient, GoogleOAuth)
 │
 ├── api/                        # Cấu hình Axios clients
-│   ├── adminAxiosClient.ts     # Client riêng cho Admin (có thể đính kèm header/interceptors riêng)
-│   └── axiosClient.ts          # Client chung cho App (tự động gắn JWT token vào headers)
+│   └── axiosClient.ts          # Client gọi API chính, tự động đính kèm JWT token từ localStorage
 │
-├── assets/                     # Tài nguyên tĩnh (Images, Fonts, Icons)
-│   ├── fonts/                  # Chứa font chữ (VD: Montserrat woff2) và file css import font
-│   ├── icon/                   # Các icon/avatar dùng sẵn trong app
-│   └── ...
+├── components/                 # Các component dùng chung
+│   ├── auth/                   # Form xác thực (LoginForm, RegisterForm)
+│   ├── common/                 # Component chung (LoadingOverlay, Preloader, GlobalNotification)
+│   └── layout/                 # Bố cục giao diện (MainLayout, BottomNavigation)
 │
-├── components/                 # Các component có thể tái sử dụng (Reusable components)
-│   ├── auth/                   # Components liên quan đến xác thực (VD: LoginForm, RegisterForm)
-│   ├── common/                 # Components chung (LoadingOverlay, Button, Modal...)
-│   └── layout/                 # Cấu trúc layout (MainLayout, BottomNavigation, PageTransition...)
-│
-├── hooks/                      # Custom React Hooks
-│   ├── queryKeys.ts            # Nơi định nghĩa tập trung các keys cho TanStack Query
+├── hooks/                      # Custom React Hooks quản lý dữ liệu
+│   ├── queryKeys.ts            # Quản lý tập trung các khóa cache (React Query Keys)
 │   ├── mutations/              # Chứa các hooks thay đổi dữ liệu (POST, PUT, DELETE)
-│   │   ├── useAdminMutations.ts
-│   │   ├── useAuthMutations.ts
-│   │   ├── useBookingMutations.ts
-│   │   ├── useMatchMutations.ts
-│   │   └── useOwnerMutations.ts
-│   └── queries/                # Chứa các hooks lấy dữ liệu (GET)
-│       ├── useAdminQueries.ts
-│       ├── useBookingQueries.ts
-│       ├── useMatchQueries.ts
-│       ├── useOwnerQueries.ts
-│       └── usePublicQueries.ts
+│   └── queries/                # Chứa các hooks truy vấn dữ liệu (GET)
 │
-├── pages/                      # Các trang (Pages) tương ứng với từng Route
-│   ├── admin/                  # Giao diện cho Admin (Dashboard, Duyệt chủ sân, Quản lý user...)
+├── pages/                      # Các trang theo tuyến đường
 │   ├── auth/                   # Giao diện Đăng nhập, Đăng ký, Quên mật khẩu
-│   ├── home/                   # Giao diện chính (Trang chủ, Bản đồ, Khám phá, Chi tiết sân, Đặt sân)
-│   │   ├── HomePage.tsx        # Trang chủ - Danh sách sân nổi bật, tìm kiếm nhanh
-│   │   ├── MapPage.tsx         # Bản đồ tìm sân - Google Maps JavaScript API, GPS, lọc môn thể thao
-│   │   ├── ExplorePage.tsx     # Bảng tin xã hội - Feed, Giải đấu, Lớp học, Ưu đãi
-│   │   ├── VenueDetailPage.tsx # Chi tiết sân - Thông tin, ảnh, đặt lịch, thanh toán
-│   │   ├── MatchListPage.tsx   # Danh sách kèo đấu
-│   │   ├── MatchDetailPage.tsx # Chi tiết kèo - Tham gia/rời kèo
-│   │   └── PaymentResultPage.tsx # Kết quả thanh toán VNPay
+│   ├── error/                  # Giao diện báo lỗi
+│   │   └── NotFoundPage.tsx    # Trang 404 tùy chỉnh trên di động (xanh lá cây, Montserrat, nút Trang chủ)
+│   ├── home/                   # Giao diện chính (Trang chủ, Chi tiết sân, Kèo đấu, Bản đồ Google Maps)
+│   ├── owner/                  # Giao diện Chủ sân (Đăng ký chủ sân, Doanh thu, Cấu hình sân)
+│   └── profile/                # Giao diện cá nhân (Hồ sơ, Lịch sử đặt sân, Đổi mật khẩu)
 │
-└── services/                   # Lớp giao tiếp trực tiếp với Backend API (Gọi axios)
-    ├── adminService.ts         # Gọi API phần Admin
-    ├── authService.ts          # Gọi API phần Authentication
-    ├── bookingService.ts       # Gọi API Đặt sân
-    ├── matchService.ts         # Gọi API Kèo đấu
-    ├── ownerService.ts         # Gọi API Chủ sân
-    └── publicService.ts        # Gọi API Public (Không cần đăng nhập)
+└── services/                   # Lớp gọi API thô qua Axios
 ```
 
-## Các mẫu thiết kế (Design Patterns) & Điểm nhấn
+### Điểm nhấn Kỹ thuật của User PWA
+- **Bảo vệ Định tuyến (Route Guards)**: `AuthGuard` và `OwnerGuard` kiểm soát truy cập dựa trên JWT token.
+- **Trang báo lỗi 404 di động (`NotFoundPage.tsx`)**: Đăng ký catch-all wildcard (`Route path="*"`) hiển thị giao diện xanh lá đặc trưng, hướng dẫn người chơi quay lại trang chủ.
+- **Bản đồ Google Maps JS SDK**: Tải động Script tại runtime giúp tối ưu tài nguyên, hỗ trợ ghim địa điểm và bộ lọc bán kính GPS.
 
-1. **Phân tách Layer (Layered Architecture):**
-   - **UI Layer (Pages/Components):** Chỉ chịu trách nhiệm hiển thị giao diện và nhận tương tác từ người dùng.
-   - **State Layer (Hooks/Queries/Mutations):** Dùng TanStack Query để quản lý vòng đời của dữ liệu bất đồng bộ (Loading, Success, Error). Tách biệt hoàn toàn việc fetch data khỏi UI.
-   - **Service Layer (Services):** Chứa các logic gọi HTTP Request thuần túy bằng Axios.
-   - **API Layer (API Client):** Cấu hình Interceptors (tự động gắn token `localStorage` vào `Authorization` header).
+---
 
-2. **Route Guarding & Routing:**
-   - Sử dụng `react-router-dom`.
-   - Có các component Guard (`AuthGuard`, `OwnerGuard`, `AdminGuard`) để bảo vệ các tuyến đường yêu cầu đặc quyền. Nếu không có quyền, người dùng sẽ tự động bị chuyển hướng.
-   - Hoạt ảnh chuyển trang (Page Transition) sử dụng `framer-motion` được tích hợp vào trong Component `<AnimatedRoutes>`.
+## 2. Phân hệ 2: Admin Portal (`Frontend/admin`)
 
-3. **Styling (Thiết kế giao diện):**
-   - Định hướng Mobile-first (Tối ưu hóa hiển thị di động). 
-   - Sử dụng CSS thuần với CSS Variables (trong `index.css`) để quản lý Theming (Màu sắc gốc, Font chữ).
+Cổng quản trị hệ thống được tách riêng, xây dựng bằng **Next.js 15 (App Router)**, **TypeScript**, **Tailwind CSS** và **Shadcn UI** phục vụ hiển thị màn hình lớn (Desktop).
 
-4. **Quản lý khóa Query (Query Keys Management):**
-   - File `queryKeys.ts` tập trung toàn bộ các định danh key (VD: `['venues', 'public']`). Điều này giúp tránh gõ sai key và dễ dàng `invalidateQueries` (làm mới dữ liệu) sau khi người dùng thực hiện cập nhật.
+### Cấu trúc Thư mục `Frontend/admin/src`
+```text
+src/
+├── app/                        # Thư mục App Router chính của Next.js
+│   ├── (main)/dashboard/       # Các trang quản trị thuộc Dashboard layout bảo vệ
+│   │   ├── layout.tsx          # Bố cục Dashboard tích hợp Sidebar, Header và Breadcrumb động
+│   │   ├── default/            # Trang tổng quan thống kê
+│   │   ├── users/              # Quản lý người chơi (Khóa/Mở khóa tài khoản)
+│   │   ├── owner-requests/     # Phê duyệt hồ sơ nâng cấp chủ sân
+│   │   ├── venues/             # Quản lý cơ sở sân bãi
+│   │   ├── sport-categories/   # CRUD danh mục các môn thể thao
+│   │   └── [...not-found]/     # Catch-all báo lỗi 404 riêng cho khu vực dashboard
+│   ├── login/                  # Trang đăng nhập của quản trị viên
+│   ├── layout.tsx              # Root Layout toàn cục của Admin
+│   ├── not-found.tsx           # Trang báo lỗi 404 của toàn trang Admin
+│   └── error.tsx               # Error boundary bắt lỗi kết xuất runtime toàn hệ thống Admin
+│
+├── components/                 # Các UI Components của Shadcn
+│   └── ui/                     # Breadcrumb, Button, Card, Dialog, Table...
+│
+└── services/                   # Các dịch vụ gọi API phục vụ Admin
+```
 
-5. **Tích hợp API bên ngoài (External API Integration):**
-   - **Google Maps JavaScript API** được tải động trong `MapPage.tsx` thông qua `useEffect` (tạo script tag tại runtime). Không sử dụng thư viện wrapper React bên thứ ba để tránh xung đột phiên bản với React 19.
-   - API Key được cấu hình an toàn qua Vite environment variable: `import.meta.env.VITE_GOOGLE_MAPS_API_KEY`.
-   - Dữ liệu môn thể thao cho bộ lọc bản đồ được truy vấn trực tiếp từ Backend API `/api/SportCategories` thông qua hook `useSportCategories()`, đảm bảo đồng bộ với cơ sở dữ liệu.
+### Điểm nhấn Kỹ thuật của Admin Portal
+- **Thanh Breadcrumb động (`DashboardBreadcrumb`)**: Tự động phân tích đường dẫn (`usePathname`), chuyển đổi các phân đoạn tiếng Anh (ví dụ: `owner-requests` thành *"Yêu cầu Owner"*) hiển thị cấu trúc điều hướng trực quan trong Header.
+- **Hệ thống Xử lý Lỗi (Admin Error Handling)**:
+  - **`not-found.tsx`**: Trang 404 toàn cục bắt lỗi sai URL ngoài khu vực điều khiển, có giao diện đẹp và nút quay lại Dashboard.
+  - **`[...not-found]/page.tsx`**: Trang bắt lỗi 404 nằm sâu trong Dashboard giúp giữ nguyên khung layout (Sidebar, Header) của hệ thống quản trị.
+  - **`error.tsx`**: Client Component bắt các lỗi runtime kết xuất giao diện để hệ thống không bị crash trắng màn hình, cung cấp tính năng *"Thử lại"* (Reset boundary) và *"Quay lại Dashboard"*.
 
-6. **Fullscreen Layout Pattern:**
-   - Component `MainLayout` hỗ trợ prop `noPaddingBottom` để cho phép các trang như MapPage sử dụng toàn bộ viewport mà không bị cắt bởi padding dành cho bottom navigation.
-   - MapPage sử dụng `position: fixed` cho map container để bản đồ hiển thị xuyên qua các góc bo tròn của thanh điều hướng.
+---
+
+## 3. Kiến trúc Gọi API (Client-Server Data Flow)
+
+Cả hai ứng dụng đều giao tiếp độc lập với Backend thông qua các endpoints RESTful API của dự án `.NET Core 9` chạy tại `http://localhost:5001`.
+- Phân hệ **User PWA** sử dụng `axiosClient` lưu thông tin vào `localStorage.token`.
+- Phân hệ **Admin Portal** sử dụng JWT riêng thông qua `localStorage.adminToken` gửi kèm header `Authorization: Bearer <token>` để thực thi các tác vụ đặc quyền quản trị.
