@@ -1,39 +1,65 @@
 "use client";
 
+import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import apiClient from "@/lib/api-client";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  remember: z.boolean().optional(),
+  username: z.string().min(2, { message: "Tên đăng nhập phải có ít nhất 2 ký tự." }),
+  password: z.string().min(4, { message: "Mật khẩu phải có ít nhất 4 ký tự." }),
+  adminKey: z.string().min(1, { message: "Mã Admin Key là bắt buộc." }),
 });
 
 export function LoginForm() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
-      remember: false,
+      adminKey: "",
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    try {
+      const res: any = await apiClient.post("/api/auth/admin-login", {
+        username: data.username,
+        password: data.password,
+        adminKey: data.adminKey,
+      });
+
+      if (res && res.token) {
+        localStorage.setItem("adminToken", res.token);
+        toast.success("Đăng nhập thành công!", {
+          description: "Chào mừng bạn quay trở lại trang quản trị SportConnect.",
+        });
+        router.push("/dashboard/default");
+      } else {
+        toast.error("Đăng nhập thất bại", {
+          description: "Không thể lấy mã Token xác thực từ máy chủ.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      const errMsg = error.response?.data?.message || "Thông tin đăng nhập hoặc Admin Key không chính xác.";
+      toast.error("Lỗi đăng nhập", {
+        description: errMsg,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,16 +67,17 @@ export function LoginForm() {
       <FieldGroup className="gap-4">
         <Controller
           control={form.control}
-          name="email"
+          name="username"
           render={({ field, fieldState }) => (
             <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="login-email">Email Address</FieldLabel>
+              <FieldLabel htmlFor="login-username">Tên đăng nhập</FieldLabel>
               <Input
                 {...field}
-                id="login-email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
+                id="login-username"
+                type="text"
+                placeholder="admin"
+                autoComplete="username"
+                disabled={isLoading}
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -62,13 +89,14 @@ export function LoginForm() {
           name="password"
           render={({ field, fieldState }) => (
             <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="login-password">Password</FieldLabel>
+              <FieldLabel htmlFor="login-password">Mật khẩu</FieldLabel>
               <Input
                 {...field}
                 id="login-password"
                 type="password"
                 placeholder="••••••••"
                 autoComplete="current-password"
+                disabled={isLoading}
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -77,28 +105,25 @@ export function LoginForm() {
         />
         <Controller
           control={form.control}
-          name="remember"
+          name="adminKey"
           render={({ field, fieldState }) => (
-            <Field orientation="horizontal" data-invalid={fieldState.invalid}>
-              <Checkbox
-                id="login-remember"
-                name={field.name}
-                checked={field.value}
-                onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+            <Field className="gap-1.5" data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="login-adminkey">Admin Secret Key</FieldLabel>
+              <Input
+                {...field}
+                id="login-adminkey"
+                type="password"
+                placeholder="Nhập mã Admin Key"
+                disabled={isLoading}
                 aria-invalid={fieldState.invalid}
               />
-              <FieldContent>
-                <FieldLabel htmlFor="login-remember" className="font-normal">
-                  Remember me for 30 days
-                </FieldLabel>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </FieldContent>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
       </FieldGroup>
-      <Button className="w-full" type="submit">
-        Login
+      <Button className="w-full" type="submit" disabled={isLoading}>
+        {isLoading ? "Đang xác thực..." : "Đăng nhập"}
       </Button>
     </form>
   );

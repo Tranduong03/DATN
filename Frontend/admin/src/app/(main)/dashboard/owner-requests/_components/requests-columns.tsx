@@ -3,7 +3,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { parseISO, format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Eye, CheckCircle, XCircle } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -16,44 +16,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn, getInitials } from "@/lib/utils";
+import type { OwnerRequestDto } from "./owner-requests";
 
-export type UserListItem = {
-  id: string;
-  username: string;
-  fullName: string | null;
-  email: string;
-  phone: string | null;
-  avatarUrl: string | null;
-  status: boolean;
-  trustScore: number;
-  createdAt: string;
-  roles: string[];
-};
+function StatusBadge({ status }: { status: string }) {
+  let badgeClass = "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400";
+  let dotClass = "bg-amber-500";
+  let text = "Đang chờ";
 
-function StatusBadge({ status }: { status: boolean }) {
+  if (status === "Verified") {
+    badgeClass = "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
+    dotClass = "bg-emerald-500";
+    text = "Đã duyệt";
+  } else if (status === "Rejected") {
+    badgeClass = "border-destructive/20 bg-destructive/10 text-destructive";
+    dotClass = "bg-destructive";
+    text = "Từ chối";
+  }
+
   return (
-    <Badge
-      className={cn(
-        "gap-1.5 border px-2 py-1 font-medium",
-        status
-          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-          : "border-destructive/20 bg-destructive/10 text-destructive"
-      )}
-      variant="outline"
-    >
-      <span className={cn("size-1.5 rounded-full", status ? "bg-emerald-500" : "bg-destructive")} />
-      {status ? "Hoạt động" : "Bị khóa"}
+    <Badge className={cn("gap-1.5 border px-2 py-1 font-medium", badgeClass)} variant="outline">
+      <span className={cn("size-1.5 rounded-full", dotClass)} />
+      {text}
     </Badge>
   );
 }
 
-export const usersColumns: ColumnDef<UserListItem>[] = [
+export const requestsColumns: ColumnDef<OwnerRequestDto>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <div className="flex items-center justify-center">
         <Checkbox
-          aria-label="Select all users"
+          aria-label="Select all requests"
           checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         />
@@ -62,7 +56,7 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         <Checkbox
-          aria-label={`Select ${row.original.fullName || row.original.username}`}
+          aria-label={`Select request from ${row.original.fullName || row.original.username}`}
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
         />
@@ -73,13 +67,13 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
   },
   {
     id: "search",
-    accessorFn: (row) => `${row.fullName || ""} ${row.username} ${row.email}`,
+    accessorFn: (row) => `${row.fullName || ""} ${row.username} ${row.email} ${row.venueName || ""}`,
     filterFn: "includesString",
     enableHiding: true,
   },
   {
     accessorKey: "fullName",
-    header: "Người dùng",
+    header: "Người gửi",
     cell: ({ row }) => {
       const name = row.original.fullName || row.original.username;
       const avatarUrl = row.original.avatarUrl;
@@ -101,52 +95,35 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
     },
   },
   {
-    accessorKey: "phone",
-    header: "Số điện thoại",
-    cell: ({ row }) => <div className="text-sm">{row.original.phone || "Chưa cập nhật"}</div>,
-  },
-  {
-    accessorKey: "roles",
-    header: "Vai trò",
-    cell: ({ row }) => {
-      const roles = row.original.roles || [];
-      return (
-        <div className="flex flex-wrap gap-1">
-          {roles.map((role) => (
-            <Badge key={role} variant="secondary" className="text-xs">
-              {role === "Admin" ? "Quản trị viên" : role === "Owner" ? "Chủ sân" : "Người chơi"}
-            </Badge>
-          ))}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "trustScore",
-    header: "Điểm uy tín",
+    accessorKey: "venueName",
+    header: "Sân thể thao đề xuất",
     cell: ({ row }) => (
-      <Badge className="font-mono" variant="outline">
-        {row.original.trustScore} / 100
-      </Badge>
+      <div className="grid gap-0.5 max-w-[280px]">
+        <div className="truncate font-medium text-foreground text-sm">
+          {row.original.venueName || "Chưa thiết lập"}
+        </div>
+        <div className="truncate text-muted-foreground text-xs">
+          {row.original.venueAddress || "Chưa có địa chỉ"}
+        </div>
+      </div>
     ),
   },
   {
-    accessorKey: "status",
-    header: "Trạng thái",
-    cell: ({ row }) => <StatusBadge status={row.original.status} />,
-  },
-  {
-    id: "createdAt",
-    accessorFn: (row) => new Date(row.createdAt).getTime(),
-    header: "Ngày tham gia",
+    accessorKey: "submittedAt",
+    header: "Ngày gửi yêu cầu",
     cell: ({ row }) => {
       try {
-        const date = parseISO(row.original.createdAt);
-        return <div className="text-foreground text-sm">{format(date, "dd/MM/yyyy")}</div>;
+        const date = parseISO(row.original.submittedAt);
+        return <div className="text-foreground text-sm">{format(date, "dd/MM/yyyy HH:mm")}</div>;
       } catch {
-        return <div className="text-foreground text-sm">{row.original.createdAt}</div>;
+        return <div className="text-foreground text-sm">{row.original.submittedAt}</div>;
       }
     },
+  },
+  {
+    accessorKey: "verificationStatus",
+    header: "Trạng thái",
+    cell: ({ row }) => <StatusBadge status={row.original.verificationStatus} />,
   },
   {
     id: "actions",
@@ -154,6 +131,8 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
     cell: ({ row, table }) => {
       const meta = table.options.meta as any;
       const name = row.original.fullName || row.original.username;
+      const isPending = row.original.verificationStatus === "Pending";
+
       return (
         <div className="text-right">
           <DropdownMenu>
@@ -168,9 +147,19 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => meta?.onToggleStatus(row.original.id)}>
-                {row.original.status ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+              <DropdownMenuItem onClick={() => meta?.onViewDetails(row.original)}>
+                <Eye className="mr-2 size-4" /> Xem chi tiết
               </DropdownMenuItem>
+              {isPending && (
+                <>
+                  <DropdownMenuItem onClick={() => meta?.onApprove(row.original.userId)}>
+                    <CheckCircle className="mr-2 size-4 text-emerald-500" /> Phê duyệt
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => meta?.onReject(row.original.userId)}>
+                    <XCircle className="mr-2 size-4 text-destructive" /> Từ chối
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

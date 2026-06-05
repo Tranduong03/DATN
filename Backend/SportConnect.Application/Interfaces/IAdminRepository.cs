@@ -9,4 +9,5 @@ public interface IAdminRepository
     Task<OwnerRequestDetailDto?> GetOwnerRequestDetailAsync(Guid userId);
     Task<bool> ApproveOwnerAsync(Guid userId);
     Task<bool> RejectOwnerAsync(Guid userId, string reason);
+    Task<bool> ToggleUserStatusAsync(Guid userId);
 }

@@ -58,4 +58,14 @@ public class AdminService : IAdminService
         }
         return true;
     }
+
+    public async Task<bool> ToggleUserStatusAsync(Guid userId)
+    {
+        var success = await _adminRepository.ToggleUserStatusAsync(userId);
+        if (!success)
+        {
+            throw new NotFoundException("Không tìm thấy thông tin người dùng.");
+        }
+        return true;
+    }
 }

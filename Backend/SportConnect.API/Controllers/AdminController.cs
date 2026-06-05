@@ -90,6 +90,16 @@ public class AdminController : ControllerBase
         await _adminService.RejectOwnerAsync(userId, request.Reason);
         return Ok(new { isSuccess = true, message = "Đã từ chối yêu cầu." });
     }
+
+    /// <summary>
+    /// Khóa / Mở khóa tài khoản người dùng
+    /// </summary>
+    [HttpPost("users/{userId:guid}/toggle-status")]
+    public async Task<IActionResult> ToggleUserStatus(Guid userId)
+    {
+        await _adminService.ToggleUserStatusAsync(userId);
+        return Ok(new { isSuccess = true, message = "Đã thay đổi trạng thái tài khoản thành công." });
+    }
 }
 
 public record RejectOwnerRequest(string Reason);

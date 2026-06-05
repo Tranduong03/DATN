@@ -209,4 +209,14 @@ public class AdminRepository : IAdminRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> ToggleUserStatusAsync(Guid userId)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null) return false;
+
+        user.Status = !user.Status;
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }
