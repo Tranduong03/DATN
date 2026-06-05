@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn, getInitials } from "@/lib/utils";
-import type { OwnerRequestDto } from "./owner-requests";
+import type { OwnerRequestDto } from "./types";
 
 function StatusBadge({ status }: { status: string }) {
   let badgeClass = "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400";
