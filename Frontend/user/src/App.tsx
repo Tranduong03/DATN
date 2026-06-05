@@ -49,6 +49,9 @@ const AdminOwnerRequestsPage = lazy(() => import('./pages/admin/AdminOwnerReques
 const AdminSportCategoriesPage = lazy(() => import('./pages/admin/AdminSportCategoriesPage'));
 const AdminVenuesPage = lazy(() => import('./pages/admin/AdminVenuesPage'));
 
+// Error pages
+const NotFoundPage = lazy(() => import('./pages/error/NotFoundPage'));
+
 const tabRoutes = ['/', '/map', '/explore', '/matches', '/account', '/me'];
 
 function AppRoutes() {
@@ -130,6 +133,9 @@ function AppRoutes() {
               <Route path="/admin/sport-categories" element={<AdminSportCategoriesPage />} />
               <Route path="/admin/venues" element={<AdminVenuesPage />} />
             </Route>
+
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </AnimatePresence>
       </Suspense>
