@@ -120,7 +120,9 @@ public class AuthService : IAuthService
             "/src/assets/icon/avata_girl_1.jpg",
             "/src/assets/icon/avata_girl_2.avif"
         };
-        var avatarIndex = Math.Abs(registerDto.Username.GetHashCode()) % defaultAvatars.Length;
+        var charSum = 0;
+        foreach (var c in registerDto.Username) charSum += c;
+        var avatarIndex = charSum % defaultAvatars.Length;
 
         var user = new User
         {
