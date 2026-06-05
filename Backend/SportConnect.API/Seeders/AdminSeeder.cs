@@ -72,19 +72,19 @@ public static class AdminSeeder
                 logger.LogInformation("✅ Đã gán Role 'Admin' cho user '{Username}'", username);
             }
 
-            // 4. Đồng bộ avatar mẫu cho các tài khoản cũ chưa có avatar
+            // 4. Đồng bộ avatar mẫu cho các tài khoản cũ chưa có avatar hoặc sử dụng đường dẫn cũ
             var usersWithoutAvatar = await context.Users
-                .Where(u => string.IsNullOrEmpty(u.AvatarUrl))
+                .Where(u => string.IsNullOrEmpty(u.AvatarUrl) || u.AvatarUrl.StartsWith("/src/assets/icon/"))
                 .ToListAsync();
 
             if (usersWithoutAvatar.Any())
             {
                 var defaultAvatars = new[]
                 {
-                    "/src/assets/icon/avata_boy_1.avif",
-                    "/src/assets/icon/avata_boy_2.jpg",
-                    "/src/assets/icon/avata_girl_1.jpg",
-                    "/src/assets/icon/avata_girl_2.avif"
+                    "/icon/avata_boy_1.avif",
+                    "/icon/avata_boy_2.jpg",
+                    "/icon/avata_girl_1.jpg",
+                    "/icon/avata_girl_2.avif"
                 };
 
                 foreach (var user in usersWithoutAvatar)
@@ -95,7 +95,7 @@ public static class AdminSeeder
                 }
 
                 await context.SaveChangesAsync();
-                logger.LogInformation("✅ Đã tự động cập nhật avatar ngẫu nhiên cho {Count} tài khoản cũ chưa có avatar", usersWithoutAvatar.Count);
+                logger.LogInformation("✅ Đã tự động cập nhật hoặc chuyển đổi avatar sang đường dẫn tĩnh mới cho {Count} tài khoản", usersWithoutAvatar.Count);
             }
         }
         catch (Exception ex)

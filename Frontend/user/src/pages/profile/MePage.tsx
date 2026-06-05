@@ -37,7 +37,7 @@ export default function MePage() {
 
       let name = decoded.FullName || decoded.unique_name || 'Người dùng';
       let email = decoded.email || 'Chưa cập nhật email';
-      let avatar = decoded.AvatarUrl || '/src/assets/icon/avata_boy_1.avif';
+      let avatar = decoded.AvatarUrl || '/icon/avata_boy_1.avif';
 
       setUserInfo({ name, email, avatar });
     } catch (err) {

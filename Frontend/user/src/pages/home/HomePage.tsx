@@ -33,7 +33,7 @@ export default function HomePage() {
         // Kiểm tra token chưa hết hạn
         if (decoded.exp * 1000 > Date.now()) {
           setUserName(decoded.FullName || decoded.unique_name || 'Khách hàng');
-          setUserAvatar(decoded.AvatarUrl || '/src/assets/icon/avata_boy_1.avif');
+          setUserAvatar(decoded.AvatarUrl || '/icon/avata_boy_1.avif');
         }
       } catch (err) {
         // Bỏ qua nếu lỗi decode

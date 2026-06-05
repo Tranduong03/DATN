@@ -158,4 +158,18 @@ app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notification");
 
 // ==================== RUN ====================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        await SportConnect.API.Seeders.AdminSeeder.SeedAsync(services, app.Configuration);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred during database seeding.");
+    }
+}
+
 app.Run();

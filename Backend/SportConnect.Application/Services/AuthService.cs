@@ -115,10 +115,10 @@ public class AuthService : IAuthService
 
         var defaultAvatars = new[]
         {
-            "/src/assets/icon/avata_boy_1.avif",
-            "/src/assets/icon/avata_boy_2.jpg",
-            "/src/assets/icon/avata_girl_1.jpg",
-            "/src/assets/icon/avata_girl_2.avif"
+            "/icon/avata_boy_1.avif",
+            "/icon/avata_boy_2.jpg",
+            "/icon/avata_girl_1.jpg",
+            "/icon/avata_girl_2.avif"
         };
         var charSum = 0;
         foreach (var c in registerDto.Username) charSum += c;
