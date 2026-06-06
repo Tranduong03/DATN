@@ -27,7 +27,7 @@ export default function AccountPage() {
         <div className="profile-card">
           <img src="/SportConnect.jpg" alt="Logo" className="profile-logo" />
           <div className="profile-info">
-            <h2 className="profile-title">Sport Connect - Hệ Thống Kết Nối <br />Thể Thao</h2>
+            <h2 className="profile-title">Sport Connect - Hệ Thống <br />Kết Nối Thể Thao</h2>
             <p className="profile-subtitle">Tạo tài khoản để nhận nhiều ưu đãi hơn</p>
             <div className="profile-actions">
               <Link to="/login" className="btn-login">Đăng nhập</Link>
@@ -42,7 +42,7 @@ export default function AccountPage() {
           <div className="menu-list">
             <Link to="/reservedBooking" className="menu-item">
               <div className="menu-icon">
-                <CalendarDays size={20} />
+                <CalendarDays size={24} />
               </div>
               <span className="menu-text">Danh sách lịch đã đặt</span>
               <ChevronRight className="menu-chevron" size={20} />
@@ -55,28 +55,28 @@ export default function AccountPage() {
           <div className="menu-list">
             <Link to="/version" className="menu-item">
               <div className="menu-icon">
-                <Info size={20} />
+                <Info size={24} />
               </div>
               <span className="menu-text">Thông tin phiên bản: 1.1.0</span>
               <ChevronRight className="menu-chevron" size={20} />
             </Link>
             <Link to="/terms" className="menu-item">
               <div className="menu-icon">
-                <ShieldCheck size={20} />
+                <ShieldCheck size={24} />
               </div>
               <span className="menu-text">Điều khoản và chính sách</span>
               <ChevronRight className="menu-chevron" size={20} />
             </Link>
             <Link to="/whats-new" className="menu-item">
               <div className="menu-icon">
-                <Sparkles size={20} />
+                <Sparkles size={24} />
               </div>
               <span className="menu-text">Ứng dụng có gì mới</span>
               <ChevronRight className="menu-chevron" size={20} />
             </Link>
             <div className="menu-item" onClick={() => setIsLangModalOpen(true)} style={{ cursor: 'pointer' }}>
               <div className="menu-icon">
-                <Languages size={20} />
+                <Languages size={24} />
               </div>
               <span className="menu-text">
                 {i18n.language.startsWith('vi') ? 'Ngôn ngữ - Tiếng Việt' : 'Language - English'}

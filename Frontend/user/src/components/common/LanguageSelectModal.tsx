@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 interface LanguageSelectModalProps {
@@ -15,7 +16,7 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
     onClose();
   };
 
-  return (
+  const modalContent = (
     <div 
       onClick={onClose}
       style={{
@@ -28,7 +29,7 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000,
+        zIndex: 9999,
         padding: '24px'
       }}
     >
@@ -37,12 +38,13 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
         style={{
           width: '100%',
           maxWidth: '320px',
-          backgroundColor: '#e5e7eb',
+          backgroundColor: '#eeeeee',
           borderRadius: '16px',
           overflow: 'hidden',
           boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          border: '1px solid #cccccc'
         }}
       >
         {/* Vietnamese Option */}
@@ -51,12 +53,10 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
           style={{
             width: '100%',
             padding: '16px',
-            backgroundColor: '#eeeeee',
+            backgroundColor: '#ffffff',
             border: 'none',
             outline: 'none',
             fontSize: '18px',
-            fontWeight: '600',
-            color: '#064e3b',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -64,15 +64,15 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
             gap: '8px',
             transition: 'background-color 0.2s'
           }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e0e0e0')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#eeeeee')}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f8e9')}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
         >
-          <span style={{ fontSize: '20px' }}>🇻🇳</span>
-          <span>Tiếng Việt</span>
+          <span style={{ color: '#064e3b', fontWeight: '500' }}>VN</span>
+          <span style={{ color: '#064e3b', fontWeight: '700' }}>Tiếng Việt</span>
         </button>
 
         {/* Divider */}
-        <div style={{ height: '1px', backgroundColor: '#d1d5db' }} />
+        <div style={{ height: '1px', backgroundColor: '#e0e0e0' }} />
 
         {/* English Option */}
         <button
@@ -80,12 +80,10 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
           style={{
             width: '100%',
             padding: '16px',
-            backgroundColor: '#eeeeee',
+            backgroundColor: '#ffffff',
             border: 'none',
             outline: 'none',
             fontSize: '18px',
-            fontWeight: '600',
-            color: '#064e3b',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -93,13 +91,15 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
             gap: '8px',
             transition: 'background-color 0.2s'
           }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e0e0e0')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#eeeeee')}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f8e9')}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
         >
-          <span style={{ fontSize: '20px' }}>🇬🇧</span>
-          <span>English</span>
+          <span style={{ color: '#064e3b', fontWeight: '500' }}>GB</span>
+          <span style={{ color: '#064e3b', fontWeight: '700' }}>English</span>
         </button>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
