@@ -4,7 +4,7 @@ import { X, EyeOff, Eye, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 import { useRegister } from '../../hooks/mutations/useAuthMutations';
-import vnFlag from '../../assets/images/vn-flag.png';
+import vnFlag from '../../assets/images/vn-flag.svg';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
