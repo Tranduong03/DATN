@@ -5,7 +5,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
 import { useGoogleAuth } from '../../hooks/mutations/useAuthMutations';
-import googleLogo from '../../assets/google-logo.svg';
+import googleLogo from '../../assets/images/google-logo.svg';
 
 export default function LoginPage() {
   const navigate = useNavigate();

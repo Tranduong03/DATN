@@ -4,7 +4,7 @@ import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 import { useLogin } from '../../hooks/mutations/useAuthMutations';
-import vnFlag from '../../assets/vn-flag.png';
+import vnFlag from '../../assets/images/vn-flag.png';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
