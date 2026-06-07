@@ -52,7 +52,7 @@ export default function MePage() {
         <div className="me-header-bg"></div>
         
         <div className="me-content">
-          <Link to="/profile" className="me-profile-card" style={{ textDecoration: 'none' }}>
+          <Link to="/UserProfile" className="me-profile-card" style={{ textDecoration: 'none' }}>
             <div className="me-avatar-container">
               <img src={userInfo.avatar || undefined} alt="Avatar" className="me-avatar" />
             </div>
