@@ -37,7 +37,7 @@ Tất cả trang đều sử dụng cơ chế Dynamic Imports (`React.lazy()`) �
 | Loại Route | Guard Sử Dụng | Trang áp dụng | Cơ chế kiểm tra |
 | :--- | :--- | :--- | :--- |
 | **Công khai (Public)** | Không | `/`, `/map`, `/explore`, `/venue/:id`, `/matches`, `/login`, `/register` | Tự do truy cập |
-| **Thành viên (Member)** | `AuthGuard` | `/me`, `/profile`, `/settings`, `/reservedBooking` | Kiểm tra JWT token tại `localStorage.token` |
+| **Thành viên (Member)** | `AuthGuard` | `/me`, `/UserProfile`, `/settings`, `/reservedBooking` | Kiểm tra JWT token tại `localStorage.token` |
 | **Chủ sân (Owner)** | `OwnerGuard` | `/owner`, `/owner/venues`, `/owner/venues/:id`, `/owner/bookings` | Kiểm tra JWT token chứa role `Owner` |
 
 ### 2.3. Quản lý Lỗi PWA di động

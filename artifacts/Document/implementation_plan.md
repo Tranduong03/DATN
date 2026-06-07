@@ -365,7 +365,7 @@ frontend/src/
 │   │   ├── MatchDetailPage.jsx
 │   │   └── CreateMatchPage.jsx
 │   └── profile/
-│       └── ProfilePage.jsx
+│       └── UserProfile.tsx
 ├── services/
 │   ├── api.js                 # Axios instance + interceptors
 │   ├── authService.js         # Login, register, refresh
@@ -403,7 +403,7 @@ frontend/src/
 
   {/* Protected */}
   <Route element={<ProtectedRoute />}>
-    <Route path="/profile" element={<ProfilePage />} />
+    <Route path="/UserProfile" element={<UserProfile />} />
     <Route path="/bookings" element={<BookingListPage />} />
     <Route path="/bookings/create" element={<CreateBookingPage />} />
     <Route path="/matches/create" element={<CreateMatchPage />} />

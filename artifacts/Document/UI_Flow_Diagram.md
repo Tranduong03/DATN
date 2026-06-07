@@ -59,8 +59,8 @@ graph TD
 
     %% === USER PROFILE FLOW ===
     subgraph ProfileFlow ["Luồng Quản Lý Cá Nhân"]
-        Me -- "Cập nhật Avatar/Tên" --> ProfileEdit["Hồ Sơ ( /profile )"]:::profile
-        Me -- "Xem lịch sử" --> MyBookings["Lịch Sử Đặt Sân ( /me/bookings )"]:::profile
+        Me -- "Cập nhật Avatar/Tên" --> ProfileEdit["Hồ Sơ ( /UserProfile )"]:::profile
+        Me -- "Xem lịch sử" --> MyBookings["Lịch Sử Đặt Sân ( /reservedBooking )"]:::profile
         Me -- "Cài đặt & Bảo mật" --> Settings["Cài Đặt ( /settings )"]:::profile
         Settings --> ChangePwd["Đổi Mật Khẩu ( /settings/change-password )"]:::profile
         
