@@ -294,13 +294,13 @@ export default function ProfilePage() {
             className={`profile-tab-button ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
           >
-            TỔNG QUAN
+            Tổng quan
           </button>
           <button 
             className={`profile-tab-button ${activeTab === 'links' ? 'active' : ''}`}
             onClick={() => setActiveTab('links')}
           >
-            LIÊN KẾT
+            Liên kết
           </button>
         </div>
 
