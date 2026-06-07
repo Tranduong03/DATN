@@ -10,11 +10,16 @@ import MainLayout from '../../components/layout/MainLayout';
 
 interface JwtPayload {
   sub: string;
-  email: string;
-  unique_name: string;
-  FullName: string;
-  AvatarUrl: string;
-  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role': string | string[];
+  email?: string;
+  unique_name?: string;
+  FullName?: string;
+  AvatarUrl?: string;
+  Phone?: string;
+  birthYear?: string;
+  BirthYear?: string;
+  Gender?: string;
+  gender?: string;
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'?: string | string[];
   exp: number;
 }
 
@@ -59,21 +64,21 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'links'>('overview');
 
   // Interactive profile states
-  const [name, setName] = useState('Phi Duong');
-  const [email, setEmail] = useState('phiduong.connect@email.com');
-  const [phone, setPhone] = useState('0348102328');
+  const [name, setName] = useState('Username');
+  const [email, setEmail] = useState('Chưa cập nhật email');
+  const [phone, setPhone] = useState('Chưa cập nhật');
   const [birthYear, setBirthYear] = useState('2026');
   const [gender, setGender] = useState('Chọn giới tính');
   
   // Overview Tab states
-  const [height, setHeight] = useState(182);
-  const [weight, setWeight] = useState(78);
-  const [specialNotes, setSpecialNotes] = useState('Chấn thương cổ chân trái');
+  const [height, setHeight] = useState(170);
+  const [weight, setWeight] = useState(60);
+  const [specialNotes, setSpecialNotes] = useState('Chưa có ghi chú đặc biệt');
   
-  const [favPosition, setFavPosition] = useState('Bên phải, trung tâm');
-  const [sportsLevel, setSportsLevel] = useState('Bóng đá: Advanced, Bóng rổ: Intermediate');
-  const [goals, setGoals] = useState('Tăng thể lực, cải thiện dứt điểm');
-  const [frequency, setFrequency] = useState('4-5 lần/tuần');
+  const [favPosition, setFavPosition] = useState('Chưa cập nhật');
+  const [sportsLevel, setSportsLevel] = useState('Chưa cập nhật');
+  const [goals, setGoals] = useState('Chưa cập nhật');
+  const [frequency, setFrequency] = useState('Chưa cập nhật');
 
   // Editing toggle states
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -120,21 +125,28 @@ export default function ProfilePage() {
           const rawRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
           const roles = Array.isArray(rawRole) ? rawRole : rawRole ? [rawRole] : ['Default'];
           
+          const userPhone = decoded.Phone || 'Chưa cập nhật';
+          const userBirthYear = decoded.BirthYear || decoded.birthYear || 'Chưa cập nhật';
+          const userGender = decoded.Gender || decoded.gender || 'Chọn giới tính';
+
           setUser({
             id: decoded.sub,
-            name: decoded.FullName || decoded.unique_name || 'Phi Duong',
-            email: decoded.email || 'phiduong.connect@email.com',
-            username: decoded.unique_name || 'phi.duong',
+            name: decoded.FullName || decoded.unique_name || 'Username',
+            email: decoded.email || 'Chưa cập nhật email',
+            username: decoded.unique_name || 'Username',
             avatar: decoded.AvatarUrl || '',
-            phone: '0348102328',
-            dob: '15/05/2026',
-            gender: 'Nam',
+            phone: userPhone,
+            dob: userBirthYear,
+            gender: userGender,
             roles,
           });
 
           // Sync database claims with editable states
-          setName(decoded.FullName || decoded.unique_name || 'Phi Duong');
-          setEmail(decoded.email || 'phiduong.connect@email.com');
+          setName(decoded.FullName || decoded.unique_name || 'Username');
+          setEmail(decoded.email || 'Chưa cập nhật email');
+          setPhone(userPhone);
+          setBirthYear(userBirthYear);
+          setGender(userGender);
         } catch {
           localStorage.removeItem('token');
           navigate('/account');

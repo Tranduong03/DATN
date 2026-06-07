@@ -9,7 +9,6 @@ import LoadingOverlay from './components/common/LoadingOverlay';
 // Route Guards (imported statically to avoid authentication validation delays)
 import AuthGuard from './pages/auth/AuthGuard';
 import OwnerGuard from './pages/owner/OwnerGuard';
-import AdminGuard from './pages/admin/AdminGuard';
 
 // Lazy loaded page components
 // Auth pages
@@ -40,14 +39,6 @@ const MatchListPage = lazy(() => import('./pages/home/MatchListPage'));
 const MatchDetailPage = lazy(() => import('./pages/home/MatchDetailPage'));
 const MapPage = lazy(() => import('./pages/home/MapPage'));
 const ExplorePage = lazy(() => import('./pages/home/ExplorePage'));
-
-// Admin pages
-const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
-const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
-const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'));
-const AdminOwnerRequestsPage = lazy(() => import('./pages/admin/AdminOwnerRequestsPage'));
-const AdminSportCategoriesPage = lazy(() => import('./pages/admin/AdminSportCategoriesPage'));
-const AdminVenuesPage = lazy(() => import('./pages/admin/AdminVenuesPage'));
 
 // Error pages
 const NotFoundPage = lazy(() => import('./pages/error/NotFoundPage'));
@@ -120,18 +111,6 @@ function AppRoutes() {
               <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
               <Route path="/owner/venues" element={<OwnerVenuesPage />} />
               <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
-            </Route>
-
-            {/* Admin login — public, không cần guard */}
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-
-            {/* Admin routes — được bảo vệ bởi AdminGuard */}
-            <Route element={<AdminGuard />}>
-              <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/admin/users" element={<AdminUsersPage />} />
-              <Route path="/admin/owner-requests" element={<AdminOwnerRequestsPage />} />
-              <Route path="/admin/sport-categories" element={<AdminSportCategoriesPage />} />
-              <Route path="/admin/venues" element={<AdminVenuesPage />} />
             </Route>
 
             {/* Catch-all route */}

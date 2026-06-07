@@ -340,7 +340,8 @@ public class AuthService : IAuthService
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
             new Claim(JwtRegisteredClaimNames.UniqueName, user.Username ?? ""),
             new Claim("FullName", user.FullName ?? ""),
-            new Claim("AvatarUrl", user.AvatarUrl ?? "")
+            new Claim("AvatarUrl", user.AvatarUrl ?? ""),
+            new Claim("Phone", user.Phone ?? "")
         };
 
         // Fix N+1: load all roles in one query, then look up in memory
