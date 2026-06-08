@@ -64,11 +64,11 @@ export default function MePage() {
           </Link>
 
           <div className="me-dashboard-box">
-            <div className="me-membership">
+            <Link to="/member" className="me-membership" style={{ textDecoration: 'none', cursor: 'pointer' }}>
               <span className="me-membership-icon">💎</span>
               <span className="me-membership-text">Hạng thành viên</span>
               <ChevronRight color="white" size={16} style={{ marginLeft: '4px' }} />
-            </div>
+            </Link>
 
             {/* Quick Actions Grid */}
             <div className="me-grid-actions">

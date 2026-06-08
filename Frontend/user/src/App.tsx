@@ -24,6 +24,7 @@ const UserProfile = lazy(() => import('./pages/profile/UserProfile'));
 const SettingsPage = lazy(() => import('./pages/profile/SettingsPage'));
 const ChangePasswordPage = lazy(() => import('./pages/profile/ChangePasswordPage'));
 const MyBookingsPage = lazy(() => import('./pages/profile/MyBookingsPage'));
+const MemberPage = lazy(() => import('./pages/profile/MemberPage'));
 
 // Owner pages
 const OwnerOnboardingFlow = lazy(() => import('./pages/owner/OwnerOnboardingFlow'));
@@ -100,6 +101,7 @@ function AppRoutes() {
             <Route element={<AuthGuard />}>
               <Route path="/me" element={withTransition(MePage)} />
               <Route path="/UserProfile" element={<UserProfile />} />
+              <Route path="/member" element={<MemberPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/settings/change-password" element={<ChangePasswordPage />} />
               <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
