@@ -74,8 +74,8 @@ function AppRoutes() {
     </PageTransition>
   );
 
-  // Hide bottom nav on certain pages
-  const hideBottomNav = ['/login', '/register', '/forgot-password', '/payment-result', '/admin', '/owner'].some(path => location.pathname.startsWith(path));
+  // Only show bottom nav on 5 main routes
+  const showBottomNav = ['/', '/map', '/explore', '/matches', '/me'].includes(location.pathname);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
@@ -120,7 +120,7 @@ function AppRoutes() {
           </Routes>
         </AnimatePresence>
       </Suspense>
-      {!hideBottomNav && <BottomNavigation />}
+      {showBottomNav && <BottomNavigation />}
       <GlobalNotification />
     </div>
   );

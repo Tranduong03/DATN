@@ -1143,10 +1143,11 @@ input[type="password"]::-ms-clear {
 
 /* Home Header */
 .home-header {
-  background: linear-gradient(135deg, #2a9d8f 0%, #1e6d62 100%);
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.65) 0%, rgba(0, 112, 40, 0.85) 100%), url('./assets/images/backdrop.webp') no-repeat center center;
+  background-size: cover;
   padding: 20px;
   padding-bottom: 40px;
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 24px 24px;
   position: relative;
   overflow: hidden;
 }

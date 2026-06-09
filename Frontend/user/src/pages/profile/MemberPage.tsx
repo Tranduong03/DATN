@@ -10,7 +10,7 @@ export default function MemberPage() {
           display: 'flex', 
           flexDirection: 'column', 
           height: '100%', 
-          background: '#f8fafc',
+          background: '#e4f0f3b9',
           fontFamily: "'Inter', sans-serif"
         }}
       >
@@ -22,17 +22,17 @@ export default function MemberPage() {
             display: 'flex', 
             justifyContent: 'center', 
             alignItems: 'center', 
-            padding: '32px',
+            padding: '28px',
             textAlign: 'center'
           }}
         >
           <p 
             style={{ 
-              color: '#1e293b', 
-              fontSize: '14.5px', 
-              fontWeight: '550', 
+              color: '#204e2e', 
+              fontSize: '13px', 
+              fontWeight: '350', 
               lineHeight: '1.6',
-              maxWidth: '280px',
+              maxWidth: '320px',
               margin: '0 auto'
             }}
           >
