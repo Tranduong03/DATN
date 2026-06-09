@@ -1,22 +1,5 @@
 import axios from 'axios';
 
-// Hàm hỗ trợ parse hạn sử dụng JWT (exp) mà không cần thư viện bên ngoài
-function getJwtExpiry(token: string): number | null {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    const payload = JSON.parse(jsonPayload);
-    return payload.exp ? payload.exp * 1000 : null; // Đổi sang mili-giây
-  } catch (e) {
-    return null;
-  }
-}
 
 const axiosClient = axios.create({
   baseURL: '/api',
@@ -39,55 +22,9 @@ function onRefreshed(token: string) {
 
 // Add a request interceptor
 axiosClient.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      const exp = getJwtExpiry(token);
-      const now = Date.now();
-      const BUFFER_TIME = 5 * 60 * 1000; // 5 phút
-
-      // Nếu token chưa hết hạn hoàn toàn nhưng sắp hết hạn (dưới BUFFER_TIME)
-      if (
-        exp &&
-        exp - now < BUFFER_TIME &&
-        exp - now > 0 &&
-        !config.url?.includes('/auth/refresh-token') &&
-        !config.url?.includes('/auth/login')
-      ) {
-        if (!isRefreshing) {
-          isRefreshing = true;
-          // Gọi ngầm endpoint refresh-token
-          axios
-            .post('/api/auth/refresh-token', {}, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
-            .then((res) => {
-              const newToken = res.data.token;
-              if (newToken) {
-                localStorage.setItem('token', newToken);
-                onRefreshed(newToken);
-              }
-            })
-            .catch((err) => {
-              console.error('Không thể tự động refresh token:', err);
-            })
-            .finally(() => {
-              isRefreshing = false;
-            });
-        }
-
-        // Đợi cho đến khi token mới được cập nhật
-        const retryOriginalRequest = new Promise<string>((resolve) => {
-          subscribeTokenRefresh((newToken) => {
-            resolve(newToken);
-          });
-        });
-
-        const newToken = await retryOriginalRequest;
-        config.headers.Authorization = `Bearer ${newToken}`;
-        return config;
-      }
-
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -102,14 +39,70 @@ axiosClient.interceptors.response.use(
   (response) => {
     return response.data;
   },
-  (error) => {
-    // Xử lý khi lỗi 401 hoặc 403 (token hết hạn hẳn hoặc không hợp lệ)
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      localStorage.removeItem('token');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Tránh vòng lặp vô tận nếu api refresh hoặc login trả về 401
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403) &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/refresh') &&
+      !originalRequest.url?.includes('/auth/login')
+    ) {
+      originalRequest._retry = true;
+
+      const refreshToken = localStorage.getItem('refreshToken');
+      const accessToken = localStorage.getItem('token');
+
+      if (!refreshToken || !accessToken) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
       }
+
+      if (!isRefreshing) {
+        isRefreshing = true;
+
+        axios
+          .post('/api/auth/refresh', {
+            accessToken,
+            refreshToken,
+          })
+          .then((res) => {
+            const newAccessToken = res.data.token || res.data.Token;
+            const newRefreshToken = res.data.refreshToken || res.data.RefreshToken;
+            if (newAccessToken && newRefreshToken) {
+              localStorage.setItem('token', newAccessToken);
+              localStorage.setItem('refreshToken', newRefreshToken);
+              onRefreshed(newAccessToken);
+            }
+          })
+          .catch((err) => {
+            console.error('Không thể refresh token tự động:', err);
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            if (window.location.pathname !== '/login') {
+              window.location.href = '/login';
+            }
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      }
+
+      // Đợi refresh thành công rồi chạy lại request ban đầu
+      return new Promise((resolve) => {
+        subscribeTokenRefresh((newToken) => {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          resolve(axiosClient(originalRequest));
+        });
+      });
     }
+
     return Promise.reject(error);
   }
 );

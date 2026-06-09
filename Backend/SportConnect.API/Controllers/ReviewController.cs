@@ -33,14 +33,7 @@ public class ReviewController : ControllerBase
     [Authorize]
     public async Task<IActionResult> CreateReview([FromBody] CreateReviewDto dto)
     {
-        try
-        {
-            var review = await _reviewService.CreateReviewAsync(GetUserId(), dto);
-            return Ok(new { isSuccess = true, message = "Đánh giá thành công!", data = review });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { isSuccess = false, message = ex.Message });
-        }
+        var review = await _reviewService.CreateReviewAsync(GetUserId(), dto);
+        return Ok(new { isSuccess = true, message = "Đánh giá thành công!", data = review });
     }
 }

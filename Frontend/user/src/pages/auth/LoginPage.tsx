@@ -19,6 +19,7 @@ export default function LoginPage() {
       try {
         const data: any = await googleAuthMutation.mutateAsync(tokenResponse.access_token);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('refreshToken', data.refreshToken);
         navigate('/me'); // Navigate to account or home
       } catch (err: any) {
         setError(err.response?.data?.message || 'Network error. Please try again.');

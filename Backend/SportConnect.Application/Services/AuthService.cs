@@ -26,7 +26,7 @@ public class AuthService : IAuthService
         _emailService = emailService;
     }
 
-    public async Task<string> LoginAsync(LoginDto loginDto)
+    public async Task<AuthResultDto> LoginAsync(LoginDto loginDto)
     {
         var users = await _unitOfWork.Repository<User>().FindAsync(u => 
             u.Username == loginDto.UsernameOrEmail || u.Email == loginDto.UsernameOrEmail || u.Phone == loginDto.UsernameOrEmail);
@@ -48,10 +48,20 @@ public class AuthService : IAuthService
             throw new AppException("Invalid username/email or password.");
         }
 
-        return await GenerateJwtTokenAsync(user);
+        var token = await GenerateJwtTokenAsync(user);
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        var expiryDays = Convert.ToDouble(_config["JwtSettings:RefreshTokenExpiryDays"] ?? "7");
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(expiryDays);
+
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return new AuthResultDto { Token = token, RefreshToken = refreshToken };
     }
 
-    public async Task<string> AdminLoginAsync(LoginDto loginDto)
+    public async Task<AuthResultDto> AdminLoginAsync(LoginDto loginDto)
     {
         var users = await _unitOfWork.Repository<User>().FindAsync(u => 
             u.Username == loginDto.UsernameOrEmail || u.Email == loginDto.UsernameOrEmail || u.Phone == loginDto.UsernameOrEmail);
@@ -92,11 +102,21 @@ public class AuthService : IAuthService
             throw new AppException("Bạn không có quyền truy cập trang quản trị.");
         }
 
-        return await GenerateJwtTokenAsync(user);
+        var token = await GenerateJwtTokenAsync(user);
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        var expiryDays = Convert.ToDouble(_config["JwtSettings:RefreshTokenExpiryDays"] ?? "7");
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(expiryDays);
+
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return new AuthResultDto { Token = token, RefreshToken = refreshToken };
     }
 
 
-    public async Task<string> RegisterAsync(RegisterDto registerDto)
+    public async Task<AuthResultDto> RegisterAsync(RegisterDto registerDto)
     {
         if (string.IsNullOrEmpty(registerDto.Email) && string.IsNullOrEmpty(registerDto.Phone))
         {
@@ -152,10 +172,20 @@ public class AuthService : IAuthService
 
         await _unitOfWork.CompleteAsync();
 
-        return await GenerateJwtTokenAsync(user);
+        var token = await GenerateJwtTokenAsync(user);
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        var expiryDays = Convert.ToDouble(_config["JwtSettings:RefreshTokenExpiryDays"] ?? "7");
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(expiryDays);
+
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return new AuthResultDto { Token = token, RefreshToken = refreshToken };
     }
 
-    public async Task<string> GoogleLoginAsync(GoogleLoginDto googleLoginDto)
+    public async Task<AuthResultDto> GoogleLoginAsync(GoogleLoginDto googleLoginDto)
     {
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", googleLoginDto.Token);
@@ -223,7 +253,17 @@ public class AuthService : IAuthService
             }
         }
 
-        return await GenerateJwtTokenAsync(user);
+        var token = await GenerateJwtTokenAsync(user);
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        var expiryDays = Convert.ToDouble(_config["JwtSettings:RefreshTokenExpiryDays"] ?? "7");
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(expiryDays);
+
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return new AuthResultDto { Token = token, RefreshToken = refreshToken };
     }
 
     public async Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordDto changePasswordDto)
@@ -366,5 +406,70 @@ public class AuthService : IAuthService
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public async Task<AuthResultDto> RefreshAsync(RefreshTokenDto dto)
+    {
+        var principal = GetPrincipalFromExpiredToken(dto.AccessToken);
+        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            throw new AppException("Token không hợp lệ.");
+        }
+
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId);
+        if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiry <= DateTime.UtcNow)
+        {
+            throw new AppException("Refresh Token không hợp lệ hoặc đã hết hạn.", System.Net.HttpStatusCode.Unauthorized);
+        }
+
+        var newAccessToken = await GenerateJwtTokenAsync(user);
+        var newRefreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = newRefreshToken;
+        var expiryDays = Convert.ToDouble(_config["JwtSettings:RefreshTokenExpiryDays"] ?? "7");
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(expiryDays);
+
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return new AuthResultDto
+        {
+            Token = newAccessToken,
+            RefreshToken = newRefreshToken
+        };
+    }
+
+    private string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
+    }
+
+    private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    {
+        var jwtSettings = _config.GetSection("JwtSettings");
+        var secretKey = jwtSettings["SecretKey"];
+
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
+            ValidateLifetime = false // Cho phép token đã hết hạn
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+        var jwtSecurityToken = securityToken as JwtSecurityToken;
+        if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            throw new SecurityTokenException("Token không hợp lệ.");
+
+        return principal;
     }
 }

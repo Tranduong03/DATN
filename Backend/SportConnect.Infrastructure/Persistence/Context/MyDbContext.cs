@@ -86,6 +86,15 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasDefaultValue(true);
+
+            entity.Property(e => e.RefreshToken)
+                .HasColumnName("refresh_token")
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            entity.Property(e => e.RefreshTokenExpiry)
+                .HasColumnName("refresh_token_expiry")
+                .IsRequired(false);
         });
 
         modelBuilder.Entity<Role>(entity =>

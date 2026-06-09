@@ -22,8 +22,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
-        var token = await _authService.LoginAsync(loginDto);
-        return Ok(new { Token = token });
+        var result = await _authService.LoginAsync(loginDto);
+        return Ok(new { Token = result.Token, RefreshToken = result.RefreshToken });
     }
 
     /// <summary>
@@ -41,23 +41,23 @@ public class AuthController : ControllerBase
 
         // 2. Đăng nhập + kiểm tra role Admin (AdminLoginAsync throw nếu không phải Admin)
         var loginDto = new LoginDto { UsernameOrEmail = dto.Username, Password = dto.Password };
-        var token = await _authService.AdminLoginAsync(loginDto);
+        var result = await _authService.AdminLoginAsync(loginDto);
 
-        return Ok(new { isSuccess = true, token });
+        return Ok(new { isSuccess = true, token = result.Token, refreshToken = result.RefreshToken });
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
     {
-        var token = await _authService.RegisterAsync(registerDto);
-        return Ok(new { Message = "User registered successfully!", Token = token });
+        var result = await _authService.RegisterAsync(registerDto);
+        return Ok(new { Message = "User registered successfully!", Token = result.Token, RefreshToken = result.RefreshToken });
     }
 
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleLoginDto)
     {
-        var token = await _authService.GoogleLoginAsync(googleLoginDto);
-        return Ok(new { Token = token });
+        var result = await _authService.GoogleLoginAsync(googleLoginDto);
+        return Ok(new { Token = result.Token, RefreshToken = result.RefreshToken });
     }
 
     [Authorize]
@@ -86,6 +86,13 @@ public class AuthController : ControllerBase
 
         var newToken = await _authService.RefreshTokenAsync(userId);
         return Ok(new { isSuccess = true, token = newToken });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto dto)
+    {
+        var result = await _authService.RefreshAsync(dto);
+        return Ok(result);
     }
 
     [Authorize]

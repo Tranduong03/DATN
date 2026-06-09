@@ -44,6 +44,7 @@ export default function RegisterForm() {
       });
 
       localStorage.setItem('token', data.token);
+      localStorage.setItem('refreshToken', data.refreshToken);
       navigate('/me');
     } catch (err: any) {
       setErrorMessage(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại!');

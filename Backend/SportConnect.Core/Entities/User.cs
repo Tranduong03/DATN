@@ -14,6 +14,8 @@ public class User
     public int NoShowCount { get; set; } = 0;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool Status { get; set; } = true;
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiry { get; set; }
 
     // Navigation properties (Liên kết bảng)
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();

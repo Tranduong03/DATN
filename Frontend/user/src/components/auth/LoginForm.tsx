@@ -35,6 +35,7 @@ export default function LoginForm() {
       });
 
       localStorage.setItem('token', data.token);
+      localStorage.setItem('refreshToken', data.refreshToken);
       navigate('/me');
     } catch (err: any) {
       setErrorMessage(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!');

@@ -72,29 +72,30 @@ public class OwnerOnboardingService : IOwnerOnboardingService
 
     public async Task<bool> SubmitAsync(Guid userId, string draftData)
     {
-        var profiles = await _unitOfWork.Repository<OwnerProfile>().FindAsync(p => p.UserId == userId);
-        var profile = profiles.FirstOrDefault();
-
-        if (profile == null)
-        {
-            profile = new OwnerProfile
-            {
-                UserId = userId,
-                CreatedAt = DateTime.UtcNow
-            };
-            await _unitOfWork.Repository<OwnerProfile>().AddAsync(profile);
-        }
-
-        profile.OnboardingStatus = "Completed";
-        profile.VerificationStatus = "Pending";
-        profile.CurrentStep = 7;
-        profile.DraftData = draftData;
-        profile.UpdatedAt = DateTime.UtcNow;
-        _unitOfWork.Repository<OwnerProfile>().Update(profile);
-
-        // Parse JSON draftData to create Venue
+        await _unitOfWork.BeginTransactionAsync();
         try
         {
+            var profiles = await _unitOfWork.Repository<OwnerProfile>().FindAsync(p => p.UserId == userId);
+            var profile = profiles.FirstOrDefault();
+
+            if (profile == null)
+            {
+                profile = new OwnerProfile
+                {
+                    UserId = userId,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.Repository<OwnerProfile>().AddAsync(profile);
+            }
+
+            profile.OnboardingStatus = "Completed";
+            profile.VerificationStatus = "Pending";
+            profile.CurrentStep = 7;
+            profile.DraftData = draftData;
+            profile.UpdatedAt = DateTime.UtcNow;
+            _unitOfWork.Repository<OwnerProfile>().Update(profile);
+
+            // Parse JSON draftData to create Venue
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(draftData, options);
 
@@ -136,14 +137,15 @@ public class OwnerOnboardingService : IOwnerOnboardingService
 
                 await _unitOfWork.Repository<Venue>().AddAsync(venue);
             }
+
+            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.CommitTransactionAsync();
+            return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error parsing draft data: {ex.Message}");
-            // Continue saving the profile anyway
+            await _unitOfWork.RollbackTransactionAsync();
+            throw new SportConnect.Core.Exceptions.AppException($"Đã xảy ra lỗi khi gửi yêu cầu đăng ký chủ sân: {ex.Message}");
         }
-
-        await _unitOfWork.CompleteAsync();
-        return true;
     }
 }

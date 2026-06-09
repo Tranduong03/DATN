@@ -42,6 +42,7 @@ export function LoginForm() {
 
       if (res && res.token) {
         localStorage.setItem("adminToken", res.token);
+        localStorage.setItem("adminRefreshToken", res.refreshToken);
         toast.success("Đăng nhập thành công!", {
           description: "Chào mừng bạn quay trở lại trang quản trị SportConnect.",
         });
