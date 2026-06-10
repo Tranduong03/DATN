@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import OwnerLayout from './OwnerLayout';
 import { useMyVenues } from '../../hooks/queries/useOwnerQueries';
 import { Layout, ShoppingCart, Package, TrendingUp, Layers, Users, Ticket, Calendar, LogOut, QrCode } from 'lucide-react';
+import defaultOwnerAvatar from '../../assets/images/owner-default.webp';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -123,7 +124,7 @@ export default function OwnerDashboardPage() {
           {/* Circle Avatar Frame */}
           <div className="owner-banner-avatar-container">
             <div className="owner-banner-avatar-frame">
-              {/* Temporarily empty white circle */}
+              <img src={defaultOwnerAvatar} alt="Owner Avatar" className="owner-banner-avatar-img" />
             </div>
           </div>
 

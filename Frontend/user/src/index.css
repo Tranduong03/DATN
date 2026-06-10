@@ -3763,10 +3763,10 @@ input[type="password"]::-ms-clear {
 
 .owner-grid-item-pattern {
   position: absolute;
-  right: -15px;
-  bottom: -15px;
-  width: 60px;
-  height: 60px;
+  right: 1px;
+  bottom: -10px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   filter: blur(4px);
@@ -3774,35 +3774,34 @@ input[type="password"]::-ms-clear {
 
 .owner-grid-item-content {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   height: 100%;
   width: 100%;
   color: #ffffff;
   z-index: 2;
 }
 
-.owner-grid-item-icon-wrapper {
-  background: rgba(255, 255, 255, 0.25);
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+.owner-grid-item-icon-wrapper svg {
+  width: 48px;
+  height: 48px;
 }
 
 .owner-grid-item-title {
-  font-size: 13.5px;
+  font-size: 17px;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: 0.2px;
+  flex: 1;
 }
 
 .owner-grid-item-bg-icon {
   position: absolute;
   right: 50px;
-  bottom: 25px;
+  bottom: 27px;
   opacity: 0.12;
   color: #ffffff;
-  transform: scale(5);
+  transform: scale(4.8);
   pointer-events: none;
   z-index: 1;
 }
