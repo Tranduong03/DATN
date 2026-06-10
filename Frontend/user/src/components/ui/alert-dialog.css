@@ -1,0 +1,98 @@
+.alert-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+}
+
+.alert-dialog-content {
+  background: #1c1c1e; /* Dark iOS-style modal background */
+  border-radius: 26px;
+  padding: 24px 20px 20px 20px;
+  width: 100%;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.alert-dialog-content.size-sm {
+  max-width: 320px;
+}
+
+.alert-dialog-content.size-md {
+  max-width: 440px;
+}
+
+.alert-dialog-content.size-lg {
+  max-width: 600px;
+}
+
+.alert-dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.alert-dialog-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff; /* White title */
+  letter-spacing: -0.2px;
+}
+
+.alert-dialog-description {
+  margin: 0;
+  font-size: 13.5px;
+  color: #98989f; /* Gray description */
+  line-height: 1.45;
+}
+
+.alert-dialog-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle divider line */
+}
+
+.alert-dialog-btn-cancel {
+  padding: 12px 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background: #2c2c2e; /* Dark button background */
+  color: #ffffff; /* White text */
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s;
+}
+
+.alert-dialog-btn-cancel:hover {
+  background: #3a3a3c;
+}
+
+.alert-dialog-btn-action {
+  padding: 12px 0;
+  border: none;
+  border-radius: 12px;
+  background: #e5e5ea; /* Off-white button background */
+  color: #000000; /* Black text */
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s;
+}
+
+.alert-dialog-btn-action:hover {
+  background: #d1d1d6;
+}
