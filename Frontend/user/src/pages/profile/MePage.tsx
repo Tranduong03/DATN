@@ -30,8 +30,9 @@ export default function MePage() {
 
     try {
       const decoded = jwtDecode<JwtPayload>(token);
+      const hasRefreshToken = !!localStorage.getItem('refreshToken');
       
-      if (decoded.exp * 1000 < Date.now()) {
+      if (decoded.exp * 1000 < Date.now() && !hasRefreshToken) {
         throw new Error('Token expired');
       }
 
@@ -42,6 +43,7 @@ export default function MePage() {
       setUserInfo({ name, email, avatar });
     } catch (err) {
       localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       navigate('/account');
     }
   }, [navigate]);

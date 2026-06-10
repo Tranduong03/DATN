@@ -14,8 +14,10 @@ export default function OwnerGuard() {
 
   try {
     const decoded: any = jwtDecode(token);
-    if (decoded.exp * 1000 < Date.now()) {
+    const hasRefreshToken = !!localStorage.getItem('refreshToken');
+    if (decoded.exp * 1000 < Date.now() && !hasRefreshToken) {
       localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       return <Navigate to="/login" replace />;
     }
 
@@ -30,6 +32,7 @@ export default function OwnerGuard() {
     }
   } catch (err) {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     return <Navigate to="/login" replace />;
   }
 

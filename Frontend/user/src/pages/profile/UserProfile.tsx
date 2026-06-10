@@ -8,6 +8,7 @@ import {
   Award, Phone, Cake, Mars, Venus
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
+import axiosClient from '../../api/axiosClient';
 
 interface JwtPayload {
   sub: string;
@@ -139,22 +140,20 @@ export default function ProfilePage() {
 
     try {
       const decoded = jwtDecode<JwtPayload>(token);
-      if (decoded.exp * 1000 < Date.now()) {
+      const hasRefreshToken = !!localStorage.getItem('refreshToken');
+      if (decoded.exp * 1000 < Date.now() && !hasRefreshToken) {
         throw new Error('expired');
       }
     } catch {
       localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       navigate('/account');
       return;
     }
 
-    // Call refresh-token to ensure latest state
-    fetch('/api/Auth/refresh-token', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(r => r.json())
-      .then(res => {
+    // Call refresh-token using axiosClient so the interceptor handles refresh automatically if needed
+    axiosClient.post('/Auth/refresh-token')
+      .then((res: any) => {
         const freshToken = res.token || res.Token;
         if (freshToken) {
           localStorage.setItem('token', freshToken);

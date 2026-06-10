@@ -3648,9 +3648,24 @@ input[type="password"]::-ms-clear {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Shared Flex Center alignment */
+.owner-banner-action-btn,
+.owner-banner-avatar-frame,
+.owner-grid-item-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Shared Circular elements */
+.owner-banner-action-btn,
+.owner-banner-avatar-frame {
+  border-radius: 50%;
+}
+
 .owner-dashboard-banner {
   background: linear-gradient(rgba(4, 120, 87, 0.4), rgba(6, 78, 59, 0.85)), url('https://images.unsplash.com/photo-1626224484214-e0c1f6087d3d?w=800&fit=crop') center/cover no-repeat;
-  padding: 24px 16px 48px 16px;
+  padding: 24px 16px 48px; /* Combined top left bottom right */
   position: relative;
   text-align: center;
   border-bottom: 1px solid rgba(4, 120, 87, 0.15);
@@ -3671,10 +3686,6 @@ input[type="password"]::-ms-clear {
   -webkit-backdrop-filter: blur(8px);
   width: 38px;
   height: 38px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -3693,14 +3704,10 @@ input[type="password"]::-ms-clear {
 .owner-banner-avatar-frame {
   width: 90px;
   height: 90px;
-  border-radius: 50%;
   border: 3px solid #ffffff;
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
   background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .owner-banner-avatar-img {
@@ -3710,7 +3717,7 @@ input[type="password"]::-ms-clear {
 }
 
 .owner-banner-venue-name {
-  margin: 16px 0 0 0;
+  margin: 16px 0 0; /* Shorthand */
   color: #ffffff;
   font-size: 20px;
   font-weight: 800;
@@ -3721,13 +3728,12 @@ input[type="password"]::-ms-clear {
 .owner-dashboard-content-card {
   background-color: #ffffff;
   border-radius: 28px 28px 0 0;
-  padding: 24px 20px;
+  padding: 24px 20px 90px; /* Combined padding-bottom */
   margin-top: -24px;
   position: relative;
   z-index: 10;
   flex: 1;
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.02);
-  padding-bottom: 90px;
 }
 
 .owner-dashboard-grid {
@@ -3781,9 +3787,6 @@ input[type="password"]::-ms-clear {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .owner-grid-item-title {
