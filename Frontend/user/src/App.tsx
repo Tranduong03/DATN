@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { useRef, lazy, Suspense } from 'react';
+import { useRef, lazy, Suspense, useState, useEffect } from 'react';
 import PageTransition from './components/layout/PageTransition';
 import BottomNavigation from './components/layout/BottomNavigation';
 import GlobalNotification from './components/common/GlobalNotification';
 import LoadingOverlay from './components/common/LoadingOverlay';
+import Preloader from './components/common/Preloader';
 
 // Route Guards (imported statically to avoid authentication validation delays)
 import AuthGuard from './pages/auth/AuthGuard';
@@ -32,6 +33,7 @@ const OwnerDashboardPage = lazy(() => import('./pages/owner/OwnerDashboardPage')
 const OwnerVenuesPage = lazy(() => import('./pages/owner/OwnerVenuesPage'));
 const VenueConfigPage = lazy(() => import('./pages/owner/VenueConfigPage'));
 const OwnerBookingsPage = lazy(() => import('./pages/owner/OwnerBookingsPage'));
+const OwnerSubFeaturePage = lazy(() => import('./pages/owner/OwnerSubFeaturePage'));
 
 // General/Home pages
 const VenueDetailPage = lazy(() => import('./pages/home/VenueDetailPage'));
@@ -50,6 +52,31 @@ function AppRoutes() {
   const location = useLocation();
   const prevPathRef = useRef(location.pathname);
   const directionRef = useRef(1);
+
+  // Preload transition state for Owner <-> Default App switching
+  const lastRolePathRef = useRef(location.pathname);
+  const [isPreloading, setIsPreloading] = useState(false);
+
+  useEffect(() => {
+    const prevPath = lastRolePathRef.current;
+    const currentPath = location.pathname;
+
+    const wasOwner = prevPath.startsWith('/owner');
+    const isOwner = currentPath.startsWith('/owner');
+
+    if (wasOwner !== isOwner) {
+      setIsPreloading(true);
+      
+      const timer = setTimeout(() => {
+        setIsPreloading(false);
+      }, 2450); // 2450ms to allow Preloader's internal 2s + 0.4s fadeout to complete
+
+      lastRolePathRef.current = currentPath;
+      return () => clearTimeout(timer);
+    }
+
+    lastRolePathRef.current = currentPath;
+  }, [location.pathname]);
 
   if (location.pathname !== prevPathRef.current) {
     const prevIndex = tabRoutes.indexOf(prevPathRef.current);
@@ -113,6 +140,12 @@ function AppRoutes() {
               <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
               <Route path="/owner/venues" element={<OwnerVenuesPage />} />
               <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
+              <Route path="/owner/pos" element={<OwnerSubFeaturePage />} />
+              <Route path="/owner/inventory" element={<OwnerSubFeaturePage />} />
+              <Route path="/owner/analytics" element={<OwnerSubFeaturePage />} />
+              <Route path="/owner/customers" element={<OwnerSubFeaturePage />} />
+              <Route path="/owner/vouchers" element={<OwnerSubFeaturePage />} />
+              <Route path="/owner/monthly-bookings" element={<OwnerSubFeaturePage />} />
             </Route>
 
             {/* Catch-all route */}
@@ -122,6 +155,7 @@ function AppRoutes() {
       </Suspense>
       {showBottomNav && <BottomNavigation />}
       <GlobalNotification />
+      {isPreloading && <Preloader />}
     </div>
   );
 }

@@ -1,110 +1,233 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import OwnerLayout from './OwnerLayout';
-import { useOwnerStats, useOwnerBookings } from '../../hooks/queries/useBookingQueries';
+import { useMyVenues } from '../../hooks/queries/useOwnerQueries';
+import { Layout, ShoppingCart, Package, TrendingUp, Layers, Users, Ticket, Calendar, LogOut, QrCode } from 'lucide-react';
 
 export default function OwnerDashboardPage() {
-  const { data: statsData } = useOwnerStats();
-  const { data: bookingsData } = useOwnerBookings();
-  const stats = statsData?.data || { todayBookings: 0, weeklyRevenue: 0, newReviews: 0 };
-  const bookings = bookingsData?.data || [];
+  const navigate = useNavigate();
+  const { data: venues } = useMyVenues();
 
-  const upcomingBookings = bookings
-    .filter((b: { startTime: string; status: string; id: string; bookerName: string; courtName: string; totalPrice: number; }) => new Date(b.startTime) >= new Date() && b.status !== 'CANCELLED')
-    .sort((a: { startTime: string }, b: { startTime: string }) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-    .slice(0, 5); // Take top 5 upcoming
+  // Determine venue name and avatar
+  const venue = venues && venues.length > 0 ? venues[0] : null;
+  const venueName = venue?.name || 'Sân thể thao Sport Connect';
+  
+  const [showExitModal, setShowExitModal] = useState(false);
 
-  const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+  const handleGoBackToUser = () => {
+    setShowExitModal(true);
+  };
+
+  const handleScanQR = () => {
+    alert('Tính năng chưa cập nhật...');
+  };
+
+  // 8 menus grid data
+  const menus = [
+    {
+      id: 'courts',
+      title: 'Xem trạng thái sân',
+      icon: <Layout size={24} />,
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)',
+      path: venue ? `/owner/venues/${venue.id}` : '/owner/venues',
+    },
+    {
+      id: 'pos',
+      title: 'Bán hàng',
+      icon: <ShoppingCart size={24} />,
+      gradient: 'linear-gradient(135deg, #ec4899 0%, #f97316 100%)',
+      path: '/owner/pos',
+    },
+    {
+      id: 'inventory',
+      title: 'Kho & dịch vụ',
+      icon: <Package size={24} />,
+      gradient: 'linear-gradient(135deg, #a855f7 0%, #f43f5e 100%)',
+      path: '/owner/inventory',
+    },
+    {
+      id: 'analytics',
+      title: 'Doanh thu & lợi nhuận',
+      icon: <TrendingUp size={24} />,
+      gradient: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+      path: '/owner/analytics',
+    },
+    {
+      id: 'branch',
+      title: 'Quản lý chi nhánh',
+      icon: <Layers size={24} />,
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
+      path: venue ? `/owner/venues/${venue.id}?tab=profile` : '/owner/venues',
+    },
+    {
+      id: 'customers',
+      title: 'Quản lý khách hàng',
+      icon: <Users size={24} />,
+      gradient: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
+      path: '/owner/customers',
+    },
+    {
+      id: 'vouchers',
+      title: 'Quản lý voucher',
+      icon: <Ticket size={24} />,
+      gradient: 'linear-gradient(135deg, #06b6d4 0%, #4f46e5 100%)',
+      path: '/owner/vouchers',
+    },
+    {
+      id: 'monthly',
+      title: 'Quản lý đơn tháng',
+      icon: <Calendar size={24} />,
+      gradient: 'linear-gradient(135deg, #6366f1 0%, #d946ef 100%)',
+      path: '/owner/monthly-bookings',
+    },
+  ];
 
   return (
-    <OwnerLayout title="Tổng quan" subtitle="Chào mừng trở lại! Dưới đây là thông tin hoạt động kinh doanh của bạn.">
-      <div className="admin-stats-grid">
-        <div className="admin-stat-card admin-stat-card--indigo">
-          <div className="admin-stat-icon">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+    <OwnerLayout showSystemHeader={false}>
+      <div className="owner-dashboard-wrapper">
+        
+        {/* Dynamic Green Banner Header exactly as pictured */}
+        <div className="owner-dashboard-banner">
+          {/* Header Action Buttons */}
+          <div className="owner-banner-header-actions">
+            <button className="owner-banner-action-btn" onClick={handleGoBackToUser} title="Quay lại giao diện người dùng">
+              <LogOut size={22} color="white" />
+            </button>
+            <button className="owner-banner-action-btn" onClick={handleScanQR} title="Quét mã QR Check-in">
+              <QrCode size={22} color="white" />
+            </button>
           </div>
-          <div className="admin-stat-body">
-            <span className="admin-stat-value">{stats.todayBookings}</span>
-            <span className="admin-stat-label">Lượt đặt hôm nay</span>
-            <span className="admin-stat-trend" style={{ color: '#6366f1' }}>Cập nhật liên tục</span>
-          </div>
-        </div>
-        <div className="admin-stat-card admin-stat-card--emerald">
-          <div className="admin-stat-icon">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="admin-stat-body">
-            <span className="admin-stat-value">{formatPrice(stats.weeklyRevenue)}</span>
-            <span className="admin-stat-label">Doanh thu tuần này</span>
-            <span className="admin-stat-trend" style={{ color: '#10b981' }}>Đã xác nhận</span>
-          </div>
-        </div>
-        <div className="admin-stat-card admin-stat-card--amber">
-          <div className="admin-stat-icon">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-          </div>
-          <div className="admin-stat-body">
-            <span className="admin-stat-value">{stats.newReviews}</span>
-            <span className="admin-stat-label">Đánh giá mới</span>
-            <span className="admin-stat-trend">Tuần này</span>
-          </div>
-        </div>
-      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginTop: '24px' }}>
-        {/* Biểu đồ doanh thu giả lập (CSS) */}
-        <div className="admin-section" style={{ margin: 0 }}>
-          <h2 className="admin-section-title">Biểu đồ doanh thu (7 ngày qua)</h2>
-          <div style={{ height: '240px', display: 'flex', alignItems: 'flex-end', gap: '12px', padding: '16px 0 0 0', borderBottom: '1px solid #e2e8f0' }}>
-            {[12, 18, 15, 25, 20, 35, 45].map((val, idx) => (
-              <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '100%', backgroundColor: '#e0e7ff', borderRadius: '4px 4px 0 0', position: 'relative', height: '180px', display: 'flex', alignItems: 'flex-end' }}>
-                  <div style={{ width: '100%', backgroundColor: '#6366f1', borderRadius: '4px 4px 0 0', height: `${val * 2}%`, transition: 'height 0.5s ease-in-out' }}></div>
-                  <span style={{ position: 'absolute', top: '-24px', width: '100%', textAlign: 'center', fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>{val}k</span>
+          {/* Circle Avatar Frame */}
+          <div className="owner-banner-avatar-container">
+            <div className="owner-banner-avatar-frame">
+              {/* Temporarily empty white circle */}
+            </div>
+          </div>
+
+          {/* Venue Name */}
+          <h2 className="owner-banner-venue-name">{venueName}</h2>
+        </div>
+
+        {/* Main Content White Container */}
+        <div className="owner-dashboard-content-card">
+          <div className="owner-dashboard-grid">
+            {menus.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => navigate(m.path)}
+                className="owner-dashboard-grid-item"
+                style={{ background: m.gradient }}
+              >
+                {/* Large background watermark icon */}
+                <div className="owner-grid-item-bg-icon">
+                  {m.icon}
                 </div>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>T{idx + 2}</span>
-              </div>
+
+                {/* Background Pattern effect */}
+                <div className="owner-grid-item-pattern"></div>
+                
+                {/* Content */}
+                <div className="owner-grid-item-content">
+                  <div className="owner-grid-item-icon-wrapper">
+                    {m.icon}
+                  </div>
+                  <span className="owner-grid-item-title">{m.title}</span>
+                </div>
+              </button>
             ))}
           </div>
-          <p style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>Doanh thu tính theo (k VND)</p>
         </div>
 
-        {/* Lịch đặt gần đây */}
-        <div className="admin-section" style={{ margin: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h2 className="admin-section-title" style={{ margin: 0 }}>Lịch đặt sắp tới</h2>
-            <Link to="/owner/bookings" className="admin-btn-secondary" style={{ fontSize: 13 }}>Xem tất cả</Link>
-          </div>
-          
-          {upcomingBookings.length === 0 ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: '#6b7280', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb' }}>
-              Hiện chưa có lịch đặt nào sắp diễn ra.
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {upcomingBookings.map((b: { id: string; bookerName: string; courtName: string; startTime: string; totalPrice: number; status: string; }) => (
-                <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: '#fff' }}>
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '14px' }}>{b.bookerName}</div>
-                    <div style={{ fontSize: '13px', color: '#64748b' }}>{b.courtName} • {new Date(b.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: '700', color: '#ef4444', fontSize: '14px' }}>{formatPrice(b.totalPrice)}</div>
-                    <span className={`admin-status-badge ${b.status === 'CONFIRMED' ? 'admin-status-badge--success' : b.status === 'PENDING' ? 'admin-status-badge--warning' : 'admin-status-badge--danger'}`} style={{ marginTop: '4px', fontSize: '10px', padding: '2px 6px' }}>
-                      {b.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
+
+      {showExitModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.45)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: 24,
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: 24,
+            padding: '24px 20px',
+            width: '100%',
+            maxWidth: 320,
+            boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+          }}>
+            <h3 style={{
+              margin: 0,
+              fontSize: 18,
+              fontWeight: 800,
+              color: '#064e3b',
+            }}>
+              Đăng xuất
+            </h3>
+            
+            <p style={{
+              margin: 0,
+              fontSize: 13.5,
+              color: '#64748b',
+              lineHeight: 1.45,
+            }}>
+              Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?
+            </p>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 12,
+              marginTop: 8,
+            }}>
+              <button 
+                onClick={() => setShowExitModal(false)}
+                style={{
+                  padding: '11px 0',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: 12,
+                  background: '#ffffff',
+                  color: '#334155',
+                  fontWeight: 700,
+                  fontSize: 13.5,
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+              >
+                Hủy
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setShowExitModal(false);
+                  navigate('/');
+                }}
+                style={{
+                  padding: '11px 0',
+                  border: 'none',
+                  borderRadius: 12,
+                  background: '#ef4444',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  fontSize: 13.5,
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+              >
+                Đăng xuất
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </OwnerLayout>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Plus, Edit2, Check, X, Trash2, Image, Camera, Save, Globe, Phone, MapPin, Clock } from 'lucide-react';
 import OwnerLayout from './OwnerLayout';
 import { useVenueDetail, useCourts, usePriceRules } from '../../hooks/queries/useOwnerQueries';
@@ -7,7 +7,15 @@ import { useAddCourt, useUpdateCourt, useUpsertPriceRules, useUpdateVenue, useAd
 
 export default function VenueConfigPage() {
   const { id: venueId } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab') as 'courts' | 'pricing' | 'profile' | null;
   const [activeTab, setActiveTab] = useState<'courts' | 'pricing' | 'profile'>('courts');
+
+  useEffect(() => {
+    if (tabParam && ['courts', 'pricing', 'profile'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   // Queries
   const { data: venue, isLoading: loadingVenue } = useVenueDetail(venueId!);
