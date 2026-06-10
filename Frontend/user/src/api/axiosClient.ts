@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 const axiosClient = axios.create({
   baseURL: '/api',
   headers: {
@@ -9,14 +8,19 @@ const axiosClient = axios.create({
 });
 
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: { resolve: (token: string) => void; reject: (err: any) => void }[] = [];
 
-function subscribeTokenRefresh(cb: (token: string) => void) {
-  refreshSubscribers.push(cb);
+function subscribeTokenRefresh(resolve: (token: string) => void, reject: (err: any) => void) {
+  refreshSubscribers.push({ resolve, reject });
 }
 
 function onRefreshed(token: string) {
-  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers.forEach((sub) => sub.resolve(token));
+  refreshSubscribers = [];
+}
+
+function onRefreshFailed(error: any) {
+  refreshSubscribers.forEach((sub) => sub.reject(error));
   refreshSubscribers = [];
 }
 
@@ -41,16 +45,20 @@ axiosClient.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    const isRetry = originalRequest._retry || originalRequest.headers?.['X-Retry'] === 'true';
 
-    // Tránh vòng lặp vô tận nếu api refresh hoặc login trả về 401
+    // Tránh vòng lặp vô tận nếu api refresh hoặc login trả về 401/403
     if (
       error.response &&
       (error.response.status === 401 || error.response.status === 403) &&
-      !originalRequest._retry &&
+      !isRetry &&
       !originalRequest.url?.includes('/auth/refresh') &&
       !originalRequest.url?.includes('/auth/login')
     ) {
       originalRequest._retry = true;
+      if (originalRequest.headers) {
+        originalRequest.headers['X-Retry'] = 'true';
+      }
 
       const refreshToken = localStorage.getItem('refreshToken');
       const accessToken = localStorage.getItem('token');
@@ -79,10 +87,13 @@ axiosClient.interceptors.response.use(
               localStorage.setItem('token', newAccessToken);
               localStorage.setItem('refreshToken', newRefreshToken);
               onRefreshed(newAccessToken);
+            } else {
+              throw new Error('Response body does not contain valid access or refresh tokens.');
             }
           })
           .catch((err) => {
             console.error('Không thể refresh token tự động:', err);
+            onRefreshFailed(err);
             localStorage.removeItem('token');
             localStorage.removeItem('refreshToken');
             if (window.location.pathname !== '/login') {
@@ -95,11 +106,16 @@ axiosClient.interceptors.response.use(
       }
 
       // Đợi refresh thành công rồi chạy lại request ban đầu
-      return new Promise((resolve) => {
-        subscribeTokenRefresh((newToken) => {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          resolve(axiosClient(originalRequest));
-        });
+      return new Promise((resolve, reject) => {
+        subscribeTokenRefresh(
+          (newToken) => {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            resolve(axiosClient(originalRequest));
+          },
+          (err) => {
+            reject(err);
+          }
+        );
       });
     }
 

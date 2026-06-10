@@ -8,14 +8,19 @@ const apiClient = axios.create({
 });
 
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: { resolve: (token: string) => void; reject: (err: any) => void }[] = [];
 
-function subscribeTokenRefresh(cb: (token: string) => void) {
-  refreshSubscribers.push(cb);
+function subscribeTokenRefresh(resolve: (token: string) => void, reject: (err: any) => void) {
+  refreshSubscribers.push({ resolve, reject });
 }
 
 function onRefreshed(token: string) {
-  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers.forEach((sub) => sub.resolve(token));
+  refreshSubscribers = [];
+}
+
+function onRefreshFailed(error: any) {
+  refreshSubscribers.forEach((sub) => sub.reject(error));
   refreshSubscribers = [];
 }
 
@@ -36,16 +41,20 @@ apiClient.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
+    const isRetry = originalRequest._retry || originalRequest.headers?.['X-Retry'] === 'true';
 
     if (
       typeof window !== "undefined" &&
       error.response &&
       (error.response.status === 401 || error.response.status === 403) &&
-      !originalRequest._retry &&
+      !isRetry &&
       !originalRequest.url?.includes("/auth/refresh") &&
       !originalRequest.url?.includes("/admin-login")
     ) {
       originalRequest._retry = true;
+      if (originalRequest.headers) {
+        originalRequest.headers['X-Retry'] = 'true';
+      }
 
       const refreshToken = localStorage.getItem("adminRefreshToken");
       const accessToken = localStorage.getItem("adminToken");
@@ -72,10 +81,13 @@ apiClient.interceptors.response.use(
               localStorage.setItem("adminToken", newAccessToken);
               localStorage.setItem("adminRefreshToken", newRefreshToken);
               onRefreshed(newAccessToken);
+            } else {
+              throw new Error("Response body does not contain valid access or refresh tokens.");
             }
           })
           .catch((err) => {
             console.error("Không thể refresh admin token tự động:", err);
+            onRefreshFailed(err);
             localStorage.removeItem("adminToken");
             localStorage.removeItem("adminRefreshToken");
             window.location.href = "/auth/v1/login";
@@ -85,11 +97,16 @@ apiClient.interceptors.response.use(
           });
       }
 
-      return new Promise((resolve) => {
-        subscribeTokenRefresh((newToken) => {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          resolve(apiClient(originalRequest));
-        });
+      return new Promise((resolve, reject) => {
+        subscribeTokenRefresh(
+          (newToken) => {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            resolve(apiClient(originalRequest));
+          },
+          (err) => {
+            reject(err);
+          }
+        );
       });
     }
 
