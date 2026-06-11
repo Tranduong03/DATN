@@ -151,7 +151,10 @@ if (app.Environment.IsDevelopment())
 // 3. CORS — phải trước Authentication
 app.UseCors("AllowFrontend");
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthentication(); // ← phải trước UseAuthorization
 app.UseAuthorization();
 app.MapControllers();

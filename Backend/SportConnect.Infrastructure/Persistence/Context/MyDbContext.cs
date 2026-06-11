@@ -219,12 +219,20 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
             entity.Property(e => e.OperatingEndHour)
                 .HasColumnName("operating_end_hour");
 
+            var sportTypesComparer = new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<string>>(
+                (c1, c2) => (c1 == null && c2 == null) || (c1 != null && c2 != null && c1.SequenceEqual(c2)),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToList()
+            );
+
             entity.Property(e => e.SportTypes)
                 .HasColumnName("sport_types")
                 .HasConversion(
-                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions)null),
-                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions)null) ?? new List<string>()
-                );
+                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
+                )
+                .Metadata.SetValueComparer(sportTypesComparer);
+
 
             entity.Property(e => e.VenueScale)
                 .HasColumnName("venue_scale")
