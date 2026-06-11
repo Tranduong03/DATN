@@ -182,6 +182,16 @@ public class AdminRepository : IAdminRepository
         if (venue != null)
         {
             venue.Status = "ACTIVE";
+
+            // Tự động thêm ảnh mặc định nếu venue chưa có ảnh nào
+            var hasImages = await _context.VenueImages.AnyAsync(vi => vi.VenueId == venue.Id);
+            if (!hasImages)
+            {
+                _context.VenueImages.AddRange(
+                    new VenueImage { VenueId = venue.Id, ImageUrl = "/images/owner-default.webp", ImageType = "Avatar" },
+                    new VenueImage { VenueId = venue.Id, ImageUrl = "/images/bg-default.webp", ImageType = "Cover" }
+                );
+            }
         }
 
         await _context.SaveChangesAsync();

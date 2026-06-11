@@ -136,6 +136,23 @@ public class OwnerOnboardingService : IOwnerOnboardingService
                 };
 
                 await _unitOfWork.Repository<Venue>().AddAsync(venue);
+                await _unitOfWork.CompleteAsync(); // Lưu venue trước để có venue.Id
+
+                // Tự động thêm ảnh mặc định cho venue mới
+                var defaultAvatar = new VenueImage
+                {
+                    VenueId = venue.Id,
+                    ImageUrl = "/images/owner-default.webp",
+                    ImageType = "Avatar"
+                };
+                var defaultCover = new VenueImage
+                {
+                    VenueId = venue.Id,
+                    ImageUrl = "/images/bg-default.webp",
+                    ImageType = "Cover"
+                };
+                await _unitOfWork.Repository<VenueImage>().AddAsync(defaultAvatar);
+                await _unitOfWork.Repository<VenueImage>().AddAsync(defaultCover);
             }
 
             await _unitOfWork.CompleteAsync();
