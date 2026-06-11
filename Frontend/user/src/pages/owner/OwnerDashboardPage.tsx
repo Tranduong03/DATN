@@ -61,7 +61,7 @@ export default function OwnerDashboardPage() {
     },
     {
       id: 'branch',
-      title: 'Quản lý chi nhánh',
+      title: 'Quản lý sân',
       icon: <Layers size={24} />,
       gradient: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
       path: venue ? `/owner/venues/${venue.id}?tab=profile` : '/owner/venues',
