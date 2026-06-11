@@ -36,7 +36,7 @@ export default function OwnerDashboardPage() {
       title: 'Xem trạng thái sân',
       icon: <Layout size={24} />,
       gradient: 'linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)',
-      path: venue ? `/owner/venues/${venue.id}` : '/owner/venues',
+      path: venue ? `/owner/venues/${venue.id}/edit` : '/owner/venues',
     },
     {
       id: 'pos',
@@ -64,7 +64,7 @@ export default function OwnerDashboardPage() {
       title: 'Quản lý sân',
       icon: <Layers size={24} />,
       gradient: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
-      path: venue ? `/owner/venues/${venue.id}?tab=profile` : '/owner/venues',
+      path: venue ? `/owner/venues/${venue.id}` : '/owner/venues',
     },
     {
       id: 'customers',

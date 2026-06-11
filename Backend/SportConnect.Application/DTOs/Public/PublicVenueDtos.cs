@@ -17,6 +17,7 @@ public class PublicVenueDto
     public double Rating { get; set; }
     public int ReviewCount { get; set; }
     public string? AvatarUrl { get; set; }
+    public string? CoverUrl { get; set; }
     public List<string> SportTypes { get; set; } = new();
 }
 

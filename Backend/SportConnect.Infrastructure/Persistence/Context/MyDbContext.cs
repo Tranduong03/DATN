@@ -272,7 +272,7 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasDefaultValue("Gallery");
 
             entity.HasOne(e => e.Venue)
-                .WithMany()
+                .WithMany(v => v.Images)
                 .HasForeignKey(e => e.VenueId)
                 .OnDelete(DeleteBehavior.Cascade);
         });

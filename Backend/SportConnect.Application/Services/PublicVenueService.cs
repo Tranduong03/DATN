@@ -39,6 +39,12 @@ public class PublicVenueService : IPublicVenueService
         var allAvatars = await _unitOfWork.Repository<VenueImage>().FindAsync(vi => venueIds.Contains(vi.VenueId) && vi.ImageType == "Avatar");
         var avatarsByVenue = allAvatars.GroupBy(vi => vi.VenueId).ToDictionary(g => g.Key, g => g.First().ImageUrl);
 
+        var allCovers = await _unitOfWork.Repository<VenueImage>().FindAsync(vi => venueIds.Contains(vi.VenueId) && (vi.ImageType == "Cover" || vi.ImageType == "Gallery"));
+        var coversByVenue = allCovers.GroupBy(vi => vi.VenueId).ToDictionary(
+            g => g.Key, 
+            g => g.FirstOrDefault(img => img.ImageType == "Cover")?.ImageUrl ?? g.First().ImageUrl
+        );
+
         return allVenues.Select(venue =>
         {
             var rules = priceRulesByVenue.GetValueOrDefault(venue.Id, new List<PriceRule>());
@@ -57,6 +63,7 @@ public class PublicVenueService : IPublicVenueService
                 ReviewCount = venue.ReviewCount,
                 Distance = "5km",
                 AvatarUrl = avatarsByVenue.GetValueOrDefault(venue.Id),
+                CoverUrl = coversByVenue.GetValueOrDefault(venue.Id),
                 SportTypes = venue.SportTypes
             };
         }).ToList();
@@ -91,6 +98,7 @@ public class PublicVenueService : IPublicVenueService
             ReviewCount = venue.ReviewCount,
             Distance = "5km",
             AvatarUrl = avatar,
+            CoverUrl = images.FirstOrDefault(vi => vi.ImageType == "Cover")?.ImageUrl ?? images.FirstOrDefault(vi => vi.ImageType == "Gallery")?.ImageUrl,
             SportTypes = venue.SportTypes,
             BankQrUrl = venue.BankQrUrl,
             ContactPhone = venue.ContactPhone,

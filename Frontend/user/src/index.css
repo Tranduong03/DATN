@@ -3805,3 +3805,272 @@ input[type="password"]::-ms-clear {
   z-index: 1;
 }
 
+/* ========================================================
+   OWNER VENUE DETAIL PAGE STYLES (MOBILE-FIRST)
+   ======================================================== */
+.owner-venue-detail-page {
+  min-height: 100vh;
+  background-color: #2b6139; /* Forest Green exactly as in screenshot */
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.owner-venue-cover-container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.owner-venue-cover-img {
+  width: 100%;
+  height: 180px;
+}
+
+.owner-venue-back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: background 0.2s;
+}
+
+.owner-venue-back-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.owner-venue-header-info {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 20px;
+  margin-top: -45px;
+  position: relative;
+  z-index: 15;
+  gap: 16px;
+}
+
+.owner-venue-avatar-wrapper {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  flex-shrink: 0;
+}
+
+.owner-venue-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.owner-venue-title-section {
+  flex: 1;
+  padding-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.owner-venue-name-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.3;
+  margin-top: -5px;
+  margin-left: -5px;
+}
+
+.owner-venue-more-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+}
+
+.owner-venue-more-btn:hover {
+  opacity: 1;
+}
+
+.owner-venue-tabs-bar {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 16px 16px 0;
+  background-color: #2b6139;
+  scrollbar-width: none;
+}
+
+.owner-venue-tabs-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.owner-venue-tab {
+  padding: 10px 16px;
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.owner-venue-tab.active {
+  color: #ffffff;
+}
+
+.owner-venue-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background-color: #ffffff;
+}
+
+.owner-venue-content {
+  padding: 24px 20px 100px;
+  flex: 1;
+  background-color: #2b6139;
+}
+
+.owner-venue-info-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-venue-info-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+.owner-venue-info-icon {
+  color: #ffffff;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.owner-venue-link-section {
+  margin-top: 24px;
+}
+
+.owner-venue-link-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #facc15; /* Yellow-400 */
+  margin: 0 0 10px 0;
+  letter-spacing: 0.2px;
+}
+
+.owner-venue-link-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background-color: rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.owner-venue-link-text {
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.85);
+  word-break: break-all;
+  flex: 1;
+  margin: 0;
+}
+
+.owner-venue-copy-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  opacity: 0.8;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.owner-venue-copy-btn:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.owner-venue-fab-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 20px;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.owner-venue-fab {
+  pointer-events: auto;
+  background: #f1b23e; /* Golden-yellow */
+  color: #ffffff;
+  border: none;
+  border-radius: 12px; /* Not pill-shaped, matches screenshot */
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.owner-venue-fab:hover {
+  background-color: #e2a03f;
+  transform: translateY(-2px);
+}
+
+.owner-venue-fab:active {
+  transform: translateY(0);
+}
+
+

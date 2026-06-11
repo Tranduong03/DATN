@@ -32,6 +32,7 @@ const OwnerOnboardingFlow = lazy(() => import('./pages/owner/OwnerOnboardingFlow
 const OwnerDashboardPage = lazy(() => import('./pages/owner/OwnerDashboardPage'));
 const OwnerVenuesPage = lazy(() => import('./pages/owner/OwnerVenuesPage'));
 const VenueConfigPage = lazy(() => import('./pages/owner/VenueConfigPage'));
+const OwnerVenueDetailPage = lazy(() => import('./pages/owner/OwnerVenueDetailPage'));
 const OwnerBookingsPage = lazy(() => import('./pages/owner/OwnerBookingsPage'));
 const OwnerSubFeaturePage = lazy(() => import('./pages/owner/OwnerSubFeaturePage'));
 
@@ -139,7 +140,8 @@ function AppRoutes() {
               <Route path="/owner" element={<OwnerDashboardPage />} />
               <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
               <Route path="/owner/venues" element={<OwnerVenuesPage />} />
-              <Route path="/owner/venues/:id" element={<VenueConfigPage />} />
+              <Route path="/owner/venues/:id" element={<OwnerVenueDetailPage />} />
+              <Route path="/owner/venues/:id/edit" element={<VenueConfigPage />} />
               <Route path="/owner/pos" element={<OwnerSubFeaturePage />} />
               <Route path="/owner/inventory" element={<OwnerSubFeaturePage />} />
               <Route path="/owner/analytics" element={<OwnerSubFeaturePage />} />

@@ -22,6 +22,7 @@ public class Venue
     public User Owner { get; set; } = null!;
     public ICollection<Court> Courts { get; set; } = new List<Court>();
     public ICollection<PriceRule> PriceRules { get; set; } = new List<PriceRule>();
+    public ICollection<VenueImage> Images { get; set; } = new List<VenueImage>();
     public ICollection<FavoriteVenue> FavoritedByUsers { get; set; } = new List<FavoriteVenue>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

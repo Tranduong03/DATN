@@ -201,8 +201,8 @@ export default function HomePage() {
                 <div 
                   className="venue-cover" 
                   style={{ 
-                    backgroundImage: venue.avatarUrl ? `url(${venue.avatarUrl})` : 'none', 
-                    backgroundColor: venue.avatarUrl ? 'transparent' : '#A8DADC',
+                    backgroundImage: venue.coverUrl ? `url(${venue.coverUrl})` : (venue.avatarUrl ? `url(${venue.avatarUrl})` : 'none'), 
+                    backgroundColor: venue.coverUrl || venue.avatarUrl ? 'transparent' : '#A8DADC',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     position: 'relative'
