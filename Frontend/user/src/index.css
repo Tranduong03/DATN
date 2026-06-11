@@ -3594,12 +3594,11 @@ input[type="password"]::-ms-clear {
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  height: 68px;
+  height: 75px;
   background: #ffffff;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  border-radius: 0;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
   z-index: 100;
   border-top: 1.5px solid #e2e8f0;
