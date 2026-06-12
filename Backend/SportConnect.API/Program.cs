@@ -35,6 +35,8 @@ builder.Services.AddScoped<IPublicVenueService, PublicVenueService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
 builder.Services.AddScoped<IMatchService, MatchService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<StaffPermissionService>();
 builder.Services.AddScoped<ActivityLogService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();

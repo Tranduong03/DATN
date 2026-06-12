@@ -106,7 +106,7 @@ export default function MePage() {
             <div className="me-menu-section">
               <h3 className="me-menu-title">Hoạt động</h3>
               <div className="me-menu-list">
-                <Link to="/groups" className="me-menu-item">
+                <Link to="/teams" className="me-menu-item">
                   <Users className="me-menu-icon" />
                   <span className="me-menu-text">Nhóm của tôi</span>
                   <ChevronRight className="me-menu-chevron" size={20} />

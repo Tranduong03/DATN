@@ -44,6 +44,10 @@ const MatchDetailPage = lazy(() => import('./pages/home/MatchDetailPage'));
 const MapPage = lazy(() => import('./pages/home/MapPage'));
 const ExplorePage = lazy(() => import('./pages/home/ExplorePage'));
 
+// Team pages
+const TeamListPage = lazy(() => import('./pages/teams/TeamListPage'));
+const TeamDetailPage = lazy(() => import('./pages/teams/TeamDetailPage'));
+
 // Error pages
 const NotFoundPage = lazy(() => import('./pages/error/NotFoundPage'));
 
@@ -124,6 +128,8 @@ function AppRoutes() {
             <Route path="/account" element={withTransition(AccountPage)} />
 
             <Route path="/reservedBooking" element={<MyBookingsPage />} />
+            <Route path="/teams" element={withTransition(TeamListPage)} />
+            <Route path="/teams/:id" element={<TeamDetailPage />} />
 
             {/* User Protected Routes */}
             <Route element={<AuthGuard />}>

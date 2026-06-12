@@ -190,6 +190,22 @@ export default function ProfilePage() {
           setPhone(userPhone);
           setBirthYear(userBirthYear);
           setGender(userGender);
+
+          // Fetch extra profile properties from DB
+          axiosClient.get('/users/profile')
+            .then((res: any) => {
+              if (res && res.isSuccess && res.data) {
+                const data = res.data;
+                if (data.height) setHeight(data.height);
+                if (data.weight) setWeight(data.weight);
+                if (data.specialNotes) setSpecialNotes(data.specialNotes);
+                if (data.favPosition) setFavPosition(data.favPosition);
+                if (data.sportsLevel) setSportsLevel(data.sportsLevel);
+                if (data.goals) setGoals(data.goals);
+                if (data.frequency) setFrequency(data.frequency);
+              }
+            })
+            .catch(err => console.error("Error loading user profile:", err));
         } catch {
           localStorage.removeItem('token');
           navigate('/account');
@@ -201,8 +217,44 @@ export default function ProfilePage() {
 
   const isOwner = user.roles.some(r => r === 'Owner' || r === 'owner');
 
-  const handleSaveProfile = () => {
+  const updateProfileOnBackend = async (fields: any) => {
+    try {
+      await axiosClient.put('/users/profile', fields);
+    } catch (err) {
+      console.error("Error updating profile", err);
+    }
+  };
+
+  const handleSaveProfile = async () => {
     setIsEditingProfile(false);
+    await updateProfileOnBackend({
+      fullName: name,
+      phone: phone
+    });
+  };
+
+  const handleSavePhysical = async () => {
+    await updateProfileOnBackend({
+      height,
+      weight
+    });
+  };
+
+  const handleSavePersonalization = async () => {
+    await updateProfileOnBackend({
+      favPosition,
+      sportsLevel,
+      goals,
+      frequency
+    });
+  };
+
+  const handleSaveNotes = async (notes: string) => {
+    setSpecialNotes(notes);
+    setIsEditingNotes(false);
+    await updateProfileOnBackend({
+      specialNotes: notes
+    });
   };
 
   const handleTabChange = (tab: 'overview' | 'links') => {
@@ -461,14 +513,18 @@ export default function ProfilePage() {
                     <div className="section-card-header">
                       <h3 className="section-card-title">THÔNG TIN THỂ CHẤT</h3>
                       <button 
-                        onClick={() => setIsEditingPhysical(!isEditingPhysical)} 
+                        onClick={() => {
+                          if (isEditingPhysical) {
+                            handleSavePhysical();
+                          }
+                          setIsEditingPhysical(!isEditingPhysical);
+                        }} 
                         className={`section-edit-btn ${isEditingPhysical ? 'active' : ''}`}
                         aria-label="Sửa thông tin thể chất"
                       >
-                        <Edit2 size={14} />
+                        {isEditingPhysical ? <Check size={14} /> : <Edit2 size={14} />}
                       </button>
                     </div>
-
                     {/* Double Card + BMI Layout */}
                     <div className="physical-cards-row">
                       <div className="physical-stat-card">
@@ -534,7 +590,7 @@ export default function ProfilePage() {
                               onChange={(e) => setSpecialNotes(e.target.value)} 
                               className="notes-textarea"
                             />
-                            <button onClick={() => setIsEditingNotes(false)} className="notes-save-btn">
+                            <button onClick={() => handleSaveNotes(specialNotes)} className="notes-save-btn">
                               Xác nhận
                             </button>
                           </div>
@@ -555,7 +611,7 @@ export default function ProfilePage() {
                               placeholder="Nhập ghi chú đặc biệt của bạn..."
                               className="notes-textarea"
                             />
-                            <button onClick={() => setIsEditingNotes(false)} className="notes-save-btn">
+                            <button onClick={() => handleSaveNotes(specialNotes)} className="notes-save-btn">
                               Xác nhận
                             </button>
                           </div>
@@ -579,11 +635,16 @@ export default function ProfilePage() {
                     <div className="section-card-header">
                       <h3 className="section-card-title">CÁ NHÂN HÓA</h3>
                       <button 
-                        onClick={() => setIsEditingPersonalization(!isEditingPersonalization)} 
+                        onClick={() => {
+                          if (isEditingPersonalization) {
+                            handleSavePersonalization();
+                          }
+                          setIsEditingPersonalization(!isEditingPersonalization);
+                        }} 
                         className={`section-edit-btn ${isEditingPersonalization ? 'active' : ''}`}
                         aria-label="Sửa cá nhân hóa"
                       >
-                        <Edit2 size={14} />
+                        {isEditingPersonalization ? <Check size={14} /> : <Edit2 size={14} />}
                       </button>
                     </div>
 

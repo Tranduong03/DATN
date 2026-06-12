@@ -22,6 +22,8 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<FavoriteVenue> FavoriteVenues => Set<FavoriteVenue>();
     public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<Team> Teams => Set<Team>();
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -94,6 +96,49 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
 
             entity.Property(e => e.RefreshTokenExpiry)
                 .HasColumnName("refresh_token_expiry")
+                .IsRequired(false);
+
+            entity.Property(e => e.Height)
+                .HasColumnName("height")
+                .IsRequired(false);
+
+            entity.Property(e => e.Weight)
+                .HasColumnName("weight")
+                .IsRequired(false);
+
+            entity.Property(e => e.SpecialNotes)
+                .HasColumnName("special_notes")
+                .HasColumnType("nvarchar(max)")
+                .IsRequired(false);
+
+            entity.Property(e => e.FavPosition)
+                .HasColumnName("fav_position")
+                .HasMaxLength(255)
+                .IsRequired(false);
+
+            entity.Property(e => e.SportsLevel)
+                .HasColumnName("sports_level")
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            entity.Property(e => e.Goals)
+                .HasColumnName("goals")
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            entity.Property(e => e.Frequency)
+                .HasColumnName("frequency")
+                .HasMaxLength(255)
+                .IsRequired(false);
+
+            entity.Property(e => e.PreferredSports)
+                .HasColumnName("preferred_sports")
+                .HasColumnType("nvarchar(max)")
+                .IsRequired(false);
+
+            entity.Property(e => e.PreferredLocations)
+                .HasColumnName("preferred_locations")
+                .HasColumnType("nvarchar(max)")
                 .IsRequired(false);
         });
 
@@ -613,6 +658,100 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .WithOne(b => b.Review)
                 .HasForeignKey<Review>(e => e.BookingId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ==========================================
+        // 8. CẤU HÌNH BẢNG ĐỘI/NHÓM (TEAMS & TEAM MEMBERS)
+        // ==========================================
+        modelBuilder.Entity<Team>(entity =>
+        {
+            entity.ToTable("Teams");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.Name)
+                .HasColumnName("name")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.SportType)
+                .HasColumnName("sport_type")
+                .HasMaxLength(100);
+
+            entity.Property(e => e.AvatarUrl)
+                .HasColumnName("avatar_url")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.CreatorId)
+                .HasColumnName("creator_id");
+
+            entity.Property(e => e.SkillLevel)
+                .HasColumnName("skill_level")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Location)
+                .HasColumnName("location")
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .HasDefaultValue("ACTIVE");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("GETDATE()");
+
+            // Relationship with Creator (User)
+            entity.HasOne(e => e.Creator)
+                .WithMany(u => u.CreatedTeams)
+                .HasForeignKey(e => e.CreatorId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<TeamMember>(entity =>
+        {
+            entity.ToTable("TeamMembers");
+
+            entity.HasKey(e => new { e.TeamId, e.UserId });
+
+            entity.Property(e => e.TeamId)
+                .HasColumnName("team_id");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.Role)
+                .HasColumnName("role")
+                .HasMaxLength(50)
+                .HasDefaultValue("MEMBER");
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .HasDefaultValue("PENDING");
+
+            entity.Property(e => e.JoinedAt)
+                .HasColumnName("joined_at")
+                .HasDefaultValueSql("GETDATE()");
+
+            // Relationships
+            entity.HasOne(e => e.Team)
+                .WithMany(t => t.TeamMembers)
+                .HasForeignKey(e => e.TeamId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.TeamMemberships)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
