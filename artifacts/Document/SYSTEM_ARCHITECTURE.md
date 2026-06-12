@@ -101,11 +101,18 @@ Không gian mạng xã hội thể thao dạng Facebook/Zalo:
 - **Lớp học (Classes Tab):** Quảng bá lớp huấn luyện với thông tin HLV, giá, lịch học.
 - **Ưu đãi (Promotions Tab):** Mã coupon khuyến mãi từ các sân, hỗ trợ sao chép mã tự động.
 
+### H. Luồng Đội Nhóm & Đề Xuất Cá Nhân Hóa (Teams & AI Personalization Flow)
+Hỗ trợ liên kết cộng đồng người chơi và đề xuất trận đấu thông minh:
+- **Cá nhân hóa Hồ sơ:** Người chơi có thể cập nhật chi tiết các chỉ số thể chất (BMI), vị trí chơi yêu thích, trình độ thể thao, mục tiêu và tần suất tập luyện ở trang cá nhân. Dữ liệu được đồng bộ realtime với API `/api/users/profile`.
+- **Quản lý Đội nhóm (Teams):** Cho phép người dùng tạo đội thể thao riêng, tìm kiếm/duyệt danh sách các đội hiện có, gửi yêu cầu xin gia nhập (`TeamMember` ở trạng thái `PENDING`) và phê duyệt/quản lý thành viên đội (Captain có quyền Approve/Reject thành viên).
+- **Đề xuất gợi ý thông minh (AI Recommendations):** Tích hợp logic đề xuất trận đấu/đội nhóm phù hợp dựa trên các dữ liệu sở thích (môn thể thao ưa thích, trình độ chơi và khu vực hoạt động) ngay trên giao diện danh sách trận đấu (`MatchListPage.tsx`).
+
 ---
 
 ## 5. Định hướng cho tương lai (Next Steps)
 - ~~Tích hợp cổng thanh toán trực tuyến (VNPay / Momo) cho Booking.~~ ✅ Đã tích hợp VNPay.
 - ~~Xây dựng tính năng "Tìm đối / Ghép đội" (Matchmaking).~~ ✅ Đã triển khai hệ thống Match/Kèo đấu.
+- ~~Xây dựng tính năng Đội nhóm và Đề xuất AI.~~ ✅ Đã triển khai hệ thống Đội nhóm & Gợi ý trận đấu/đội nhóm cá nhân hóa.
 - ~~Tích hợp bản đồ tìm sân (Google Maps API).~~ ✅ Đã hoàn thành.
 - ~~Xây dựng bảng tin khám phá (Social Feed).~~ ✅ Đã hoàn thành.
 - Cải thiện hệ thống Đánh giá (Review & Rating) cho các cơ sở.

@@ -47,6 +47,11 @@ erDiagram
     %% --- System Logging ---
     User ||--o{ ActivityLog : "performs"
 
+    %% --- Teams & Memberships ---
+    User ||--o{ Team : "creates (Captain)"
+    User ||--o{ TeamMember : "joins"
+    Team ||--o{ TeamMember : "has"
+
     %% --- Field Specifications ---
     User {
         Guid Id PK
@@ -63,6 +68,36 @@ erDiagram
         bool Status
         string RefreshToken
         datetime RefreshTokenExpiry
+        double Height
+        double Weight
+        string SpecialNotes
+        string FavPosition
+        string SportsLevel
+        string Goals
+        string Frequency
+        string PreferredSports "JSON"
+        string PreferredLocations "JSON"
+    }
+
+    Team {
+        Guid Id PK
+        string Name
+        string Description
+        string SportType
+        string AvatarUrl
+        Guid CreatorId FK
+        datetime CreatedAt
+        string SkillLevel
+        string Location
+        string Status
+    }
+
+    TeamMember {
+        Guid TeamId PK, FK
+        Guid UserId PK, FK
+        string Role
+        string Status
+        datetime JoinedAt
     }
 
     Role {
@@ -237,6 +272,12 @@ Lưu trữ thông tin tài khoản người dùng của toàn hệ thống (bao 
 * `Status` (bool): Trạng thái hoạt động (`true`: Hoạt động, `false`: Bị khóa).
 * `RefreshToken` (string): Mã để lấy lại Access Token mới.
 * `RefreshTokenExpiry` (DateTime): Thời gian hết hạn của Refresh Token.
+* `Height` / `Weight` (double, Nullable): Chiều cao (cm) và Cân nặng (kg).
+* `SpecialNotes` (string, Nullable): Ghi chú sức khỏe hoặc lưu ý đặc biệt.
+* `FavPosition` (string, Nullable): Vị trí chơi yêu thích (ví dụ: Tiền đạo, Hậu vệ, Người đứng lưới...).
+* `SportsLevel` (string, Nullable): Trình độ tự đánh giá (`BEGINNER`, `INTERMEDIATE`, `ADVANCED`).
+* `Goals` / `Frequency` (string, Nullable): Mục tiêu tập luyện và Tần suất chơi thể thao.
+* `PreferredSports` / `PreferredLocations` (string, Nullable): Danh sách môn thể thao và khu vực quận huyện ưa thích (định dạng JSON).
 
 #### Bảng `Role` & `UserRole`
 Phân chia vai trò trong hệ thống (như Admin, Owner, Customer, Staff).
@@ -318,3 +359,28 @@ Hệ thống thông báo đẩy (Realtime thông qua SignalR và lưu trữ offl
 #### Bảng `ActivityLog` (Nhật ký hệ thống)
 * Lưu trữ lại các lịch sử tác động dữ liệu nhạy cảm (Tạo/Hủy đặt sân, Thay đổi trạng thái, Phê duyệt cụm sân).
 * Hỗ trợ lưu trữ trạng thái trước và sau khi thay đổi thông qua định dạng JSON (`OldValue`, `NewValue`).
+
+---
+
+### 2.5 Nhóm Đội Nhóm & Cá Nhân Hóa (Teams & User Personalization)
+
+#### Bảng `Team` (Thông tin Đội nhóm)
+Quản lý các nhóm/câu lạc bộ thể thao do người dùng tự lập ra.
+* `Id` (Guid, PK): Định danh duy nhất của đội nhóm.
+* `Name` (string): Tên đội nhóm.
+* `Description` (string, Nullable): Mô tả chi tiết về đội.
+* `SportType` (string, Nullable): Môn thể thao chính của đội nhóm.
+* `AvatarUrl` (string, Nullable): Ảnh đại diện của đội.
+* `CreatorId` (Guid, FK -> `User`): Người sáng lập / Đội trưởng ban đầu.
+* `CreatedAt` (DateTime): Ngày giờ thành lập đội nhóm.
+* `SkillLevel` (string, Nullable): Trình độ chuyên môn (`BEGINNER`, `INTERMEDIATE`, `ADVANCED`).
+* `Location` (string, Nullable): Khu vực hoạt động chính.
+* `Status` (string): Trạng thái hoạt động (`ACTIVE`, `INACTIVE`).
+
+#### Bảng `TeamMember` (Thành viên Đội nhóm)
+Bảng trung gian quản lý danh sách thành viên thuộc các đội nhóm.
+* `TeamId` (Guid, PK, FK -> `Team`): Đội nhóm liên kết.
+* `UserId` (Guid, PK, FK -> `User`): Thành viên liên kết.
+* `Role` (string): Vai trò của thành viên trong đội (`CAPTAIN`, `MEMBER`).
+* `Status` (string): Trạng thái thành viên (`PENDING`, `APPROVED`, `REJECTED`).
+* `JoinedAt` (DateTime): Thời gian gia nhập đội nhóm.

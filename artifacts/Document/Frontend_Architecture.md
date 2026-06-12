@@ -36,7 +36,8 @@ src/
 │   │   └── NotFoundPage.tsx    # Trang 404 tùy chỉnh trên di động (xanh lá cây, Montserrat, nút Trang chủ)
 │   ├── home/                   # Giao diện chính (Trang chủ, Chi tiết sân, Kèo đấu, Bản đồ Google Maps)
 │   ├── owner/                  # Giao diện Chủ sân (Đăng ký chủ sân, Doanh thu, Cấu hình sân)
-│   └── profile/                # Giao diện cá nhân (Hồ sơ, Lịch sử đặt sân, Đổi mật khẩu)
+│   ├── profile/                # Giao diện cá nhân (Hồ sơ, Lịch sử đặt sân, Đổi mật khẩu)
+│   └── teams/                  # Giao diện Đội nhóm (TeamListPage, TeamDetailPage)
 │
 └── services/                   # Lớp gọi API thô qua Axios
 ```
