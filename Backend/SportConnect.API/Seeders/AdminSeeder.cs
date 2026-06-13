@@ -95,12 +95,12 @@ public static class AdminSeeder
                 }
 
                 await context.SaveChangesAsync();
-                logger.LogInformation("✅ Đã tự động cập nhật hoặc chuyển đổi avatar sang đường dẫn tĩnh mới cho {Count} tài khoản", usersWithoutAvatar.Count);
+                logger.LogInformation("Đã tự động cập nhật hoặc chuyển đổi avatar sang đường dẫn tĩnh mới cho {Count} tài khoản", usersWithoutAvatar.Count);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "❌ AdminSeeder thất bại: {Message}", ex.Message);
+            logger.LogError(ex, "AdminSeeder thất bại: {Message}", ex.Message);
         }
     }
 }

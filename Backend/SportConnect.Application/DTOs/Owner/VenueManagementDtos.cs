@@ -14,6 +14,7 @@ public class VenueDto
     public string Status { get; set; } = string.Empty;
     public int VenueScale { get; set; }
     public string? ContactPhone { get; set; }
+    public string? ContactPhone2 { get; set; }
     public string? BankQrUrl { get; set; }
     public List<string> SportTypes { get; set; } = new();
     public List<VenueImageDto> Images { get; set; } = new();
@@ -32,6 +33,7 @@ public class UpdateVenueDto
     public string Address { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? ContactPhone { get; set; }
+    public string? ContactPhone2 { get; set; }
     public string? BankQrUrl { get; set; }
     public string OperatingStartHour { get; set; } = "06:00";
     public string OperatingEndHour { get; set; } = "22:00";

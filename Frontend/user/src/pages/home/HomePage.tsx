@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { jwtDecode } from 'jwt-decode';
+import VenueDetailSheet from './VenueDetailSheet';
 
 export default function HomePage() {
   const [activeSport, setActiveSport] = useState('Pickleball');
@@ -16,6 +17,10 @@ export default function HomePage() {
   const [showNotiPopover, setShowNotiPopover] = useState(false);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Bottom Sheet State
+  const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     // 1. Format Ngày (VD: Thứ năm, 14/05/2026)
@@ -197,7 +202,15 @@ export default function HomePage() {
             ) : venues.length === 0 ? (
               <p>Không tìm thấy sân nào.</p>
             ) : venues.map((venue: any) => (
-              <div key={venue.id} className="venue-card">
+              <div 
+                key={venue.id} 
+                className="venue-card" 
+                onClick={() => {
+                  setSelectedVenueId(venue.id);
+                  setIsSheetOpen(true);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 <div 
                   className="venue-cover" 
                   style={{ 
@@ -232,7 +245,15 @@ export default function HomePage() {
                         color={favorites.includes(venue.id) ? '#ef4444' : 'currentColor'}
                       />
                     </button>
-                    <button className="action-btn"><Share2 size={16} /></button>
+                    <button 
+                      className="action-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Share logic if any, otherwise just stop propagation
+                      }}
+                    >
+                      <Share2 size={16} />
+                    </button>
                   </div>
                 </div>
                 
@@ -253,7 +274,16 @@ export default function HomePage() {
                       <Clock size={12} /> {venue.operatingStartHour} - {venue.operatingEndHour}
                     </div>
                   </div>
-                  <button className="btn-book" onClick={() => navigate(`/venue/${venue.id}`)}>ĐẶT LỊCH</button>
+                  <button 
+                    className="btn-book" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedVenueId(venue.id);
+                      setIsSheetOpen(true);
+                    }}
+                  >
+                    ĐẶT LỊCH
+                  </button>
                 </div>
               </div>
             ))}
@@ -261,6 +291,13 @@ export default function HomePage() {
 
         </div>
       </div>
+
+      {/* Venue Detail Bottom Sheet */}
+      <VenueDetailSheet
+        venueId={selectedVenueId}
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+      />
 
       {/* Toast Notification */}
       {toastMessage && (

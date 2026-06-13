@@ -501,12 +501,13 @@ input[type="password"]::-ms-clear {
 
 .bottom-nav {
   position: fixed;
-  bottom: 0;
+  bottom: -5px;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  height: 75px;
+  height: calc(80px + env(safe-area-inset-bottom));
+  padding-bottom: calc(5px + env(safe-area-inset-bottom));
   background-color: white;
   border-radius: 24px 24px 0 0;
   border-top: 1.35px solid #7bd880;
@@ -724,6 +725,8 @@ input[type="password"]::-ms-clear {
   .bottom-nav {
     position: absolute;
     bottom: 0;
+    height: 75px;
+    padding-bottom: 0;
   }
 }
 
@@ -4071,6 +4074,710 @@ input[type="password"]::-ms-clear {
 
 .owner-venue-fab:active {
   transform: translateY(0);
+}
+
+/* Bottom Sheet / Venue Detail Sheet Styles */
+.bottom-sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.bottom-sheet-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+  max-width: 480px;
+  height: 91vh;
+  background-color: #ffffff;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  will-change: transform;
+}
+
+/* Transitions: disable transition when dragging for instant tracking, enable when snapping */
+.bottom-sheet.transitioning {
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bottom-sheet.state-closed {
+  transform: translate(-50%, 100%);
+}
+
+.bottom-sheet.state-half {
+  transform: translate(-50%, 44.44%); /* Leaves 50% of viewport visible (90% total height - 40% translation = 50% visible) */
+}
+
+.bottom-sheet.state-full {
+  transform: translate(-50%, 0%); /* Leaves 90% of viewport visible (90% total height - 0% translation = 90% visible) */
+}
+
+/* Drag Handle Bar */
+.bottom-sheet-drag-handle-container {
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1010;
+  cursor: grab;
+}
+
+.bottom-sheet-drag-handle-container:active {
+  cursor: grabbing;
+}
+
+.bottom-sheet-drag-handle {
+  width: 40px;
+  height: 5px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Header/Cover Section */
+.bottom-sheet-header {
+  height: 200px;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.bottom-sheet-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.1) 100%);
+}
+
+.bottom-sheet-header-actions {
+  position: absolute;
+  top: 20px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1005;
+}
+
+.bottom-sheet-close-btn, .bottom-sheet-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: background-color 0.2s;
+}
+
+.bottom-sheet-close-btn:hover, .bottom-sheet-action-btn:hover {
+  background: #ffffff;
+}
+
+.bottom-sheet-header-right-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bottom-sheet-book-header-btn {
+  background: #f1b23e; /* Golden-yellow */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+
+.bottom-sheet-book-header-btn:hover {
+  background: #e2a03f;
+  transform: scale(1.03);
+}
+
+/* Body / Scrollable Content */
+.bottom-sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  padding: 16px 16px 32px 16px;
+  scrollbar-width: thin;
+}
+
+/* Fixed Header (Cover + Card) */
+.bottom-sheet-fixed-header {
+  padding: 0 16px;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.bottom-sheet-cover-bg {
+  height: 190px;
+  background-size: cover;
+  background-position: center;
+  width: calc(100% + 32px);
+  margin-left: -16px;
+  margin-top: 0px;
+  border-radius: 0px;
+}
+
+/* Floating Card Info */
+.venue-sheet-card {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  border-radius: 24px;
+  padding: 20px 16px 16px 16px;
+  box-shadow: 0 12px 30px rgba(6, 78, 59, 0.08);
+  margin-top: -95px; /* Overlaps cover image like in UserProfile */
+  position: relative;
+  z-index: 1006;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.venue-sheet-avatar-center {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 3.5px solid #10b981; /* Theme green border */
+  background: white;
+  padding: 2.5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  margin: 8px auto 12px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.venue-sheet-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.venue-sheet-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #10b981;
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.venue-sheet-title-info-center {
+  text-align: center;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.venue-sheet-title-center {
+  font-size: 19px;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.venue-sheet-badge-center {
+  background: #e6f7f0;
+  border: 1px solid #10b981;
+  color: #10b981;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.venue-sheet-details-list {
+  width: 100%;
+}
+
+.venue-sheet-rating-pill {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #10b981;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.venue-sheet-logo-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.venue-sheet-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #f1b23e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+}
+
+.venue-sheet-title-info {
+  flex: 1;
+}
+
+.venue-sheet-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.venue-sheet-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.venue-sheet-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 13px;
+  color: #475569;
+}
+
+.venue-sheet-detail-row:last-child {
+  border-bottom: none;
+}
+
+.venue-sheet-detail-icon {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.venue-sheet-detail-text {
+  line-height: 1.4;
+}
+
+.venue-sheet-contact-btn {
+  background: transparent;
+  border: none;
+  color: #10b981;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+/* Tabs inside sheet */
+.sheet-tabs-container {
+  margin-top: 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  border: 1px solid #f1f5f9;
+}
+
+.sheet-tab-header-list {
+  display: flex;
+  border-bottom: 1px solid #f1f5f9;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sheet-tab-header-list::-webkit-scrollbar {
+  display: none;
+}
+
+.sheet-tab-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 12px 8px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.sheet-tab-btn.active {
+  color: #10b981;
+}
+
+.sheet-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background-color: #10b981;
+  border-radius: 2px;
+}
+
+.sheet-tab-pane {
+  padding: 16px;
+  min-height: 120px;
+}
+
+.sheet-tab-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* Image gallery grid */
+.sheet-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.sheet-gallery-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Review Item in sheet */
+.sheet-review-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sheet-review-item:last-child {
+  border-bottom: none;
+}
+
+.sheet-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.sheet-review-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sheet-review-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sheet-review-username {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.sheet-review-rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #fef3c7;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 750;
+  color: #b45309;
+}
+
+.sheet-review-comment {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Booking grid inside sheet */
+.sheet-booking-container {
+  margin-top: 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  border: 1px solid #f1f5f9;
+}
+
+.sheet-booking-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+}
+
+.sheet-booking-date-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 12px;
+  outline: none;
+}
+
+.sheet-booking-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.sheet-booking-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sheet-booking-table th {
+  padding: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  background-color: #f8fafc;
+}
+
+.sheet-booking-table td {
+  padding: 4px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sheet-slot-cell {
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Checkout Bar inside sheet */
+.sheet-checkout-bar {
+  margin-top: 16px;
+  background: #fff;
+  border: 1px solid #10b981;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+.sheet-checkout-total {
+  font-size: 16px;
+  font-weight: 750;
+  color: #0f172a;
+}
+
+.sheet-checkout-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Floating header buttons overlay */
+.bottom-sheet-floating-header {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 1010;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.bottom-sheet-floating-header button,
+.bottom-sheet-floating-header a {
+  pointer-events: auto;
+}
+
+/* Horizontal card header layout (Avatar & Title side-by-side) */
+.venue-sheet-header-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  height: 70px;
+}
+
+.venue-sheet-avatar-left {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #10b981;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.venue-sheet-avatar-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.venue-sheet-avatar-left .venue-sheet-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e2e8f0;
+  color: #475569;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.venue-sheet-title-info-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.venue-sheet-title-left {
+  font-size: 17px;
+  font-weight: 700;
+  color: #064e3b;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+}
+
+.venue-sheet-badge-left {
+  align-self: flex-start;
+  background: rgba(16, 185, 129, 0.5);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.venue-sheet-divider {
+  height: 0.5px;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: none;
+  margin: 5px 0;
+  display: block;
+  width: 100%;
+}
+
+.venue-sheet-contacts-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.venue-sheet-contact-link {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+  display: inline-block;
+}
+
+.venue-sheet-contact-link:hover {
+  color: #059669;
+  text-decoration: underline;
+}
+
+.venue-sheet-contact-placeholder {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
 }
 
 

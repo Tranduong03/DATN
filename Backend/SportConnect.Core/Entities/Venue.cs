@@ -8,6 +8,7 @@ public class Venue
     public string Address { get; set; } = string.Empty;
     public string? BankQrUrl { get; set; }
     public string? ContactPhone { get; set; }
+    public string? ContactPhone2 { get; set; }
     public string? Description { get; set; }
     public TimeSpan OperatingStartHour { get; set; }
     public TimeSpan OperatingEndHour { get; set; }

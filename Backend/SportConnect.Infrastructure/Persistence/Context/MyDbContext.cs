@@ -254,6 +254,10 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasColumnName("contact_phone")
                 .HasMaxLength(50);
 
+            entity.Property(e => e.ContactPhone2)
+                .HasColumnName("contact_phone2")
+                .HasMaxLength(50);
+
             entity.Property(e => e.Description)
                 .HasColumnName("description")
                 .HasColumnType("nvarchar(max)");

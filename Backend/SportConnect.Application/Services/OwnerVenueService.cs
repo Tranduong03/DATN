@@ -43,6 +43,7 @@ public class OwnerVenueService : IOwnerVenueService
             Status = v.Status,
             VenueScale = v.VenueScale,
             ContactPhone = v.ContactPhone,
+            ContactPhone2 = v.ContactPhone2,
             BankQrUrl = v.BankQrUrl,
             SportTypes = v.SportTypes,
             Images = imagesByVenue.GetValueOrDefault(v.Id, new List<VenueImage>())
@@ -74,6 +75,7 @@ public class OwnerVenueService : IOwnerVenueService
             Status = v.Status,
             VenueScale = v.VenueScale,
             ContactPhone = v.ContactPhone,
+            ContactPhone2 = v.ContactPhone2,
             BankQrUrl = v.BankQrUrl,
             SportTypes = v.SportTypes,
             Images = images.Select(img => new VenueImageDto
@@ -95,6 +97,7 @@ public class OwnerVenueService : IOwnerVenueService
         venue.Address = dto.Address;
         venue.Description = dto.Description;
         venue.ContactPhone = dto.ContactPhone;
+        venue.ContactPhone2 = dto.ContactPhone2;
         venue.BankQrUrl = dto.BankQrUrl;
         venue.OperatingStartHour = TimeSpan.Parse(dto.OperatingStartHour);
         venue.OperatingEndHour = TimeSpan.Parse(dto.OperatingEndHour);

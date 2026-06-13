@@ -102,6 +102,7 @@ public class PublicVenueService : IPublicVenueService
             SportTypes = venue.SportTypes,
             BankQrUrl = venue.BankQrUrl,
             ContactPhone = venue.ContactPhone,
+            ContactPhone2 = venue.ContactPhone2,
             GalleryImages = gallery,
             Courts = courts.Select(c => new PublicCourtDto
             {

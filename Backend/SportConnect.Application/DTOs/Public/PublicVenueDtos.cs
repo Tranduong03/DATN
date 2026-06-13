@@ -25,6 +25,7 @@ public class PublicVenueDetailDto : PublicVenueDto
 {
     public string? BankQrUrl { get; set; }
     public string? ContactPhone { get; set; }
+    public string? ContactPhone2 { get; set; }
     public List<string> GalleryImages { get; set; } = new();
     public List<PublicCourtDto> Courts { get; set; } = new();
     public List<PublicPriceRuleDto> PriceRules { get; set; } = new();
