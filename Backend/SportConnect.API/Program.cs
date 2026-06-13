@@ -11,6 +11,36 @@ using Microsoft.OpenApi.Models;
 using SportConnect.API.Middleware;
 using SportConnect.API.Services;
 using SportConnect.API.Hubs;
+using System.IO;
+
+// Load env configuration from .env file
+var currentDirectory = Directory.GetCurrentDirectory();
+var envFilePath = Path.Combine(currentDirectory, ".env");
+if (!File.Exists(envFilePath))
+{
+    var parentDirectory = Directory.GetParent(currentDirectory)?.FullName;
+    if (parentDirectory != null)
+    {
+        envFilePath = Path.Combine(parentDirectory, ".env");
+    }
+}
+
+if (File.Exists(envFilePath))
+{
+    foreach (var line in File.ReadAllLines(envFilePath))
+    {
+        if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+            continue;
+
+        var parts = line.Split('=', 2);
+        if (parts.Length == 2)
+        {
+            var key = parts[0].Trim();
+            var val = parts[1].Trim().Trim('"').Trim('\'');
+            Environment.SetEnvironmentVariable(key, val);
+        }
+    }
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
