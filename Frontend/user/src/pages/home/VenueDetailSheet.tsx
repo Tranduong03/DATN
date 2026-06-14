@@ -3,22 +3,27 @@ import { createPortal } from 'react-dom';
 import { Share2, Heart, MapPin, Clock, Star, Phone, ArrowLeft, Copy } from 'lucide-react';
 import { usePublicVenueDetail } from '../../hooks/queries/usePublicQueries';
 import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
-import { useNavigate } from 'react-router-dom';
 
 interface VenueDetailSheetProps {
   venueId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  favorites?: string[];
+  onToggleFavorite?: (venueId: string) => void;
 }
 
-export default function VenueDetailSheet({ venueId, isOpen, onClose }: VenueDetailSheetProps) {
-  const navigate = useNavigate();
+export default function VenueDetailSheet({ 
+  venueId, 
+  isOpen, 
+  onClose,
+  favorites = [],
+  onToggleFavorite
+}: VenueDetailSheetProps) {
   const [sheetState, setSheetState] = useState<'closed' | 'half' | 'full'>('closed');
   
   // Touch Gestures State
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
-  const [currentY, setCurrentY] = useState(0);
   const [translateY, setTranslateY] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(true);
 
@@ -85,11 +90,6 @@ export default function VenueDetailSheet({ venueId, isOpen, onClose }: VenueDeta
     setIsDragging(true);
     setIsTransitioning(false);
 
-    if (sheetRef.current) {
-      const currentHeight = sheetRef.current.offsetHeight;
-      const initialTranslateY = getSnapPx(sheetState, currentHeight);
-      setCurrentY(initialTranslateY);
-    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -213,8 +213,20 @@ export default function VenueDetailSheet({ venueId, isOpen, onClose }: VenueDeta
                 <button className="bottom-sheet-action-btn" style={{ marginRight: 4 }}>
                   <Share2 size={18} />
                 </button>
-                <button className="bottom-sheet-action-btn" style={{ marginRight: 8 }}>
-                  <Heart size={18} />
+                <button 
+                  className="bottom-sheet-action-btn" 
+                  style={{ 
+                    marginRight: 8,
+                    color: favorites.includes(venue.id) ? '#ef4444' : undefined,
+                    backgroundColor: favorites.includes(venue.id) ? '#fee2e2' : undefined
+                  }}
+                  onClick={() => onToggleFavorite && onToggleFavorite(venue.id)}
+                >
+                  <Heart 
+                    size={18} 
+                    fill={favorites.includes(venue.id) ? '#ef4444' : 'none'} 
+                    color={favorites.includes(venue.id) ? '#ef4444' : 'currentColor'}
+                  />
                 </button>
                 <button 
                   className="bottom-sheet-book-header-btn"

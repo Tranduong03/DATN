@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 import { useLogin } from '../../hooks/mutations/useAuthMutations';
 import vnFlag from '../../assets/images/vn-flag.svg';
+import { isValidEmail, isValidPhone, isValidPassword } from '../../utils/validation';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
@@ -22,11 +23,37 @@ export default function LoginForm() {
     e.preventDefault();
     setErrorMessage('');
     
-    const usernameOrEmail = activeTab === 'email' ? email : phone;
-    if (!usernameOrEmail || !password) {
-      setErrorMessage('Vui lòng nhập đầy đủ thông tin');
+    if (activeTab === 'email') {
+      if (!email.trim()) {
+        setErrorMessage('Vui lòng nhập email');
+        return;
+      }
+      if (!isValidEmail(email)) {
+        setErrorMessage('Email không đúng định dạng');
+        return;
+      }
+    } else {
+      if (!phone.trim()) {
+        setErrorMessage('Vui lòng nhập số điện thoại');
+        return;
+      }
+      if (!isValidPhone(phone)) {
+        setErrorMessage('Số điện thoại không đúng định dạng');
+        return;
+      }
+    }
+
+    if (!password) {
+      setErrorMessage('Vui lòng nhập mật khẩu');
       return;
     }
+
+    if (!isValidPassword(password)) {
+      setErrorMessage('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    const usernameOrEmail = activeTab === 'email' ? email : phone;
 
     try {
       const data: any = await loginMutation.mutateAsync({

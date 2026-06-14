@@ -18,6 +18,12 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Auth & Favorites States
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+
   // Bottom Sheet State
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -39,10 +45,23 @@ export default function HomePage() {
         if (decoded.exp * 1000 > Date.now()) {
           setUserName(decoded.FullName || decoded.unique_name || 'Khách hàng');
           setUserAvatar(decoded.AvatarUrl || '/icon/avata_boy_1.avif');
+          setIsLoggedIn(true);
+          const uId = decoded.id || decoded.sub || 'default';
+          setUserId(uId);
+
+          // Load user-specific favorites
+          const savedFavorites = localStorage.getItem(`favorites_${uId}`);
+          if (savedFavorites) {
+            setFavorites(JSON.parse(savedFavorites));
+          }
+        } else {
+          setIsLoggedIn(false);
         }
       } catch (err) {
-        // Bỏ qua nếu lỗi decode
+        setIsLoggedIn(false);
       }
+    } else {
+      setIsLoggedIn(false);
     }
   }, []);
 
@@ -56,16 +75,38 @@ export default function HomePage() {
   }, [toastMessage]);
 
   const toggleFavorite = (venueId: any) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    let newFavorites;
     if (favorites.includes(venueId)) {
-      setFavorites(favorites.filter(id => id !== venueId));
+      newFavorites = favorites.filter(id => id !== venueId);
       setToastMessage('Đã xóa khỏi danh sách yêu thích');
     } else {
-      setFavorites([...favorites, venueId]);
+      newFavorites = [...favorites, venueId];
       setToastMessage('Đã thêm vào danh sách yêu thích');
+    }
+    setFavorites(newFavorites);
+    if (userId) {
+      localStorage.setItem(`favorites_${userId}`, JSON.stringify(newFavorites));
     }
   };
 
   const { data: venues = [], isLoading } = usePublicVenues(searchTerm);
+
+  const displayVenues = venues.filter((venue: any) => {
+    const matchesSport = activeSport
+      ? venue.sportTypes?.some((s: string) => s.toLowerCase().includes(activeSport.toLowerCase()))
+      : true;
+      
+    const matchesFavorite = showOnlyFavorites
+      ? favorites.includes(venue.id)
+      : true;
+      
+    return matchesSport && matchesFavorite;
+  });
 
   const quickFilters = ['Cầu lông gần tôi', 'Pickleball gần tôi', 'Xé vé gần tôi', 'Bóng đá gần tôi'];
   
@@ -164,8 +205,31 @@ export default function HomePage() {
                 <Search size={20} color="#666" />
               </button>
             </div>
-            <button className="favorite-btn">
-              <Heart size={20} color="#666" />
+            <button 
+              className={`favorite-btn ${showOnlyFavorites ? 'active' : ''}`}
+              onClick={() => {
+                if (!isLoggedIn) {
+                  navigate('/login');
+                  return;
+                }
+                
+                if (favorites.length === 0) {
+                  setToastMessage('Chưa có sân yêu thích');
+                  setShowOnlyFavorites(false);
+                } else {
+                  setShowOnlyFavorites(!showOnlyFavorites);
+                }
+              }}
+              style={{
+                color: showOnlyFavorites ? '#ef4444' : undefined,
+                backgroundColor: showOnlyFavorites ? '#fee2e2' : undefined
+              }}
+            >
+              <Heart 
+                size={20} 
+                fill={showOnlyFavorites ? '#ef4444' : 'none'} 
+                color={showOnlyFavorites ? '#ef4444' : '#666'} 
+              />
             </button>
           </div>
         </div>
@@ -199,9 +263,9 @@ export default function HomePage() {
           <div className="venue-list">
             {isLoading ? (
               <p>Đang tải danh sách sân...</p>
-            ) : venues.length === 0 ? (
-              <p>Không tìm thấy sân nào.</p>
-            ) : venues.map((venue: any) => (
+            ) : displayVenues.length === 0 ? (
+              <p>{showOnlyFavorites ? 'Chưa có sân yêu thích nào cho bộ lọc này.' : 'Không tìm thấy sân nào.'}</p>
+            ) : displayVenues.map((venue: any) => (
               <div 
                 key={venue.id} 
                 className="venue-card" 
@@ -297,7 +361,80 @@ export default function HomePage() {
         venueId={selectedVenueId}
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
+        favorites={favorites}
+        onToggleFavorite={toggleFavorite}
       />
+
+      {/* Login Popup Modal */}
+      {showLoginModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 11000,
+          padding: '24px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '340px',
+            textAlign: 'center',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#064e3b', marginBottom: '12px', marginTop: 0 }}>
+              Yêu cầu đăng nhập
+            </h3>
+            <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '20px', lineHeight: '1.5' }}>
+              Bạn cần đăng nhập tài khoản để thực hiện lưu sân vào danh sách yêu thích.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setShowLoginModal(false)}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '12px',
+                  border: '1.5px solid #e2e8f0',
+                  background: 'transparent',
+                  color: '#475569',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Hủy bỏ
+              </button>
+              <button 
+                onClick={() => {
+                  setShowLoginModal(false);
+                  navigate('/login');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: '#10b981',
+                  color: '#ffffff',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Đăng nhập
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast Notification */}
       {toastMessage && (

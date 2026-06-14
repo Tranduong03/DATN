@@ -4,6 +4,7 @@ import { ChevronLeft, X, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
 import { useForgotPassword } from '../../hooks/mutations/useAuthMutations';
+import { isValidEmail, isValidPhone } from '../../utils/validation';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -21,13 +22,25 @@ export default function ForgotPasswordPage() {
     setMessage('');
     setError('');
 
-    if (method === 'email' && !email) {
-      setError('Vui lòng nhập email của bạn');
-      return;
+    if (method === 'email') {
+      if (!email.trim()) {
+        setError('Vui lòng nhập email của bạn');
+        return;
+      }
+      if (!isValidEmail(email)) {
+        setError('Email không đúng định dạng');
+        return;
+      }
     }
-    if (method === 'phone' && !phone) {
-      setError('Vui lòng nhập số điện thoại của bạn');
-      return;
+    if (method === 'phone') {
+      if (!phone.trim()) {
+        setError('Vui lòng nhập số điện thoại của bạn');
+        return;
+      }
+      if (!isValidPhone(phone)) {
+        setError('Số điện thoại không đúng định dạng');
+        return;
+      }
     }
 
     try {

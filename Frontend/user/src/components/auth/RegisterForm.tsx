@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 import { useRegister } from '../../hooks/mutations/useAuthMutations';
 import vnFlag from '../../assets/images/vn-flag.svg';
+import { isValidEmail, isValidPhone, isValidPassword, isValidFullName } from '../../utils/validation';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
@@ -24,13 +25,38 @@ export default function RegisterForm() {
     e.preventDefault();
     setErrorMessage('');
 
-    if ((!email && !phone) || !password || !fullName) {
-      setErrorMessage('Vui lòng nhập Email hoặc Số điện thoại, và các thông tin bắt buộc khác');
+    if (!email.trim() && !phone.trim()) {
+      setErrorMessage('Vui lòng nhập Email hoặc Số điện thoại');
+      return;
+    }
+
+    if (email.trim() && !isValidEmail(email)) {
+      setErrorMessage('Email không đúng định dạng');
+      return;
+    }
+
+    if (phone.trim() && !isValidPhone(phone)) {
+      setErrorMessage('Số điện thoại không đúng định dạng');
+      return;
+    }
+
+    if (!isValidFullName(fullName)) {
+      setErrorMessage('Họ và tên phải từ 2 ký tự trở lên');
+      return;
+    }
+
+    if (!password) {
+      setErrorMessage('Vui lòng nhập mật khẩu');
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      setErrorMessage('Mật khẩu phải có ít nhất 6 ký tự');
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage('Mật khẩu không khớp');
+      setErrorMessage('Mật khẩu nhập lại không khớp');
       return;
     }
 

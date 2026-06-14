@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import axiosClient from '../../api/axiosClient';
+import { isValidPhone, isValidFullName } from '../../utils/validation';
 
 interface JwtPayload {
   sub: string;
@@ -130,6 +131,7 @@ export default function ProfilePage() {
   const [isEditingPhysical, setIsEditingPhysical] = useState(false);
   const [isEditingPersonalization, setIsEditingPersonalization] = useState(false);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -226,10 +228,22 @@ export default function ProfilePage() {
   };
 
   const handleSaveProfile = async () => {
+    setValidationError('');
+
+    if (!isValidFullName(name)) {
+      setValidationError('Họ và tên phải từ 2 ký tự trở lên');
+      return;
+    }
+
+    if (phone && phone !== 'Chưa cập nhật' && !isValidPhone(phone)) {
+      setValidationError('Số điện thoại không đúng định dạng');
+      return;
+    }
+
     setIsEditingProfile(false);
     await updateProfileOnBackend({
       fullName: name,
-      phone: phone
+      phone: phone === 'Chưa cập nhật' ? null : phone
     });
   };
 
@@ -310,7 +324,10 @@ export default function ProfilePage() {
           <div className="profile-card-glass">
             {/* Absolute Edit Profile Button at the Top Right of the Glass Card */}
             <button 
-              onClick={() => setIsEditingProfile(!isEditingProfile)} 
+              onClick={() => {
+                setValidationError('');
+                setIsEditingProfile(!isEditingProfile);
+              }} 
               className={`profile-glass-edit-btn ${isEditingProfile ? 'active' : ''}`}
               aria-label="Chỉnh sửa thông tin cá nhân"
             >
@@ -415,9 +432,16 @@ export default function ProfilePage() {
 
             {/* Quick Action to save Profile details if editing */}
             {isEditingProfile && (
-              <button onClick={handleSaveProfile} className="profile-save-all-btn">
-                Lưu thông tin liên hệ
-              </button>
+              <>
+                {validationError && (
+                  <div style={{ color: '#ef4444', fontSize: '13px', marginBottom: '10px', textAlign: 'center', fontWeight: '500' }}>
+                    {validationError}
+                  </div>
+                )}
+                <button onClick={handleSaveProfile} className="profile-save-all-btn">
+                  Lưu thông tin liên hệ
+                </button>
+              </>
             )}
           </div>
         </div>
