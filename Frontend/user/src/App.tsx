@@ -106,8 +106,8 @@ function AppRoutes() {
     </PageTransition>
   );
 
-  // Only show bottom nav on 5 main routes
-  const showBottomNav = ['/', '/map', '/explore', '/matches', '/me'].includes(location.pathname);
+  // Only show bottom nav on 5 main routes (plus /account as unauthenticated profile root)
+  const showBottomNav = ['/', '/map', '/explore', '/matches', '/me', '/account'].includes(location.pathname);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
