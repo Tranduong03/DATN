@@ -5,13 +5,11 @@ import { getSportEmojiFromCategories, getSportColorFromCategories, FALLBACK_SPOR
 import { 
   Search, 
   SlidersHorizontal, 
-  Star, 
-  ArrowRight,
   Locate,
   Layers,
   Compass
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import VenueDetailSheet from './VenueDetailSheet';
 
 // Type definitions
 interface MapVenue {
@@ -57,7 +55,27 @@ export default function MapPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   // 4. Details bottom sheet
-  const [selectedVenue, setSelectedVenue] = useState<MapVenue | null>(null);
+  const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  const toggleFavorite = (vId: string) => {
+    let newFavorites;
+    if (favorites.includes(vId)) {
+      newFavorites = favorites.filter(id => id !== vId);
+    } else {
+      newFavorites = [...favorites, vId];
+    }
+    setFavorites(newFavorites);
+    localStorage.setItem('map_favorites', JSON.stringify(newFavorites));
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem('map_favorites');
+    if (saved) {
+      setFavorites(JSON.parse(saved));
+    }
+  }, []);
 
   // Fetch venues from backend
   const { data: rawVenues } = usePublicVenues();
@@ -247,7 +265,7 @@ export default function MapPage() {
     }
   }, [userCoords, mapInstance]);
 
-  // Update Markers dynamically when venues change or selectedVenue changes
+  // Update Markers dynamically when venues change or selectedVenueId changes
   useEffect(() => {
     if (!mapInstance) return;
 
@@ -257,7 +275,7 @@ export default function MapPage() {
 
     // Add new markers
     filteredVenues.forEach(venue => {
-      const isSelected = selectedVenue?.id === venue.id;
+      const isSelected = selectedVenueId === venue.id;
       const primarySport = venue.sportTypes[0] || 'Cầu lông';
       const color = getSportColor(primarySport);
       const emoji = getSportEmoji(primarySport);
@@ -280,13 +298,14 @@ export default function MapPage() {
       });
 
       marker.addListener('click', () => {
-        setSelectedVenue(venue);
+        setSelectedVenueId(venue.id);
+        setIsSheetOpen(true);
         mapInstance.panTo({ lat: venue.lat, lng: venue.lng });
       });
 
       markersRef.current.push(marker);
     });
-  }, [filteredVenues, mapInstance, selectedVenue]);
+  }, [filteredVenues, mapInstance, selectedVenueId]);
 
   return (
     <MainLayout noPaddingBottom={true}>
@@ -511,7 +530,7 @@ export default function MapPage() {
         {/* 2. Floating Action Controls Bottom-Right */}
         <div style={{
           position: 'absolute',
-          bottom: selectedVenue ? 210 : 80, // Shift up if venue card details is visible
+          bottom: isSheetOpen ? 210 : 80, // Shift up if venue card details is visible
           right: 16,
           zIndex: 10,
           display: 'flex',
@@ -565,142 +584,14 @@ export default function MapPage() {
           </button>
         </div>
 
-        {/* 3. Bottom Information Sheet Overlay */}
-        {selectedVenue && (
-          <div style={{
-            position: 'absolute',
-            bottom: 64, // Floating above navigation menu bar
-            left: 16,
-            right: 16,
-            backgroundColor: 'white',
-            borderRadius: 16,
-            padding: 16,
-            zIndex: 10,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-            color: '#1e293b',
-            border: '1px solid #e2e8f0',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-            animation: 'slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}>
-            {/* CSS Animation local to this component */}
-            <style>{`
-              @keyframes slideUp {
-                from { transform: translateY(100px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-              }
-            `}</style>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1, paddingRight: 8 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px 0', color: '#0f172a' }}>
-                  {selectedVenue.name}
-                </h3>
-                <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 6px 0', lineHeight: '1.4' }}>
-                  📍 {selectedVenue.address}
-                </p>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {selectedVenue.sportTypes.map(st => (
-                    <span key={st} style={{
-                      backgroundColor: 'rgba(50, 100, 65, 0.08)',
-                      color: '#326441',
-                      border: '1px solid rgba(50, 100, 65, 0.15)',
-                      borderRadius: 4,
-                      padding: '2px 6px',
-                      fontSize: 10,
-                      fontWeight: 600
-                    }}>
-                      {st}
-                    </span>
-                  ))}
-                  <span style={{
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    color: '#d97706',
-                    border: '1px solid rgba(245, 158, 11, 0.2)',
-                    borderRadius: 4,
-                    padding: '2px 6px',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 3
-                  }}>
-                    <Star size={10} fill="#f59e0b" color="#f59e0b" />
-                    {selectedVenue.rating.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Close Bottom Sheet Button */}
-              <button 
-                onClick={() => setSelectedVenue(null)}
-                style={{
-                  backgroundColor: '#f1f5f9',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: 24,
-                  height: 24,
-                  color: '#64748b',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <p style={{ fontSize: 11, color: '#475569', lineHeight: '1.4', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-              {selectedVenue.description}
-            </p>
-
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderTop: '1px solid #f1f5f9',
-              paddingTop: 10,
-              marginTop: 4
-            }}>
-              <div>
-                <span style={{ fontSize: 9, color: '#94a3b8', display: 'block', fontWeight: 600 }}>KHOẢNG CÁCH / BẢNG GIÁ</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#326441' }}>
-                  ⚡ {selectedVenue.distance.toFixed(2)} km
-                </span>
-                <span style={{ fontSize: 12, color: '#cbd5e1', margin: '0 6px' }}>|</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#b45309' }}>
-                  Từ {selectedVenue.minPrice.toLocaleString('vi-VN')}đ / giờ
-                </span>
-              </div>
-              
-              <Link 
-                to={`/venue/${selectedVenue.id}`}
-                style={{
-                  backgroundColor: '#326441',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 8,
-                  padding: '6px 14px',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  boxShadow: '0 4px 10px rgba(50, 100, 65, 0.2)',
-                  cursor: 'pointer'
-                }}
-              >
-                Đặt sân
-                <ArrowRight size={12} />
-              </Link>
-            </div>
-          </div>
-        )}
+        {/* 3. Bottom Information Sheet Overlay (Reused VenueDetailSheet) */}
+        <VenueDetailSheet
+          venueId={selectedVenueId}
+          isOpen={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+        />
       </div>
     </MainLayout>
   );

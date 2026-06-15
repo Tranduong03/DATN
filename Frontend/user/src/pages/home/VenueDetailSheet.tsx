@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { Share2, Heart, MapPin, Clock, Star, Phone, ArrowLeft, Copy, Check } from 'lucide-react';
 import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
 import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/usePublicQueries';
@@ -21,6 +22,7 @@ export default function VenueDetailSheet({
   favorites = [],
   onToggleFavorite
 }: VenueDetailSheetProps) {
+  const navigate = useNavigate();
   const [sheetState, setSheetState] = useState<'closed' | 'half' | 'full'>('closed');
 
   // Touch Gestures State
@@ -268,7 +270,7 @@ export default function VenueDetailSheet({
                 <button
                   className="bottom-sheet-book-header-btn"
                   onClick={() => {
-                    window.open(`https://sport-connect.com/venues/${venue.id || ''}`, '_blank');
+                    navigate(`/UserBooking?venueId=${venue.id}`);
                   }}
                 >
                   Đặt lịch

@@ -344,8 +344,7 @@ export default function HomePage() {
                     className="btn-book" 
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedVenueId(venue.id);
-                      setIsSheetOpen(true);
+                      navigate(`/UserBooking?venueId=${venue.id}`);
                     }}
                   >
                     ĐẶT LỊCH
