@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Plus, MapPin, Award, Check, Search } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import axiosClient from '../../api/axiosClient';
+import { useSportCategories } from '../../hooks/queries/usePublicQueries';
 
 export default function TeamListPage() {
   const navigate = useNavigate();
+  const { data: sportsData = [] } = useSportCategories();
   const [activeTab, setActiveTab] = useState<'all' | 'my'>('all');
   const [teams, setTeams] = useState<any[]>([]);
   const [myTeams, setMyTeams] = useState<any[]>([]);
@@ -234,10 +236,9 @@ export default function TeamListPage() {
                 style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
               >
                 <option value="">Tất cả môn</option>
-                <option value="Cầu lông">Cầu lông</option>
-                <option value="Bóng đá">Bóng đá</option>
-                <option value="Bóng rổ">Bóng rổ</option>
-                <option value="Tennis">Tennis</option>
+                {sportsData.map((cat: any) => (
+                  <option key={cat.id || cat.name} value={cat.name}>{cat.name}</option>
+                ))}
               </select>
             </div>
 
@@ -441,10 +442,9 @@ export default function TeamListPage() {
                       onChange={(e) => setNewTeamSport(e.target.value)}
                       style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                     >
-                      <option value="Cầu lông">Cầu lông</option>
-                      <option value="Bóng đá">Bóng đá</option>
-                      <option value="Bóng rổ">Bóng rổ</option>
-                      <option value="Tennis">Tennis</option>
+                      {sportsData.map((cat: any) => (
+                        <option key={cat.id || cat.name} value={cat.name}>{cat.name}</option>
+                      ))}
                     </select>
                   </div>
                   <div>

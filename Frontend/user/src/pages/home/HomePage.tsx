@@ -6,6 +6,7 @@ import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePubl
 import { jwtDecode } from 'jwt-decode';
 import VenueDetailSheet from './VenueDetailSheet';
 import { ensureValidToken } from '../../utils/auth';
+import { FALLBACK_SPORTS } from '../../utils/sport';
 
 export default function HomePage() {
   const [activeSport, setActiveSport] = useState('');
@@ -115,14 +116,7 @@ export default function HomePage() {
   const { data: sportsData = [] } = useSportCategories();
 
   // Dùng dữ liệu từ API nếu có, không thì dùng dữ liệu mẫu
-  const sports = sportsData.length > 0 ? sportsData : [
-    { name: 'Pickleball', color: '#4A90E2', icon: '🎾' },
-    { name: 'Cầu lông', color: '#50E3C2', icon: '🏸' },
-    { name: 'Bóng đá', color: '#7ED321', icon: '⚽' },
-    { name: 'Tennis', color: '#F5A623', icon: '🥎' },
-    { name: 'B.Chuyền', color: '#F8E71C', icon: '🏐' },
-    { name: 'Bóng rổ', color: '#FF9500', icon: '🏀' },
-  ];
+  const sports = sportsData.length > 0 ? sportsData : FALLBACK_SPORTS;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);

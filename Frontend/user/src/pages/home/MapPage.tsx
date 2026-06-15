@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
-import { getSportEmojiFromCategories, getSportColorFromCategories } from '../../utils/sport';
+import { getSportEmojiFromCategories, getSportColorFromCategories, FALLBACK_SPORTS } from '../../utils/sport';
 import { 
   Search, 
   SlidersHorizontal, 
@@ -63,13 +63,7 @@ export default function MapPage() {
   const { data: rawVenues } = usePublicVenues();
   const { data: sportsData = [] } = useSportCategories();
 
-  const fallbackSports = [
-    { name: 'Pickleball', color: '#3b82f6', icon: '🎾' },
-    { name: 'Cầu lông', color: '#10b981', icon: '🏸' },
-    { name: 'Bóng đá', color: '#15803d', icon: '⚽' },
-    { name: 'Tennis', color: '#d97706', icon: '🎾' },
-  ];
-  const sports = sportsData.length > 0 ? sportsData : fallbackSports;
+  const sports = sportsData.length > 0 ? sportsData : FALLBACK_SPORTS;
 
   // Dynamic Google Maps Script Loader
   useEffect(() => {

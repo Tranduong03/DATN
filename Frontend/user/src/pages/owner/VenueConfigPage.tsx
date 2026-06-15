@@ -548,7 +548,7 @@ export default function VenueConfigPage() {
               <div style={{ gridColumn: 'span 2' }}>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Môn thể thao kinh doanh</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 8 }}>
-                  {['Cầu lông', 'Tennis', 'Pickleball', 'Bóng đá', 'Bóng rổ', 'Khác'].map(sport => {
+                  {['Cầu lông', 'Quần vợt', 'Pickleball', 'Bóng đá', 'Bóng rổ', 'Khác'].map(sport => {
                     const active = profileSports.includes(sport);
                     return (
                       <button

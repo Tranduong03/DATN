@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Trophy, Wifi, TrendingUp, Users, CheckCircle
 import { useOnboardingStatus } from '../../hooks/queries/useOwnerQueries';
 import { useSaveDraft, useSubmitOnboarding } from '../../hooks/mutations/useOwnerMutations';
 import { useSportCategories } from '../../hooks/queries/usePublicQueries';
+import { FALLBACK_SPORTS } from '../../utils/sport';
 
 /* ─── tiny inline style helpers ─── */
 const card: React.CSSProperties = {
@@ -214,15 +215,7 @@ function Step2({ data, onNext }: { data: any; onNext: (d: any) => void }) {
   const [selected, setSelected] = useState<string[]>(data.sportTypes || []);
   const { data: sportsData = [] } = useSportCategories();
 
-  const fallbackSports = [
-    { name: 'Cầu lông', icon: '🏸' },
-    { name: 'Pickleball', icon: '🏓' },
-    { name: 'Bóng đá', icon: '⚽' },
-    { name: 'Tennis', icon: '🎾' },
-    { name: 'Bóng rổ', icon: '🏀' },
-  ];
-
-  const sports = sportsData.length > 0 ? sportsData : fallbackSports;
+  const sports = sportsData.length > 0 ? sportsData : FALLBACK_SPORTS;
   const toggle = (s: string) => setSelected(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
   return (
     <div>

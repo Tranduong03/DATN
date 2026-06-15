@@ -4720,12 +4720,12 @@ input[type="password"]::-ms-clear {
 
 .venue-sheet-badge-left {
   align-self: flex-start;
-  background: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.15);
   color: white;
-  padding: 3px 10px;
+  padding: 3px 5px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 400;
   border: 1px solid rgba(16, 185, 129, 0.2);
   display: inline-flex;
   align-items: center;

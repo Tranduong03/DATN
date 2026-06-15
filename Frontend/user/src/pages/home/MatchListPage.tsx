@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAllMatches } from '../../hooks/queries/useMatchQueries';
+import { useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { useJoinMatch } from '../../hooks/mutations/useMatchMutations';
 import { Users, MapPin, Calendar, CircleDollarSign, ShieldAlert, Award, Sparkles, Brain } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
@@ -64,6 +65,7 @@ export default function MatchListPage() {
   };
   
   const { data: matchesData = [], isLoading } = useAllMatches(statusFilter);
+  const { data: sportsData = [] } = useSportCategories();
   const joinMutation = useJoinMatch();
 
   const filteredMatches = matchesData.filter((match: any) => {
@@ -508,10 +510,9 @@ export default function MatchListPage() {
                     onChange={(e) => setQuickSport(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                   >
-                    <option value="Cầu lông">Cầu lông</option>
-                    <option value="Bóng đá">Bóng đá</option>
-                    <option value="Bóng rổ">Bóng rổ</option>
-                    <option value="Tennis">Tennis</option>
+                    {sportsData.map((cat: any) => (
+                      <option key={cat.id || cat.name} value={cat.name}>{cat.name}</option>
+                    ))}
                   </select>
                 </div>
 

@@ -2,11 +2,28 @@
  * Dynamic helpers to resolve sport attributes (emoji, color) using categories loaded from the database.
  */
 
+export const FALLBACK_SPORTS = [
+  { name: 'Cầu lông', icon: '🏸', color: '#50E3C2' },
+  { name: 'Pickleball', icon: '🏓', color: '#4A90E2' },
+  { name: 'Bóng đá', icon: '⚽', color: '#7ED321' },
+  { name: 'Quần vợt', icon: '🎾', color: '#F5A623' },
+  { name: 'Golf', icon: '⛳', color: '#417505' },
+  { name: 'Bóng chuyền', icon: '🏐', color: '#F8E71C' },
+  { name: 'Bóng rổ', icon: '🏀', color: '#FF9500' },
+  { name: 'Khác', icon: '🏆', color: '#303c4f' },
+];
+
+const normalizeSportName = (name: string): string => {
+  const s = name.toLowerCase().trim();
+  if (s === 'tennis') return 'quần vợt';
+  return s;
+};
+
 export const getSportEmojiFromCategories = (sportName: string, categories: any[]): string => {
   if (!sportName) return '🏆';
-  const s = sportName.toLowerCase().trim();
+  const s = normalizeSportName(sportName);
   const found = categories.find((cat: any) => {
-    const name = cat.name.toLowerCase().trim();
+    const name = normalizeSportName(cat.name);
     return name === s || s.includes(name) || name.includes(s);
   });
   return found?.icon || '🏆';
@@ -14,9 +31,9 @@ export const getSportEmojiFromCategories = (sportName: string, categories: any[]
 
 export const getSportColorFromCategories = (sportName: string, categories: any[]): string => {
   if (!sportName) return '#10b981';
-  const s = sportName.toLowerCase().trim();
+  const s = normalizeSportName(sportName);
   const found = categories.find((cat: any) => {
-    const name = cat.name.toLowerCase().trim();
+    const name = normalizeSportName(cat.name);
     return name === s || s.includes(name) || name.includes(s);
   });
   return found?.color || '#10b981';
