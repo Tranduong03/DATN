@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { ensureValidToken } from '../../utils/auth';
 
 interface JwtPayload {
   sub: string;
@@ -22,30 +23,28 @@ export default function MePage() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/account');
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode<JwtPayload>(token);
-      const hasRefreshToken = !!localStorage.getItem('refreshToken');
-      
-      if (decoded.exp * 1000 < Date.now() && !hasRefreshToken) {
-        throw new Error('Token expired');
+    const verifyAndLoadUser = async () => {
+      const validToken = await ensureValidToken();
+      if (!validToken) {
+        navigate('/account');
+        return;
       }
 
-      let name = decoded.FullName || decoded.unique_name || 'Người dùng';
-      let email = decoded.email || 'Chưa cập nhật email';
-      let avatar = decoded.AvatarUrl || '/icon/avata_boy_1.avif';
+      try {
+        const decoded = jwtDecode<JwtPayload>(validToken);
+        let name = decoded.FullName || decoded.unique_name || 'Người dùng';
+        let email = decoded.email || 'Chưa cập nhật email';
+        let avatar = decoded.AvatarUrl || '/icon/avata_boy_1.avif';
 
-      setUserInfo({ name, email, avatar });
-    } catch (err) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      navigate('/account');
-    }
+        setUserInfo({ name, email, avatar });
+      } catch (err) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        navigate('/account');
+      }
+    };
+
+    verifyAndLoadUser();
   }, [navigate]);
 
   return (

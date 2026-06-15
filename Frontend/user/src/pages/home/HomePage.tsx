@@ -5,6 +5,7 @@ import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { jwtDecode } from 'jwt-decode';
 import VenueDetailSheet from './VenueDetailSheet';
+import { ensureValidToken } from '../../utils/auth';
 
 export default function HomePage() {
   const [activeSport, setActiveSport] = useState('');
@@ -37,12 +38,11 @@ export default function HomePage() {
     setCurrentDate(`${dayName}, ${dateStr}`);
 
     // 2. Decode Token lấy tên User & Avatar
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-        // Kiểm tra token chưa hết hạn
-        if (decoded.exp * 1000 > Date.now()) {
+    const verifyAndLoadUser = async () => {
+      const validToken = await ensureValidToken();
+      if (validToken) {
+        try {
+          const decoded: any = jwtDecode(validToken);
           setUserName(decoded.FullName || decoded.unique_name || 'Khách hàng');
           setUserAvatar(decoded.AvatarUrl || '/icon/avata_boy_1.avif');
           setIsLoggedIn(true);
@@ -54,15 +54,17 @@ export default function HomePage() {
           if (savedFavorites) {
             setFavorites(JSON.parse(savedFavorites));
           }
-        } else {
+        } catch (err) {
           setIsLoggedIn(false);
         }
-      } catch (err) {
+      } else {
         setIsLoggedIn(false);
+        setUserName('Khách');
+        setUserAvatar('');
       }
-    } else {
-      setIsLoggedIn(false);
-    }
+    };
+    
+    verifyAndLoadUser();
   }, []);
 
   useEffect(() => {
