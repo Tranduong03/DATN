@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useChangePassword } from '../../hooks/mutations/useAuthMutations';
 import SubPageHeader from '../../components/common/SubPageHeader';
+import PasswordInput from '../../components/ui/PasswordInput';
+import FormError from '../../components/ui/FormError';
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -11,10 +13,6 @@ export default function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -65,65 +63,32 @@ export default function ChangePasswordPage() {
 
       <div className="settings-content">
         <form className="form-container" onSubmit={handleSubmit} style={{ borderRadius: '12px', marginTop: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-          <div className="form-group">
-            <label>Mật khẩu cũ (Bỏ qua nếu đăng nhập bằng Google)</label>
-            <div className="input-wrapper">
-              <input 
-                type={showOldPassword ? "text" : "password"} 
-                placeholder="Nhập mật khẩu hiện tại" 
-                autoComplete="current-password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-              />
-              <button type="button" className="eye-btn" onClick={() => setShowOldPassword(!showOldPassword)}>
-                {showOldPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-              </button>
-            </div>
-          </div>
+          <PasswordInput
+            label="Mật khẩu cũ (Bỏ qua nếu đăng nhập bằng Google)"
+            placeholder="Nhập mật khẩu hiện tại"
+            autoComplete="current-password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+          />
 
-          <div className="form-group">
-            <label>Mật khẩu mới (*)</label>
-            <div className="input-wrapper">
-              <input 
-                type={showNewPassword ? "text" : "password"} 
-                placeholder="Nhập mật khẩu mới" 
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-              <button type="button" className="eye-btn" onClick={() => setShowNewPassword(!showNewPassword)}>
-                {showNewPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-              </button>
-            </div>
-          </div>
+          <PasswordInput
+            label="Mật khẩu mới (*)"
+            placeholder="Nhập mật khẩu mới"
+            autoComplete="new-password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
 
-          <div className="form-group">
-            <label>Xác nhận mật khẩu mới (*)</label>
-            <div className="input-wrapper">
-              <input 
-                type={showConfirmPassword ? "text" : "password"} 
-                placeholder="Nhập lại mật khẩu mới" 
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <button type="button" className="eye-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-              </button>
-            </div>
-          </div>
+          <PasswordInput
+            label="Xác nhận mật khẩu mới (*)"
+            placeholder="Nhập lại mật khẩu mới"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
 
-          {errorMessage && (
-            <div style={{ color: '#e53935', fontSize: '14px', marginBottom: '16px', textAlign: 'center', fontWeight: '500' }}>
-              {errorMessage}
-            </div>
-          )}
-
-          {successMessage && (
-            <div style={{ color: '#00A859', fontSize: '14px', marginBottom: '16px', textAlign: 'center', fontWeight: '500' }}>
-              {successMessage}
-            </div>
-          )}
+          <FormError message={errorMessage} />
+          <FormError message={successMessage} type="success" />
 
           <button type="submit" className="primary-btn" disabled={isLoading} style={{ opacity: isLoading ? 0.7 : 1, marginTop: '8px' }}>
             {isLoading ? <Loader2 className="animate-spin inline-block mr-2" size={20} /> : 'XÁC NHẬN ĐỔI'}

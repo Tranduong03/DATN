@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { X, EyeOff, Eye, ScanFace, Loader2 } from 'lucide-react';
+import { X, ScanFace, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 import { useLogin } from '../../hooks/mutations/useAuthMutations';
-import vnFlag from '../../assets/images/vn-flag.svg';
 import { isValidEmail, isValidPhone, isValidPassword } from '../../utils/validation';
+import PhoneInput from '../ui/PhoneInput';
+import PasswordInput from '../ui/PasswordInput';
+import FormError from '../ui/FormError';
 
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
@@ -107,51 +108,25 @@ export default function LoginForm() {
             </div>
           </div>
         ) : (
-          <div className="form-group">
-            <label>Số điện thoại của bạn?</label>
-            <div className="phone-input-wrapper">
-              <div className="country-code">
-                <img src={vnFlag} alt="VN" />
-                <span>+ 84</span>
-                <span className="dropdown-arrow">▼</span>
-              </div>
-              <input 
-                type="tel" 
-                placeholder="Nhập số điện thoại" 
-                autoComplete="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              {phone.length > 0 && (
-                <button type="button" className="clear-btn" onClick={() => setPhone('')}>
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-          </div>
+          <PhoneInput
+            label="Số điện thoại của bạn?"
+            placeholder="Nhập số điện thoại"
+            autoComplete="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            onClear={() => setPhone('')}
+          />
         )}
 
-        <div className="form-group">
-          <label>Mật khẩu (*)</label>
-          <div className="input-wrapper">
-            <input 
-              type={showPassword ? "text" : "password"} 
-              placeholder="Nhập mật khẩu (*)" 
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="button" className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-            </button>
-          </div>
-        </div>
+        <PasswordInput
+          label="Mật khẩu (*)"
+          placeholder="Nhập mật khẩu (*)"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-        {errorMessage && (
-          <div style={{ color: 'red', fontSize: '13px', marginBottom: '12px', textAlign: 'center' }}>
-            {errorMessage}
-          </div>
-        )}
+        <FormError message={errorMessage} />
 
         <button type="submit" className="primary-btn" disabled={isLoading} style={{ opacity: isLoading ? 0.7 : 1 }}>
           {isLoading ? <Loader2 className="animate-spin inline-block mr-2" size={20} /> : 'ĐĂNG NHẬP'}

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { X, EyeOff, Eye, Loader2 } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../common/LoadingOverlay';
 import { useRegister } from '../../hooks/mutations/useAuthMutations';
-import vnFlag from '../../assets/images/vn-flag.svg';
 import { isValidEmail, isValidPhone, isValidPassword, isValidFullName } from '../../utils/validation';
+import PhoneInput from '../ui/PhoneInput';
+import PasswordInput from '../ui/PasswordInput';
+import FormError from '../ui/FormError';
 
 export default function RegisterForm() {
   const [phone, setPhone] = useState('');
@@ -13,8 +15,6 @@ export default function RegisterForm() {
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
@@ -81,28 +81,14 @@ export default function RegisterForm() {
     <div className="login-card register-card">
       <LoadingOverlay isLoading={isLoading} text="Đang đăng ký..." />
       <form className="form-container" onSubmit={handleRegister}>
-        <div className="form-group">
-          <label>Số điện thoại của bạn?</label>
-          <div className="phone-input-wrapper">
-            <div className="country-code">
-              <img src={vnFlag} alt="VN" />
-              <span>+ 84</span>
-              <span className="dropdown-arrow">▼</span>
-            </div>
-            <input
-              type="tel"
-              placeholder="Nhập số điện thoại"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            {phone.length > 0 && (
-              <button type="button" className="clear-btn" onClick={() => setPhone('')}>
-                <X size={16} />
-              </button>
-            )}
-          </div>
-        </div>
+        <PhoneInput
+          label="Số điện thoại của bạn?"
+          placeholder="Nhập số điện thoại"
+          autoComplete="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          onClear={() => setPhone('')}
+        />
 
         <div className="form-group">
           <label>Email của bạn?</label>
@@ -140,43 +126,23 @@ export default function RegisterForm() {
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Mật khẩu (*)</label>
-          <div className="input-wrapper">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Nhập mật khẩu (*)"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="button" className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-            </button>
-          </div>
-        </div>
+        <PasswordInput
+          label="Mật khẩu (*)"
+          placeholder="Nhập mật khẩu (*)"
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-        <div className="form-group">
-          <label>Nhập lại mật khẩu (*)</label>
-          <div className="input-wrapper">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Nhập lại mật khẩu"
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            <button type="button" className="eye-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-              {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-            </button>
-          </div>
-        </div>
+        <PasswordInput
+          label="Nhập lại mật khẩu (*)"
+          placeholder="Nhập lại mật khẩu"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
 
-        {errorMessage && (
-          <div style={{ color: 'red', fontSize: '13px', marginBottom: '12px', textAlign: 'center' }}>
-            {errorMessage}
-          </div>
-        )}
+        <FormError message={errorMessage} />
 
         <button type="submit" className="primary-btn" disabled={isLoading} style={{ opacity: isLoading ? 0.7 : 1 }}>
           {isLoading ? <Loader2 className="animate-spin inline-block mr-2" size={20} /> : 'ĐĂNG KÝ'}

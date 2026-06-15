@@ -3,13 +3,16 @@ import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, Camera, Calendar, Edit2, Trophy, 
-  Activity, Plus, ShieldCheck, MapPin, ChevronRight, Check,
-  Award, Phone, Cake, Mars, Venus
+  ArrowLeft, Camera, Edit2, Plus, ShieldCheck, 
+  ChevronRight, Check, Award, Phone, Cake, Mars, Venus
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import axiosClient from '../../api/axiosClient';
 import { isValidPhone, isValidFullName } from '../../utils/validation';
+import FormError from '../../components/ui/FormError';
+import PhysicalStatsSection from '../../components/profile/PhysicalStatsSection';
+import PersonalizationSection from '../../components/profile/PersonalizationSection';
+import type { TokenResponse, ApiResponse, UserProfileDbDto } from '../../types';
 
 interface JwtPayload {
   sub: string;
@@ -155,8 +158,9 @@ export default function ProfilePage() {
 
     // Call refresh-token using axiosClient so the interceptor handles refresh automatically if needed
     axiosClient.post('/Auth/refresh-token')
-      .then((res: any) => {
-        const freshToken = res.token || res.Token;
+      .then((resObj) => {
+        const res = resObj as unknown as TokenResponse;
+        const freshToken = res.token || (res as any).Token;
         if (freshToken) {
           localStorage.setItem('token', freshToken);
           return freshToken;
@@ -195,7 +199,8 @@ export default function ProfilePage() {
 
           // Fetch extra profile properties from DB
           axiosClient.get('/users/profile')
-            .then((res: any) => {
+            .then((resObj) => {
+              const res = resObj as unknown as ApiResponse<UserProfileDbDto>;
               if (res && res.isSuccess && res.data) {
                 const data = res.data;
                 if (data.height) setHeight(data.height);
@@ -219,7 +224,7 @@ export default function ProfilePage() {
 
   const isOwner = user.roles.some(r => r === 'Owner' || r === 'owner');
 
-  const updateProfileOnBackend = async (fields: any) => {
+  const updateProfileOnBackend = async (fields: Partial<UserProfileDbDto> & { fullName?: string; phone?: string | null }) => {
     try {
       await axiosClient.put('/users/profile', fields);
     } catch (err) {
@@ -433,11 +438,7 @@ export default function ProfilePage() {
             {/* Quick Action to save Profile details if editing */}
             {isEditingProfile && (
               <>
-                {validationError && (
-                  <div style={{ color: '#ef4444', fontSize: '13px', marginBottom: '10px', textAlign: 'center', fontWeight: '500' }}>
-                    {validationError}
-                  </div>
-                )}
+                <FormError message={validationError} style={{ marginBottom: '10px' }} />
                 <button onClick={handleSaveProfile} className="profile-save-all-btn">
                   Lưu thông tin liên hệ
                 </button>
@@ -532,273 +533,39 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  {/* Module 1: THÔNG TIN THỂ CHẤT (UserProfile2 style with higher contrast colors) */}
-                  <div className="overview-section-card">
-                    <div className="section-card-header">
-                      <h3 className="section-card-title">THÔNG TIN THỂ CHẤT</h3>
-                      <button 
-                        onClick={() => {
-                          if (isEditingPhysical) {
-                            handleSavePhysical();
-                          }
-                          setIsEditingPhysical(!isEditingPhysical);
-                        }} 
-                        className={`section-edit-btn ${isEditingPhysical ? 'active' : ''}`}
-                        aria-label="Sửa thông tin thể chất"
-                      >
-                        {isEditingPhysical ? <Check size={14} /> : <Edit2 size={14} />}
-                      </button>
-                    </div>
-                    {/* Double Card + BMI Layout */}
-                    <div className="physical-cards-row">
-                      <div className="physical-stat-card">
-                        <div className="card-stat-header">
-                          <span className="card-stat-title">Chiều cao</span>
-                        </div>
-                        <div className="card-stat-value">{height} <span className="unit">cm</span></div>
-                        {isEditingPhysical && (
-                          <input 
-                            type="range" 
-                            min="130" 
-                            max="220" 
-                            value={height} 
-                            onChange={(e) => setHeight(Number(e.target.value))} 
-                            className="stat-slider-mini"
-                          />
-                        )}
-                      </div>
+                  {/* Module 1: THÔNG TIN THỂ CHẤT */}
+                  <PhysicalStatsSection
+                    height={height}
+                    setHeight={setHeight}
+                    weight={weight}
+                    setWeight={setWeight}
+                    specialNotes={specialNotes}
+                    setSpecialNotes={setSpecialNotes}
+                    isEditingPhysical={isEditingPhysical}
+                    setIsEditingPhysical={setIsEditingPhysical}
+                    isEditingNotes={isEditingNotes}
+                    setIsEditingNotes={setIsEditingNotes}
+                    handleSavePhysical={handleSavePhysical}
+                    handleSaveNotes={handleSaveNotes}
+                    bmi={bmi}
+                    bmiStatus={bmiStatus}
+                    bmiClass={bmiClass}
+                  />
 
-                      <div className="physical-stat-card">
-                        <div className="card-stat-header">
-                          <span className="card-stat-title">Cân nặng</span>
-                        </div>
-                        <div className="card-stat-value">{weight} <span className="unit">kg</span></div>
-                        {isEditingPhysical && (
-                          <input 
-                            type="range" 
-                            min="30" 
-                            max="150" 
-                            value={weight} 
-                            onChange={(e) => setWeight(Number(e.target.value))} 
-                            className="stat-slider-mini"
-                          />
-                        )}
-                      </div>
-
-                      <div className="physical-stat-card bmi-card-highlight">
-                        <div className="card-stat-header">
-                          <span className="card-stat-title">Chỉ số BMI</span>
-                        </div>
-                        <div className="card-stat-value">{bmi}</div>
-                        <div className={`bmi-status-badge ${bmiClass}`}>{bmiStatus}</div>
-                      </div>
-                    </div>
-
-                    {/* Special Notes box - Smart show/hide logic */}
-                    {specialNotes && specialNotes !== 'Chưa có ghi chú đặc biệt' ? (
-                      <div className="special-notes-wrapper2">
-                        <div className="notes-header">
-                          <span className="notes-label">Ghi chú đặc biệt</span>
-                          <button 
-                            onClick={() => setIsEditingNotes(!isEditingNotes)} 
-                            className="notes-edit-btn"
-                            aria-label="Sửa ghi chú"
-                          >
-                            <Edit2 size={12} />
-                          </button>
-                        </div>
-                        {isEditingNotes ? (
-                          <div className="notes-edit-container">
-                            <textarea 
-                              value={specialNotes} 
-                              onChange={(e) => setSpecialNotes(e.target.value)} 
-                              className="notes-textarea"
-                            />
-                            <button onClick={() => handleSaveNotes(specialNotes)} className="notes-save-btn">
-                              Xác nhận
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="notes-content-box">
-                            <span className="notes-text">{specialNotes}</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="special-notes-placeholder-row">
-                        <span className="placeholder-text">Chưa có ghi chú đặc biệt nào</span>
-                        {isEditingNotes ? (
-                          <div className="notes-edit-container inline-edit">
-                            <textarea 
-                              value={specialNotes === 'Chưa có ghi chú đặc biệt' ? '' : specialNotes} 
-                              onChange={(e) => setSpecialNotes(e.target.value)} 
-                              placeholder="Nhập ghi chú đặc biệt của bạn..."
-                              className="notes-textarea"
-                            />
-                            <button onClick={() => handleSaveNotes(specialNotes)} className="notes-save-btn">
-                              Xác nhận
-                            </button>
-                          </div>
-                        ) : (
-                          <button 
-                            onClick={() => {
-                              setSpecialNotes('');
-                              setIsEditingNotes(true);
-                            }} 
-                            className="add-notes-btn"
-                          >
-                            + Thêm ghi chú
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Module 2: CÁ NHÂN HÓA (UserProfile2 vertical list style with darker line dividers) */}
-                  <div className="overview-section-card">
-                    <div className="section-card-header">
-                      <h3 className="section-card-title">CÁ NHÂN HÓA</h3>
-                      <button 
-                        onClick={() => {
-                          if (isEditingPersonalization) {
-                            handleSavePersonalization();
-                          }
-                          setIsEditingPersonalization(!isEditingPersonalization);
-                        }} 
-                        className={`section-edit-btn ${isEditingPersonalization ? 'active' : ''}`}
-                        aria-label="Sửa cá nhân hóa"
-                      >
-                        {isEditingPersonalization ? <Check size={14} /> : <Edit2 size={14} />}
-                      </button>
-                    </div>
-
-                    <div className="personalization-list">
-                      {/* Vị trí yêu thích */}
-                      <div className="personal-list-item">
-                        <div className="item-left">
-                          <MapPin size={18} className="item-icon" />
-                          <div className="item-details">
-                            <span className="item-label">Vị trí yêu thích</span>
-                            {isEditingPersonalization ? (
-                              <input 
-                                type="text" 
-                                value={favPosition} 
-                                onChange={(e) => setFavPosition(e.target.value)} 
-                                className="item-input"
-                              />
-                            ) : (
-                              <span className="item-value">
-                                {favPosition === 'Chưa cập nhật' ? (
-                                  <button onClick={() => setIsEditingPersonalization(true)} className="cta-link-btn">
-                                    + Thêm vị trí
-                                  </button>
-                                ) : (
-                                  favPosition
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Thể thao & Trình độ */}
-                      <div className="personal-list-item">
-                        <div className="item-left">
-                          <Activity size={18} className="item-icon" />
-                          <div className="item-details">
-                            <span className="item-label">Thể thao & Trình độ</span>
-                            {isEditingPersonalization ? (
-                              <input 
-                                type="text" 
-                                value={sportsLevel} 
-                                onChange={(e) => setSportsLevel(e.target.value)} 
-                                className="item-input"
-                              />
-                            ) : (
-                              <span className="item-value">
-                                {sportsLevel === 'Chưa cập nhật' ? (
-                                  <button onClick={() => setIsEditingPersonalization(true)} className="cta-link-btn">
-                                    + Chọn trình độ
-                                  </button>
-                                ) : (
-                                  sportsLevel
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Mục tiêu */}
-                      <div className="personal-list-item">
-                        <div className="item-left">
-                          <Trophy size={18} className="item-icon" />
-                          <div className="item-details">
-                            <span className="item-label">Mục tiêu</span>
-                            {isEditingPersonalization ? (
-                              <input 
-                                type="text" 
-                                value={goals} 
-                                onChange={(e) => setGoals(e.target.value)} 
-                                className="item-input"
-                              />
-                            ) : (
-                              <span className="item-value">
-                                {goals === 'Chưa cập nhật' ? (
-                                  <button onClick={() => setIsEditingPersonalization(true)} className="cta-link-btn">
-                                    + Thêm mục tiêu
-                                  </button>
-                                ) : (
-                                  goals
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Tần suất chơi */}
-                      <div className="personal-list-item no-border">
-                        <div className="item-left">
-                          <Calendar size={18} className="item-icon" />
-                          <div className="item-details">
-                            <span className="item-label">Tần suất chơi</span>
-                            {isEditingPersonalization ? (
-                              <input 
-                                type="text" 
-                                value={frequency} 
-                                onChange={(e) => setFrequency(e.target.value)} 
-                                className="item-input"
-                              />
-                            ) : (
-                              <div className="frequency-display-row">
-                                <span className="item-value">
-                                  {frequency === 'Chưa cập nhật' ? (
-                                    <button onClick={() => setIsEditingPersonalization(true)} className="cta-link-btn">
-                                      + Thiết lập tần suất
-                                    </button>
-                                  ) : (
-                                    frequency
-                                  )}
-                                </span>
-                                
-                                <div className={`frequency-mini-calendar2 ${frequency === 'Chưa cập nhật' ? 'not-configured' : ''}`}>
-                                  {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((day) => {
-                                    const isActive = frequency !== 'Chưa cập nhật' && ['T2', 'T4', 'T6'].includes(day);
-                                    return (
-                                      <span key={day} className={`mini-day2 ${isActive ? 'active' : ''}`}>
-                                        {day}
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Module 2: CÁ NHÂN HÓA */}
+                  <PersonalizationSection
+                    favPosition={favPosition}
+                    setFavPosition={setFavPosition}
+                    sportsLevel={sportsLevel}
+                    setSportsLevel={setSportsLevel}
+                    goals={goals}
+                    setGoals={setGoals}
+                    frequency={frequency}
+                    setFrequency={setFrequency}
+                    isEditingPersonalization={isEditingPersonalization}
+                    setIsEditingPersonalization={setIsEditingPersonalization}
+                    handleSavePersonalization={handleSavePersonalization}
+                  />
 
                   {/* Extra Account Settings links */}
                   <div className="extra-settings-card">

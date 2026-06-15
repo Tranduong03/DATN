@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../../components/common/LoadingOverlay';
 import { useForgotPassword } from '../../hooks/mutations/useAuthMutations';
 import { isValidEmail, isValidPhone } from '../../utils/validation';
+import PhoneInput from '../../components/ui/PhoneInput';
+import FormError from '../../components/ui/FormError';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -159,47 +161,19 @@ export default function ForgotPasswordPage() {
                   )}
                 </div>
               ) : (
-                <div style={{ 
-                  display: 'flex', alignItems: 'center',
-                  border: '1px solid #d1d5db', borderRadius: '8px', padding: '0 12px',
-                  backgroundColor: '#ffffff'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', paddingRight: '8px' }}>
-                    <span style={{ fontSize: '18px' }}>🇻🇳</span>
-                    <span style={{ fontSize: '14px', color: '#4b5563', fontWeight: '500' }}>+ 84</span>
-                    <span style={{ fontSize: '10px', color: '#9ca3af' }}>▼</span>
-                  </div>
-                  <div style={{ width: '1px', height: '24px', backgroundColor: '#e5e7eb', margin: '0 8px' }} />
-                  <input 
-                    type="tel"
-                    placeholder="Nhập số điện thoại"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    style={{
-                      flex: 1, border: 'none', outline: 'none', padding: '12px 0',
-                      fontSize: '15px', color: '#1f2937'
-                    }}
-                  />
-                  {phone && (
-                    <button type="button" onClick={() => setPhone('')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
-                      <X size={16} color="#9ca3af" />
-                    </button>
-                  )}
-                </div>
+                <PhoneInput
+                  placeholder="Nhập số điện thoại"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  onClear={() => setPhone('')}
+                  inputStyle={{ padding: '12px 0', fontSize: '15px', color: '#1f2937' }}
+                  style={{ margin: 0 }}
+                />
               )}
             </div>
 
-            {error && (
-              <div style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px', textAlign: 'center', fontWeight: '500' }}>
-                {error}
-              </div>
-            )}
-            
-            {message && (
-              <div style={{ color: '#10b981', fontSize: '13px', marginBottom: '12px', textAlign: 'center', fontWeight: 'bold' }}>
-                {message}
-              </div>
-            )}
+            <FormError message={error} />
+            <FormError message={message} type="success" />
 
             <button 
               type="submit" 
