@@ -369,7 +369,7 @@ export default function VenueDetailSheet({
                     className={`sheet-tab-btn ${activeTab === 'rules' ? 'active' : ''}`}
                     onClick={() => setActiveTab('rules')}
                   >
-                    Điều khoản & quy định
+                    Điều khoản
                   </button>
                   <button 
                     className={`sheet-tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
@@ -381,26 +381,22 @@ export default function VenueDetailSheet({
 
                 <div className="sheet-tab-pane">
                   {activeTab === 'info' && (
-                    <div>
-                      <p className="sheet-tab-text" style={{ marginBottom: 16 }}>
-                        {venue.description || 'Chưa có mô tả chi tiết cho sân này.'}
-                      </p>
-                      
-                      <h4 style={{ fontSize: 13, fontWeight: 700, color: '#e06e1b', margin: '16px 0 8px 0' }}>Link đặt sân online</h4>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#f8fafc', border: '1px solid #f1f5f9', padding: '10px 12px', borderRadius: '8px' }}>
+                    <div>                      
+                      <h4 style={{ fontSize: 15, fontWeight: 550, color: '#e06e1b', margin: '8px 0 8px 0' }}>Link đặt sân online</h4>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
                         <a 
                           href={`https://datlich.alobo.vn/san/${venue.id || ''}`} 
                           target="_blank" 
                           rel="noreferrer"
-                          style={{ fontSize: 12, color: '#b45309', wordBreak: 'break-all', textDecoration: 'none', fontWeight: 550 }}
+                          style={{ fontSize: 13, color: '#02471fff', wordBreak: 'break-all', textDecoration: 'none', fontWeight: 300 }}
                         >
                           https://datlich.alobo.vn/san/{venue.id || ''}
                         </a>
                         <button 
                           onClick={handleCopyLink}
-                          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: copied ? '#10b981' : '#64748b', display: 'flex', alignItems: 'center' }}
+                          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: copied ? '#10b981' : '#64748b', display: 'flex', alignItems: 'center', padding: '4px' }}
                         >
-                          {copied ? <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600 }}>Đã chép</span> : <Copy size={16} />}
+                          {copied ? <span style={{ fontSize: 12, color: '#10b981', fontWeight: 500 }}>Đã chép</span> : <Copy size={24} />}
                         </button>
                       </div>
                     </div>
