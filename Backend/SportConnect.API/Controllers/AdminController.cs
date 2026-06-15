@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportConnect.Application.Interfaces;
 using SportConnect.Core.Constants;
+using SportConnect.Application.DTOs.Admin;
 
 namespace SportConnect.API.Controllers;
 
@@ -100,6 +101,31 @@ public class AdminController : ControllerBase
         await _adminService.ToggleUserStatusAsync(userId);
         return Ok(new { isSuccess = true, message = "Đã thay đổi trạng thái tài khoản thành công." });
     }
+
+    /// <summary>
+    /// Cập nhật vai trò (roles) của người dùng
+    /// </summary>
+    [HttpPut("users/{userId:guid}/roles")]
+    public async Task<IActionResult> UpdateUserRoles(Guid userId, [FromBody] UpdateUserRolesDto dto)
+    {
+        await _adminService.UpdateUserRolesAsync(userId, dto.Roles);
+        return Ok(new { isSuccess = true, message = "Đã cập nhật phân quyền người dùng thành công." });
+    }
+
+    /// <summary>
+    /// Lấy danh sách các vai trò (roles) trong hệ thống
+    /// </summary>
+    [HttpGet("roles")]
+    public async Task<IActionResult> GetRoles()
+    {
+        var roles = await _adminService.GetRolesAsync();
+        return Ok(new { isSuccess = true, data = roles });
+    }
 }
 
 public record RejectOwnerRequest(string Reason);
+
+public class UpdateUserRolesDto
+{
+    public List<string> Roles { get; set; } = new();
+}

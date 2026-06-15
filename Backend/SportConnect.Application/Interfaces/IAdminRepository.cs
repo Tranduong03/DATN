@@ -10,4 +10,6 @@ public interface IAdminRepository
     Task<bool> ApproveOwnerAsync(Guid userId);
     Task<bool> RejectOwnerAsync(Guid userId, string reason);
     Task<bool> ToggleUserStatusAsync(Guid userId);
+    Task<bool> UpdateUserRolesAsync(Guid userId, List<string> roleNames);
+    Task<List<RoleDto>> GetRolesAsync();
 }

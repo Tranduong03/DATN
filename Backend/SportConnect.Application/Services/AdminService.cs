@@ -68,4 +68,19 @@ public class AdminService : IAdminService
         }
         return true;
     }
+
+    public async Task<bool> UpdateUserRolesAsync(Guid userId, List<string> roleNames)
+    {
+        var success = await _adminRepository.UpdateUserRolesAsync(userId, roleNames);
+        if (!success)
+        {
+            throw new NotFoundException("Không tìm thấy thông tin người dùng.");
+        }
+        return true;
+    }
+
+    public async Task<List<RoleDto>> GetRolesAsync()
+    {
+        return await _adminRepository.GetRolesAsync();
+    }
 }

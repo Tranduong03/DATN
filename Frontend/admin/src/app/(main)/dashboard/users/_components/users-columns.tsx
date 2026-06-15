@@ -171,6 +171,9 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
               <DropdownMenuItem onClick={() => meta?.onToggleStatus(row.original.id)}>
                 {row.original.status ? "Khóa tài khoản" : "Mở khóa tài khoản"}
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => meta?.onEditRoles(row.original)}>
+                Phân quyền vai trò
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

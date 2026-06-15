@@ -229,4 +229,65 @@ public class AdminRepository : IAdminRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> UpdateUserRolesAsync(Guid userId, List<string> roleNames)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null) return false;
+
+        // Bất kỳ tài khoản nào cũng cần có tối thiểu vai trò "Default"
+        if (!roleNames.Contains(AppRoles.Default))
+        {
+            roleNames.Add(AppRoles.Default);
+        }
+
+        var rolesInDb = await _context.Roles.ToListAsync();
+
+        // 1. Thu hồi các vai trò không có trong danh sách mới
+        var rolesToRemove = user.UserRoles
+            .Where(ur => !roleNames.Contains(ur.Role.RoleName))
+            .ToList();
+        
+        foreach (var ur in rolesToRemove)
+        {
+            _context.UserRoles.Remove(ur);
+        }
+
+        // 2. Gán các vai trò mới được chọn
+        foreach (var rName in roleNames)
+        {
+            var roleEntity = rolesInDb.FirstOrDefault(r => r.RoleName == rName);
+            if (roleEntity == null)
+            {
+                roleEntity = new Role { RoleName = rName, Description = rName };
+                _context.Roles.Add(roleEntity);
+                await _context.SaveChangesAsync();
+                rolesInDb = await _context.Roles.ToListAsync();
+            }
+
+            var alreadyHas = user.UserRoles.Any(ur => ur.Role.RoleName == rName);
+            if (!alreadyHas)
+            {
+                _context.UserRoles.Add(new UserRole { UserId = userId, RoleId = roleEntity.Id });
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<List<RoleDto>> GetRolesAsync()
+    {
+        return await _context.Roles
+            .Select(r => new RoleDto
+            {
+                Id = r.Id,
+                RoleName = r.RoleName,
+                Description = r.Description
+            })
+            .ToListAsync();
+    }
 }

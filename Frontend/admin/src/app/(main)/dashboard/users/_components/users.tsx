@@ -22,6 +22,15 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import apiClient from "@/lib/api-client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { usersColumns, type UserListItem } from "./users-columns";
 import { UsersTable } from "./users-table";
@@ -52,6 +61,7 @@ export function Users() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [availableRoles, setAvailableRoles] = React.useState<{ id: string; roleName: string; description: string | null }[]>([]);
 
   const fetchUsers = React.useCallback(async () => {
     setIsLoading(true);
@@ -68,9 +78,62 @@ export function Users() {
     }
   }, []);
 
+  const fetchAvailableRoles = React.useCallback(async () => {
+    try {
+      const res: any = await apiClient.get("/api/admin/roles");
+      if (res && res.isSuccess && res.data) {
+        setAvailableRoles(res.data || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch available roles:", err);
+    }
+  }, []);
+
   React.useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+    fetchAvailableRoles();
+  }, [fetchUsers, fetchAvailableRoles]);
+
+  const [isRolesModalOpen, setIsRolesModalOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<UserListItem | null>(null);
+  const [selectedRoles, setSelectedRoles] = React.useState<string[]>([]);
+  const [isSavingRoles, setIsSavingRoles] = React.useState(false);
+
+  const handleEditRoles = (user: UserListItem) => {
+    setSelectedUser(user);
+    setSelectedRoles(user.roles || []);
+    setIsRolesModalOpen(true);
+  };
+
+  const handleSaveRoles = async () => {
+    if (!selectedUser) return;
+    setIsSavingRoles(true);
+    try {
+      const res: any = await apiClient.put(`/api/admin/users/${selectedUser.id}/roles`, {
+        roles: selectedRoles,
+      });
+      if (res && res.isSuccess) {
+        toast.success("Cập nhật phân quyền người dùng thành công!");
+        setIsRolesModalOpen(false);
+        fetchUsers();
+      } else {
+        toast.error(res?.message || "Không thể cập nhật phân quyền.");
+      }
+    } catch (err) {
+      console.error("Error updating user roles:", err);
+      toast.error("Lỗi khi cập nhật vai trò người dùng.");
+    } finally {
+      setIsSavingRoles(false);
+    }
+  };
+
+  const handleRoleCheckboxChange = (role: string, checked: boolean) => {
+    if (checked) {
+      setSelectedRoles((prev) => [...prev, role]);
+    } else {
+      setSelectedRoles((prev) => prev.filter((r) => r !== role));
+    }
+  };
 
   const handleToggleStatus = async (userId: string) => {
     try {
@@ -99,6 +162,7 @@ export function Users() {
     },
     meta: {
       onToggleStatus: handleToggleStatus,
+      onEditRoles: handleEditRoles,
     },
     getRowId: (row) => row.id,
     autoResetPageIndex: false,
@@ -226,6 +290,77 @@ export function Users() {
           <UsersTable table={table} />
         )}
       </CardContent>
+
+      {/* Role Assignment Dialog */}
+      <Dialog open={isRolesModalOpen} onOpenChange={setIsRolesModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Phân quyền vai trò</DialogTitle>
+            <DialogDescription>
+              Thiết lập các vai trò hệ thống cho tài khoản người dùng:{" "}
+              <strong className="text-foreground">{selectedUser?.fullName || selectedUser?.username}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-3">
+              {availableRoles.map((role) => {
+                const checked = selectedRoles.includes(role.roleName);
+                // "Default" role is always checked and disabled to ensure basic access is kept
+                const isDisabled = role.roleName === "Default";
+
+                // User-friendly display names for standard roles
+                const roleLabels: Record<string, string> = {
+                  Default: "Người chơi (Default)",
+                  Staff: "Nhân viên (Staff)",
+                  Owner: "Chủ sân (Owner)",
+                  Admin: "Quản trị viên (Admin)"
+                };
+
+                const roleDescs: Record<string, string> = {
+                  Default: "Môn sinh, người chơi đặt sân cơ bản",
+                  Staff: "Nhân viên hỗ trợ quản lý vận hành",
+                  Owner: "Quản lý cơ sở thể thao, cấu hình sân, lịch đặt",
+                  Admin: "Quyền tối cao quản lý toàn hệ thống"
+                };
+
+                const label = roleLabels[role.roleName] || role.roleName;
+                const desc = role.description || roleDescs[role.roleName] || "Vai trò hệ thống";
+
+                return (
+                  <div key={role.roleName} className="flex items-start gap-3 rounded-lg border p-3 hover:bg-muted/50 transition-colors">
+                    <Checkbox
+                      id={`role-${role.roleName}`}
+                      checked={checked}
+                      disabled={isDisabled}
+                      onCheckedChange={(val) => handleRoleCheckboxChange(role.roleName, !!val)}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-0.5 leading-none">
+                      <label
+                        htmlFor={`role-${role.roleName}`}
+                        className="text-sm font-semibold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-75 cursor-pointer text-foreground"
+                      >
+                        {label}
+                      </label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRolesModalOpen(false)}>
+              Hủy
+            </Button>
+            <Button onClick={handleSaveRoles} disabled={isSavingRoles}>
+              {isSavingRoles ? "Đang lưu..." : "Xác nhận"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
