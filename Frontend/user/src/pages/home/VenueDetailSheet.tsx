@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Share2, Heart, MapPin, Clock, Star, Phone, ArrowLeft, Copy, Check } from 'lucide-react';
+import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
 import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
 import { getSportEmojiFromCategories, getSportColorFromCategories } from '../../utils/sport';
@@ -29,7 +30,10 @@ export default function VenueDetailSheet({
   const [isTransitioning, setIsTransitioning] = useState(true);
 
   // Tabs
-  const [activeTab, setActiveTab] = useState<'info' | 'services' | 'images' | 'rules' | 'reviews'>('info');
+  const { activeTab, direction, changeTab, setActiveTab } = useTabDirection<'info' | 'services' | 'images' | 'rules' | 'reviews'>(
+    'info',
+    ['info', 'services', 'images', 'rules', 'reviews']
+  );
   const [copied, setCopied] = useState(false);
 
   // Refs
@@ -160,6 +164,7 @@ export default function VenueDetailSheet({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
 
 
 
@@ -347,126 +352,116 @@ export default function VenueDetailSheet({
               {/* Tabs */}
               <div className="sheet-tabs-container">
                 <div className="sheet-tab-header-list">
-                  <button 
-                    className={`sheet-tab-btn ${activeTab === 'info' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('info')}
-                  >
-                    Thông tin
-                  </button>
-                  <button 
-                    className={`sheet-tab-btn ${activeTab === 'services' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('services')}
-                  >
-                    Dịch vụ
-                  </button>
-                  <button 
-                    className={`sheet-tab-btn ${activeTab === 'images' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('images')}
-                  >
-                    Hình ảnh
-                  </button>
-                  <button 
-                    className={`sheet-tab-btn ${activeTab === 'rules' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('rules')}
-                  >
-                    Điều khoản
-                  </button>
-                  <button 
-                    className={`sheet-tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('reviews')}
-                  >
-                    Đánh giá
-                  </button>
+                  {[
+                    { id: 'info', label: 'Thông tin' },
+                    { id: 'services', label: 'Dịch vụ' },
+                    { id: 'images', label: 'Hình ảnh' },
+                    { id: 'rules', label: 'Điều khoản' },
+                    { id: 'reviews', label: 'Đánh giá' }
+                  ].map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button 
+                        key={tab.id}
+                        className={`sheet-tab-btn ${isActive ? 'active' : ''}`}
+                        onClick={() => changeTab(tab.id as any)}
+                        style={{ position: 'relative' }}
+                      >
+                        {tab.label}
+                        {isActive && <TabUnderline />}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <div className="sheet-tab-pane">
-                  {activeTab === 'info' && (
-                    <div>                      
-                      <h4 style={{ fontSize: 15, fontWeight: 550, color: '#e06e1b', margin: '8px 0 8px 0' }}>Link đặt sân online</h4>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
-                        <a 
-                          href={`https://datlich.alobo.vn/san/${venue.id || ''}`} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          style={{ fontSize: 13, color: '#02471fff', wordBreak: 'break-all', textDecoration: 'none', fontWeight: 300 }}
-                        >
-                          https://datlich.alobo.vn/san/{venue.id || ''}
-                        </a>
-                        <button 
-                          onClick={handleCopyLink}
-                          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: copied ? '#10b981' : '#64748b', display: 'flex', alignItems: 'center', padding: '4px' }}
-                        >
-                          {copied ? <span style={{ fontSize: 12, color: '#10b981', fontWeight: 500 }}>Đã chép</span> : <Copy size={24} />}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeTab === 'services' && (
-                    <div>
-                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#475569', lineHeight: '1.8' }}>
-                        <li>Wifi miễn phí</li>
-                        <li>Bãi đỗ xe ô tô, xe máy rộng rãi</li>
-                        <li>Cho thuê vợt, bóng/quả cầu lông</li>
-                        <li>Căng tin phục vụ nước uống & đồ ăn nhẹ</li>
-                        <li>Hệ thống đèn LED đạt tiêu chuẩn thi đấu</li>
-                      </ul>
-                    </div>
-                  )}
-
-                  {activeTab === 'images' && (
-                    <div className="sheet-gallery-grid">
-                      {venue.galleryImages && venue.galleryImages.length > 0 ? (
-                        venue.galleryImages.map((img: string, idx: number) => (
-                          <img key={idx} src={img} alt={`Gallery ${idx}`} className="sheet-gallery-img" />
-                        ))
-                      ) : (
-                        <span className="sheet-tab-text" style={{ gridColumn: 'span 2' }}>Không có hình ảnh cơ sở.</span>
-                      )}
-                    </div>
-                  )}
-
-                  {activeTab === 'rules' && (
-                    <div>
-                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#475569', lineHeight: '1.8' }}>
-                        <li>Đến đúng giờ đã đặt lịch.</li>
-                        <li>Mang giày chuyên dụng cho các loại sân tương ứng để bảo vệ mặt thảm.</li>
-                        <li>Không mang theo thức ăn nhiều dầu mỡ hay đồ có gas lên mặt sân.</li>
-                        <li>Giữ gìn vệ sinh chung, vứt rác đúng nơi quy định.</li>
-                      </ul>
-                    </div>
-                  )}
-
-                  {activeTab === 'reviews' && (
-                    <div>
-                      {reviews && reviews.length > 0 ? (
-                        reviews.map((review: any) => (
-                          <div key={review.id} className="sheet-review-item">
-                            <div className="sheet-review-header">
-                              <div className="sheet-review-user">
-                                {review.userAvatar ? (
-                                  <img src={review.userAvatar} alt={review.userName} className="sheet-review-avatar" />
-                                ) : (
-                                  <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 'bold' }}>
-                                    {review.userName?.charAt(0).toUpperCase()}
-                                  </div>
-                                )}
-                                <span className="sheet-review-username">{review.userName}</span>
-                              </div>
-                              <div className="sheet-review-rating">
-                                <Star size={10} fill="#d97706" color="#d97706" />
-                                <span>{review.rating}</span>
-                              </div>
-                            </div>
-                            {review.comment && <p className="sheet-review-comment">{review.comment}</p>}
+                <TabContentSlider activeTab={activeTab} direction={direction} className="sheet-tab-pane">
+                      {activeTab === 'info' && (
+                        <div>                      
+                          <h4 style={{ fontSize: 15, fontWeight: 550, color: '#e06e1b', margin: '8px 0 8px 0' }}>Link đặt sân online</h4>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
+                            <a 
+                              href={`https://datlich.alobo.vn/san/${venue.id || ''}`} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              style={{ fontSize: 13, color: '#02471fff', wordBreak: 'break-all', textDecoration: 'none', fontWeight: 300 }}
+                            >
+                              https://datlich.alobo.vn/san/{venue.id || ''}
+                            </a>
+                            <button 
+                              onClick={handleCopyLink}
+                              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: copied ? '#10b981' : '#64748b', display: 'flex', alignItems: 'center', padding: '4px' }}
+                            >
+                              {copied ? <span style={{ fontSize: 12, color: '#10b981', fontWeight: 500 }}>Đã chép</span> : <Copy size={24} />}
+                            </button>
                           </div>
-                        ))
-                      ) : (
-                        <span className="sheet-tab-text">Chưa có đánh giá nào.</span>
+                        </div>
                       )}
-                    </div>
-                  )}
-                </div>
+
+                      {activeTab === 'services' && (
+                        <div>
+                          <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#475569', lineHeight: '1.8' }}>
+                            <li>Wifi miễn phí</li>
+                            <li>Bãi đỗ xe ô tô, xe máy rộng rãi</li>
+                            <li>Cho thuê vợt, bóng/quả cầu lông</li>
+                            <li>Căng tin phục vụ nước uống & đồ ăn nhẹ</li>
+                            <li>Hệ thống đèn LED đạt tiêu chuẩn thi đấu</li>
+                          </ul>
+                        </div>
+                      )}
+
+                      {activeTab === 'images' && (
+                        <div className="sheet-gallery-grid">
+                          {venue.galleryImages && venue.galleryImages.length > 0 ? (
+                            venue.galleryImages.map((img: string, idx: number) => (
+                              <img key={idx} src={img} alt={`Gallery ${idx}`} className="sheet-gallery-img" />
+                            ))
+                          ) : (
+                            <span className="sheet-tab-text" style={{ gridColumn: 'span 2' }}>Không có hình ảnh cơ sở.</span>
+                          )}
+                        </div>
+                      )}
+
+                      {activeTab === 'rules' && (
+                        <div>
+                          <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#475569', lineHeight: '1.8' }}>
+                            <li>Đến đúng giờ đã đặt lịch.</li>
+                            <li>Mang giày chuyên dụng cho các loại sân tương ứng để bảo vệ mặt thảm.</li>
+                            <li>Không mang theo thức ăn nhiều dầu mỡ hay đồ có gas lên mặt sân.</li>
+                            <li>Giữ gìn vệ sinh chung, vứt rác đúng nơi quy định.</li>
+                          </ul>
+                        </div>
+                      )}
+
+                      {activeTab === 'reviews' && (
+                        <div>
+                          {reviews && reviews.length > 0 ? (
+                            reviews.map((review: any) => (
+                              <div key={review.id} className="sheet-review-item">
+                                <div className="sheet-review-header">
+                                  <div className="sheet-review-user">
+                                    {review.userAvatar ? (
+                                      <img src={review.userAvatar} alt={review.userName} className="sheet-review-avatar" />
+                                    ) : (
+                                      <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 'bold' }}>
+                                        {review.userName?.charAt(0).toUpperCase()}
+                                      </div>
+                                    )}
+                                    <span className="sheet-review-username">{review.userName}</span>
+                                  </div>
+                                  <div className="sheet-review-rating">
+                                    <Star size={10} fill="#d97706" color="#d97706" />
+                                    <span>{review.rating}</span>
+                                  </div>
+                                </div>
+                                {review.comment && <p className="sheet-review-comment">{review.comment}</p>}
+                              </div>
+                            ))
+                          ) : (
+                            <span className="sheet-tab-text">Chưa có đánh giá nào.</span>
+                          )}
+                        </div>
+                      )}
+                </TabContentSlider>
               </div>
             </div>
           </>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Camera, Edit2, Plus, ShieldCheck, 
   ChevronRight, Check, Award, Phone, Cake, Mars, Venus
@@ -10,6 +9,7 @@ import MainLayout from '../../components/layout/MainLayout';
 import axiosClient from '../../api/axiosClient';
 import { isValidPhone, isValidFullName } from '../../utils/validation';
 import FormError from '../../components/ui/FormError';
+import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
 import PhysicalStatsSection from '../../components/profile/PhysicalStatsSection';
 import PersonalizationSection from '../../components/profile/PersonalizationSection';
 import type { TokenResponse, ApiResponse, UserProfileDbDto } from '../../types';
@@ -91,26 +91,10 @@ const BrandLogo = () => (
   </div>
 );
 
-const tabVariants = {
-  enter: (dir: number) => ({
-    x: dir > 0 ? '100%' : '-100%',
-    opacity: 0,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-  },
-  exit: (dir: number) => ({
-    x: dir > 0 ? '-100%' : '100%',
-    opacity: 0,
-  }),
-};
-
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<UserInfo | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'links'>('overview');
-  const [direction, setDirection] = useState<number>(0);
+  const { activeTab, direction, changeTab } = useTabDirection<'overview' | 'links'>('overview', ['overview', 'links']);
 
   // Interactive profile states
   const [name, setName] = useState('Username');
@@ -276,11 +260,7 @@ export default function ProfilePage() {
     });
   };
 
-  const handleTabChange = (tab: 'overview' | 'links') => {
-    if (tab === activeTab) return;
-    setDirection(tab === 'links' ? 1 : -1);
-    setActiveTab(tab);
-  };
+
 
   // BMI calculation
   const heightInMeters = height / 100;
@@ -433,8 +413,6 @@ export default function ProfilePage() {
                   <span>{gender}</span>
                 )}
               </div>
-            </div>
-
             {/* Quick Action to save Profile details if editing */}
             {isEditingProfile && (
               <>
@@ -449,59 +427,48 @@ export default function ProfilePage() {
 
         {/* Tab Navigation (UserProfile Original Capsule Style with Slide Animation Highlight) */}
         <div className="profile-tabs-nav" style={{ position: 'relative' }}>
-          {/* Animated pill background */}
-          <div className="profile-tab-pill-container" style={{ position: 'absolute', top: 3, bottom: 3, left: 3, right: 3, display: 'flex', zIndex: 0, pointerEvents: 'none' }}>
-            <div style={{ flex: 1, position: 'relative', display: 'flex' }}>
-              <motion.div
-                layoutId="activeTabPill"
-                animate={{
-                  x: activeTab === 'overview' ? '0%' : '100%'
-                }}
-                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                style={{
-                  width: '50%',
-                  height: '100%',
-                  background: '#ffffff',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                }}
-              />
-            </div>
-          </div>
-
           <button 
             className={`profile-tab-button ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => handleTabChange('overview')}
+            onClick={() => changeTab('overview')}
             style={{ position: 'relative', zIndex: 1 }}
           >
             Tổng quan
+            {activeTab === 'overview' && (
+              <TabUnderline
+                layoutId="activeTabPill"
+                color="#ffffff"
+                height="100%"
+                left={0}
+                right={0}
+                borderRadius="12px"
+                bottom={0}
+                style={{ zIndex: -1, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}
+              />
+            )}
           </button>
           <button 
             className={`profile-tab-button ${activeTab === 'links' ? 'active' : ''}`}
-            onClick={() => handleTabChange('links')}
+            onClick={() => changeTab('links')}
             style={{ position: 'relative', zIndex: 1 }}
           >
             Liên kết
+            {activeTab === 'links' && (
+              <TabUnderline
+                layoutId="activeTabPill"
+                color="#ffffff"
+                height="100%"
+                left={0}
+                right={0}
+                borderRadius="12px"
+                bottom={0}
+                style={{ zIndex: -1, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}
+              />
+            )}
           </button>
         </div>
 
         {/* Sliding Tab Body Wrapper */}
-        <div className="profile-tab-body-wrapper" style={{ overflow: 'hidden', position: 'relative', width: '100%' }}>
-          <AnimatePresence initial={false} custom={direction} mode="popLayout">
-            <motion.div
-              key={activeTab}
-              custom={direction}
-              variants={tabVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: 'spring', stiffness: 350, damping: 28 },
-                opacity: { duration: 0.12 }
-              }}
-              className="profile-tab-body"
-              style={{ width: '100%' }}
-            >
+        <TabContentSlider activeTab={activeTab} direction={direction} className="profile-tab-body-wrapper">
               {activeTab === 'overview' ? (
                 <div className="overview-tab-content">
                   
@@ -628,8 +595,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
               )}
-            </motion.div>
-          </AnimatePresence>
+        </TabContentSlider>
 
           <p className="profile-version-footer">SPORTCONNECT v1.2.0</p>
         </div>
