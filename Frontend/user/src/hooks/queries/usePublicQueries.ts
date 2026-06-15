@@ -20,7 +20,10 @@ export const usePublicVenueDetail = (id: string) => {
 export const useSportCategories = () => {
   return useQuery({
     queryKey: ['sportCategories'],
-    queryFn: () => publicService.getSportCategories(),
+    queryFn: () => publicService.getSportCategories().then(res => {
+      const list = (res || []) as any[];
+      return list.filter((cat: any) => cat.status === true || cat.status === undefined);
+    }),
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 };

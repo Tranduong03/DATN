@@ -7,7 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import VenueDetailSheet from './VenueDetailSheet';
 
 export default function HomePage() {
-  const [activeSport, setActiveSport] = useState('Pickleball');
+  const [activeSport, setActiveSport] = useState('');
   const [searchTerm] = useState(''); 
   const navigate = useNavigate();
   
@@ -250,7 +250,13 @@ export default function HomePage() {
               <div 
                 key={index} 
                 className={`sport-item ${activeSport === sport.name ? 'active' : ''}`}
-                onClick={() => setActiveSport(sport.name)}
+                onClick={() => {
+                  if (activeSport === sport.name) {
+                    setActiveSport('');
+                  } else {
+                    setActiveSport(sport.name);
+                  }
+                }}
               >
                 <div className="sport-icon" style={{ backgroundColor: '#fff', border: `1px solid ${sport.color}` }}>
                   <span style={{ fontSize: '24px' }}>{sport.icon}</span>

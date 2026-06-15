@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
+import { getSportEmojiFromCategories, getSportColorFromCategories } from '../../utils/sport';
 import { 
   Search, 
   SlidersHorizontal, 
@@ -189,27 +190,12 @@ export default function MapPage() {
 
   // Helper colors and emojis for marker styling
   const getSportColor = (sportName: string) => {
-    const found = sports.find((s: any) => s.name === sportName);
-    if (found && found.color) return found.color;
-    switch (sportName) {
-      case 'Pickleball': return '#3b82f6';
-      case 'Cầu lông': return '#10b981';
-      case 'Bóng đá': return '#15803d';
-      case 'Tennis': return '#d97706';
-      default: return '#64748b';
-    }
+    return getSportColorFromCategories(sportName, sports);
   };
 
   const getSportEmoji = (sportName: string) => {
-    const found = sports.find((s: any) => s.name === sportName);
-    if (found && found.icon) return found.icon;
-    switch (sportName) {
-      case 'Pickleball': return '🎾';
-      case 'Cầu lông': return '🏸';
-      case 'Bóng đá': return '⚽';
-      case 'Tennis': return '🎾';
-      default: return '📍';
-    }
+    const emoji = getSportEmojiFromCategories(sportName, sports);
+    return emoji === '🏆' ? '📍' : emoji;
   };
 
   // Google Maps Instance initialization

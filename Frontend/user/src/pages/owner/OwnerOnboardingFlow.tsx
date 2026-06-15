@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Trophy, Wifi, TrendingUp, Users, CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
 import { useOnboardingStatus } from '../../hooks/queries/useOwnerQueries';
 import { useSaveDraft, useSubmitOnboarding } from '../../hooks/mutations/useOwnerMutations';
+import { useSportCategories } from '../../hooks/queries/usePublicQueries';
 
 /* ─── tiny inline style helpers ─── */
 const card: React.CSSProperties = {
@@ -208,30 +209,38 @@ function Step1({ onNext }: { onNext: () => void }) {
 }
 
 /* ─── STEP 2 — Sport types ─── */
-const SPORT_EMOJIS: Record<string, string> = {
-  'Cầu lông': '🏸', 'Tennis': '🎾', 'Pickleball': '🏓', 'Bóng đá': '⚽', 'Bóng rổ': '🏀', 'Khác': '🏟️',
-};
+
 function Step2({ data, onNext }: { data: any; onNext: (d: any) => void }) {
   const [selected, setSelected] = useState<string[]>(data.sportTypes || []);
-  const sports = Object.keys(SPORT_EMOJIS);
+  const { data: sportsData = [] } = useSportCategories();
+
+  const fallbackSports = [
+    { name: 'Cầu lông', icon: '🏸' },
+    { name: 'Pickleball', icon: '🏓' },
+    { name: 'Bóng đá', icon: '⚽' },
+    { name: 'Tennis', icon: '🎾' },
+    { name: 'Bóng rổ', icon: '🏀' },
+  ];
+
+  const sports = sportsData.length > 0 ? sportsData : fallbackSports;
   const toggle = (s: string) => setSelected(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
   return (
     <div>
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Loại sân thể thao</h2>
       <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 20 }}>Chọn một hoặc nhiều loại sân bạn đang kinh doanh</p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        {sports.map(s => {
-          const active = selected.includes(s);
+        {sports.map((sport: any) => {
+          const active = selected.includes(sport.name);
           return (
-            <button key={s} onClick={() => toggle(s)} style={{
+            <button key={sport.name} onClick={() => toggle(sport.name)} style={{
               padding: '14px 10px', borderRadius: 12, cursor: 'pointer', textAlign: 'center', fontSize: 14, fontWeight: 600,
               border: active ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.12)',
               background: active ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.05)',
               color: active ? '#fbbf24' : 'rgba(255,255,255,0.75)',
               transition: 'all 0.2s',
             }}>
-              <div style={{ fontSize: 24, marginBottom: 6 }}>{SPORT_EMOJIS[s]}</div>
-              {s}
+              <div style={{ fontSize: 24, marginBottom: 6 }}>{sport.icon}</div>
+              {sport.name}
               {active && <CheckCircle2 size={14} style={{ marginLeft: 6, verticalAlign: 'middle', color: '#f59e0b' }} />}
             </button>
           );

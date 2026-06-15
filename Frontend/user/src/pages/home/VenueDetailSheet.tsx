@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Share2, Heart, MapPin, Clock, Star, Phone, ArrowLeft, Copy } from 'lucide-react';
-import { usePublicVenueDetail } from '../../hooks/queries/usePublicQueries';
+import { Share2, Heart, MapPin, Clock, Star, Phone, ArrowLeft, Copy, Check } from 'lucide-react';
+import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
+import { getSportEmojiFromCategories, getSportColorFromCategories } from '../../utils/sport';
 
 interface VenueDetailSheetProps {
   venueId: string | null;
@@ -38,6 +39,7 @@ export default function VenueDetailSheet({
   // Fetch Data (only query if venueId is present)
   const { data: venue, isLoading: loadingVenue } = usePublicVenueDetail(venueId || '');
   const { data: reviews = [] } = useVenueReviews(venueId || '');
+  const { data: sportsData = [] } = useSportCategories();
 
   // Sync state with isOpen prop
   useEffect(() => {
@@ -159,17 +161,49 @@ export default function VenueDetailSheet({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getSportBadge = (sportTypes: string[]) => {
-    if (!sportTypes || sportTypes.length === 0) return '🏸 Cầu lông';
-    const firstSport = sportTypes[0];
-    if (firstSport.toLowerCase().includes('cầu lông')) return '🏸 Cầu lông';
-    if (firstSport.toLowerCase().includes('pickleball')) return '🎾 Pickleball';
-    if (firstSport.toLowerCase().includes('bóng đá')) return '⚽ Bóng đá';
-    if (firstSport.toLowerCase().includes('tennis')) return '🥎 Tennis';
-    if (firstSport.toLowerCase().includes('bóng chuyền')) return '🏐 Bóng chuyền';
-    if (firstSport.toLowerCase().includes('bóng rổ')) return '🏀 Bóng rổ';
-    return `🏆 ${firstSport}`;
+
+
+  const renderSportBadges = (sportTypes: string[]) => {
+    const list = sportTypes || [];
+    if (list.length === 0) return null;
+
+    const getBadgeStyle = (sport: string) => {
+      const color = getSportColorFromCategories(sport, sportsData);
+      return {
+        backgroundColor: color,
+        color: '#ffffff',
+        borderColor: color
+      };
+    };
+    
+    if (list.length <= 2) {
+      return (
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          {list.map((sport, idx) => (
+            <span key={idx} className="venue-sheet-badge-left" style={getBadgeStyle(sport)}>
+              {getSportEmojiFromCategories(sport, sportsData)} {sport}
+            </span>
+          ))}
+        </div>
+      );
+    } else {
+      return (
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <span className="venue-sheet-badge-left" style={getBadgeStyle(list[0])}>
+            {getSportEmojiFromCategories(list[0], sportsData)} {list[0]}
+          </span>
+          <span className="venue-sheet-badge-left" style={getBadgeStyle(list[1])}>
+            {getSportEmojiFromCategories(list[1], sportsData)} {list[1]}
+          </span>
+          <span className="venue-sheet-badge-left" style={{ background: 'rgba(255,255,255,0.8)', color: '#545a63ff', borderColor: 'rgba(255,255,255,0.8)' }}>
+            {list.length - 2}+
+          </span>
+        </div>
+      );
+    }
   };
+
+  const handleBackdropClick = () => snapTo('closed');
 
   const inlineStyles = {
     transform: `translate(-50%, ${translateY}px)`
@@ -177,13 +211,11 @@ export default function VenueDetailSheet({
 
   return createPortal(
     <>
-      {/* Backdrop */}
       <div 
         className={`bottom-sheet-backdrop ${sheetState !== 'closed' ? 'open' : ''}`} 
-        onClick={() => snapTo('closed')}
+        onClick={handleBackdropClick}
       />
 
-      {/* Sheet */}
       <div 
         ref={sheetRef}
         className={`bottom-sheet state-${sheetState} ${isTransitioning ? 'transitioning' : ''}`}
@@ -192,26 +224,23 @@ export default function VenueDetailSheet({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Drag Handle Container */}
         <div className="bottom-sheet-drag-handle-container">
           <div className="bottom-sheet-drag-handle" />
         </div>
 
-        {/* Content */}
         {loadingVenue ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', padding: 24 }}>
             <span style={{ fontSize: 15, color: '#64748b' }}>Đang tải thông tin sân...</span>
           </div>
         ) : venue ? (
           <>
-            {/* Floating Header Actions (stay static at the very top of the sheet) */}
             <div className="bottom-sheet-floating-header">
               <button className="bottom-sheet-close-btn" onClick={() => snapTo('closed')}>
                 <ArrowLeft size={20} />
               </button>
               <div className="bottom-sheet-header-right-actions">
-                <button className="bottom-sheet-action-btn" style={{ marginRight: 4 }}>
-                  <Share2 size={18} />
+                <button className="bottom-sheet-action-btn" style={{ marginRight: 4 }} onClick={handleCopyLink}>
+                  {copied ? <Check size={18} color="#10b981" /> : <Share2 size={18} />}
                 </button>
                 <button 
                   className="bottom-sheet-action-btn" 
@@ -239,9 +268,7 @@ export default function VenueDetailSheet({
               </div>
             </div>
 
-            {/* Fixed Header (Cover Image + Overlapping Venue Detail Card) */}
             <div className="bottom-sheet-fixed-header">
-              {/* Cover Image */}
               <div 
                 className="bottom-sheet-cover-bg"
                 style={{ 
@@ -250,15 +277,12 @@ export default function VenueDetailSheet({
                 }}
               />
 
-              {/* Venue Card - Glassmorphism profile layout */}
               <div className="venue-sheet-card">
-                {/* Rating Pill - centered at the top margin */}
                 <div className="venue-sheet-rating-pill">
                   <Star size={14} fill="#fff" color="#fff" />
                   <span>{venue.rating || 5.0} ({venue.reviewCount || 0} đánh giá)</span>
                 </div>
 
-                {/* Horizontal row for Avatar & Title + Sport Category */}
                 <div className="venue-sheet-header-row">
                   <div className="venue-sheet-avatar-left">
                     {venue.avatarUrl ? (
@@ -271,9 +295,7 @@ export default function VenueDetailSheet({
                   </div>
                   <div className="venue-sheet-title-info-right">
                     <h2 className="venue-sheet-title-left">{venue.name}</h2>
-                    <span className="venue-sheet-badge-left">
-                      {getSportBadge(venue.sportTypes)}
-                    </span>
+                    {renderSportBadges(venue.sportTypes)}
                   </div>
                 </div>
 
