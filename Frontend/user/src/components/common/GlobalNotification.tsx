@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell } from 'lucide-react';
 import { useSignalR } from '../../hooks/useSignalR';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function GlobalNotification() {
   const connection = useSignalR();
   const [notification, setNotification] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (connection) {
@@ -13,13 +15,16 @@ export default function GlobalNotification() {
         .then(() => {
           connection.on('ReceiveNotification', (message: string) => {
             setNotification(message);
+            // Invalidate queries so that badge count and notification list auto-refresh
+            queryClient.invalidateQueries({ queryKey: ['myNotifications'] });
+            queryClient.invalidateQueries({ queryKey: ['unreadNotificationsCount'] });
             // Hide after 5 seconds
             setTimeout(() => setNotification(null), 5000);
           });
         })
         .catch(err => console.error('SignalR Connection Error: ', err));
     }
-  }, [connection]);
+  }, [connection, queryClient]);
 
   return (
     <AnimatePresence>

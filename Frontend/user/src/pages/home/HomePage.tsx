@@ -3,6 +3,7 @@ import { Bell, Search, Heart, Share2, Star, Clock, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenues, useSportCategories } from '../../hooks/queries/usePublicQueries';
+import { useUnreadNotificationsCount } from '../../hooks/queries/useNotificationQueries';
 import { jwtDecode } from 'jwt-decode';
 import VenueDetailSheet from './VenueDetailSheet';
 import { ensureValidToken } from '../../utils/auth';
@@ -16,7 +17,6 @@ export default function HomePage() {
   const [userName, setUserName] = useState('Khách');
   const [userAvatar, setUserAvatar] = useState('');
   const [currentDate, setCurrentDate] = useState('');
-  const [showNotiPopover, setShowNotiPopover] = useState(false);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -98,6 +98,8 @@ export default function HomePage() {
   };
 
   const { data: venues = [], isLoading } = usePublicVenues(searchTerm);
+  const { data: unreadResponse } = useUnreadNotificationsCount();
+  const unreadCount = unreadResponse?.data || 0;
 
   const displayVenues = venues.filter((venue: any) => {
     const matchesSport = activeSport
@@ -147,45 +149,40 @@ export default function HomePage() {
                 <span className="dot-indicator"></span>
               </button>
               <div style={{ position: 'relative' }}>
-                <button className="icon-btn" onClick={() => setShowNotiPopover(!showNotiPopover)}>
+                <button 
+                  className="icon-btn" 
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      setShowLoginModal(true);
+                    } else {
+                      navigate('/notifications');
+                    }
+                  }}
+                  style={{ position: 'relative' }}
+                >
                   <Bell size={20} color="#fff" />
-                </button>
-                {showNotiPopover && (
-                  <>
-                    <div 
-                      onClick={() => setShowNotiPopover(false)} 
-                      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }} 
-                    />
-                    <div style={{
+                  {unreadCount > 0 && (
+                    <span style={{
                       position: 'absolute',
-                      top: '42px',
-                      right: '0',
-                      backgroundColor: '#ffffff',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
-                      border: '1px solid #e2e8f0',
-                      zIndex: 100,
-                      minWidth: '160px',
-                      textAlign: 'center'
+                      top: '-4px',
+                      right: '-4px',
+                      backgroundColor: '#ef4444',
+                      color: '#ffffff',
+                      borderRadius: '50%',
+                      padding: '2px 5px',
+                      fontSize: '9px',
+                      fontWeight: 'bold',
+                      minWidth: '15px',
+                      height: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxSizing: 'border-box'
                     }}>
-                      <div style={{
-                        position: 'absolute',
-                        top: '-6px',
-                        right: '12px',
-                        width: '10px',
-                        height: '10px',
-                        backgroundColor: '#ffffff',
-                        transform: 'rotate(45deg)',
-                        borderTop: '1px solid #e2e8f0',
-                        borderLeft: '1px solid #e2e8f0'
-                      }} />
-                      <span style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
-                        Chưa có thông báo
-                      </span>
-                    </div>
-                  </>
-                )}
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
           </div>

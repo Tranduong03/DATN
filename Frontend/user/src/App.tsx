@@ -44,6 +44,7 @@ const MatchListPage = lazy(() => import('./pages/home/MatchListPage'));
 const MatchDetailPage = lazy(() => import('./pages/home/MatchDetailPage'));
 const MapPage = lazy(() => import('./pages/home/MapPage'));
 const ExplorePage = lazy(() => import('./pages/home/ExplorePage'));
+const NotificationsPage = lazy(() => import('./pages/home/NotificationsPage'));
 
 // Team pages
 const TeamListPage = lazy(() => import('./pages/teams/TeamListPage'));
@@ -138,6 +139,7 @@ function AppRoutes() {
               <Route path="/me" element={withTransition(MePage)} />
               <Route path="/UserProfile" element={<UserProfile />} />
               <Route path="/member" element={<MemberPage />} />
+              <Route path="/notifications" element={withTransition(NotificationsPage)} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/settings/change-password" element={<ChangePasswordPage />} />
               <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
