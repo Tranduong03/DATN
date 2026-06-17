@@ -4,7 +4,7 @@
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
   --category-width: 35px;
-  --court-width: 55px;
+  --court-width: 50px;
   --left-columns-width: calc(var(--category-width) + var(--court-width));
   --grid-cell-width: 37px;
 }
@@ -20,12 +20,15 @@
 .col-category {
   width: var(--category-width);
 }
+
 .col-court {
   width: var(--court-width);
 }
+
 .col-slot {
   width: var(--grid-cell-width);
 }
+
 .col-end-zone {
   width: 28px;
 }
@@ -133,7 +136,7 @@
   left: 0;
   z-index: 10;
   background-color: #c7eedb;
-  border-right: 1px solid #313749;
+  border-right: 1.25px solid #313749;
   vertical-align: middle;
   text-align: center;
   font-size: 12px;

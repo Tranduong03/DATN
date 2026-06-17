@@ -98,7 +98,7 @@ export default function BookingGrid({
     if (nameLower === 'bb 1' && (idx === 5 || idx === 6)) {
       return 'locked';
     }
-    
+
     // General fallback
     if (idx % 7 === 0) return 'locked';
     if (idx % 11 === 0) return 'event';
@@ -139,7 +139,7 @@ export default function BookingGrid({
 
   groupsList.forEach((groupName, groupIdx) => {
     const courtsInGroup = groupedCourts[groupName];
-    
+
     courtsInGroup.forEach((court, courtIndex) => {
       renderedRows.push(
         <tr key={court.courtId}>
@@ -184,8 +184,8 @@ export default function BookingGrid({
             ].filter(Boolean).join(' ');
 
             return (
-              <td 
-                key={idx} 
+              <td
+                key={idx}
                 className={`slot-td ${isSelected ? `selected ${selectedClasses}` : status}`}
               >
                 <div
@@ -243,7 +243,7 @@ export default function BookingGrid({
                 <th key={idx} className="ruler-header-cell">
                   {/* Left tick */}
                   <div className="ruler-tick" />
-                  
+
                   {/* Time label centered over the left border */}
                   <div className="ruler-time-text">
                     {timeStr}
