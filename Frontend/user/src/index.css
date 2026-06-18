@@ -3606,6 +3606,9 @@ input[type="password"]::-ms-clear {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
 }
 
 .owner-mobile-bottom-nav {
@@ -5191,4 +5194,263 @@ input[type="password"]::-ms-clear {
 .booking-bottom-action-bar.has-slots .booking-confirm-btn:disabled {
   background-color: rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========================================================
+   OWNER PRICING EDIT PAGE STYLES (MOBILE-FIRST)
+   ======================================================== */
+.owner-pricing-content {
+  padding: 16px 16px 24px 16px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.owner-pricing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+}
+
+.owner-pricing-back-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.owner-pricing-title-text {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.owner-pricing-delete-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.owner-pricing-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.owner-pricing-tab-btn-dotted {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.owner-pricing-tab-btn-active {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: none;
+  background: #f5d061;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.owner-pricing-section {
+  margin-bottom: 20px;
+}
+
+.owner-pricing-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.owner-pricing-section-subtitle {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+
+.owner-pricing-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  color: #0f172a;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.owner-pricing-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.owner-pricing-card-arrows {
+  display: flex;
+  gap: 12px;
+  color: #475569;
+  font-weight: 800;
+}
+
+.owner-pricing-card-sport-title {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.owner-pricing-card-actions {
+  display: flex;
+  gap: 12px;
+  color: #475569;
+}
+
+.owner-pricing-card-actions span {
+  cursor: pointer;
+}
+
+.owner-pricing-card-notice {
+  padding: 8px 16px;
+  background-color: #ffffff;
+  font-size: 12px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-bottom: 1px solid #cbd5e1;
+  font-weight: 500;
+}
+
+.owner-pricing-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.owner-pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 340px;
+}
+
+.owner-pricing-table th {
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+  border-bottom: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+}
+
+.owner-pricing-table th:last-child {
+  border-right: none;
+}
+
+.owner-pricing-table td {
+  padding: 12px 8px;
+  font-size: 12px;
+  color: #1e293b;
+  text-align: center;
+  border-bottom: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+  vertical-align: middle;
+}
+
+.owner-pricing-table td:last-child {
+  border-right: none;
+}
+
+.owner-pricing-input-time {
+  padding: 2px 4px;
+  font-size: 11px;
+  width: 60px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.owner-pricing-input-number {
+  padding: 2px 4px;
+  font-size: 11px;
+  width: 65px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.owner-pricing-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+}
+
+.owner-pricing-card-dotted-btn {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-top: 1.5px dashed #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.owner-pricing-under-card-dotted-btn {
+  width: 100%;
+  padding: 12px 0;
+  margin-top: 16px;
+  border-radius: 8px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.owner-pricing-save-container {
+  padding: 24px 0 12px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.owner-pricing-save-btn {
+  width: 100%;
+  padding: 14px 0;
+  border-radius: 6px;
+  border: none;
+  background: #f5d061;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

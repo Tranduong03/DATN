@@ -1,4 +1,4 @@
-import React from 'react';
+import './PricingTable.css';
 
 interface PriceRule {
   dayOfWeek: number | null;
@@ -139,70 +139,25 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
   });
   const sportName = sportTypes.length > 0 ? sportTypes.join(' & ') : 'Mặc định';
 
-  // Theme styles - always solid white background cards to stand out on green page
-  const containerStyle: React.CSSProperties = {
-    width: '100%',
-    margin: '12px 0 16px 0',
-    border: '1px solid #cbd5e1',
-    borderRadius: '4px',
-    overflow: 'hidden',
-    backgroundColor: '#ffffff'
-  };
-
-  const headerStyle: React.CSSProperties = {
-    backgroundColor: '#ffffff',
-    color: '#0f172a',
-    fontWeight: 700,
-    fontSize: '13px',
-    padding: '12px 8px',
-    borderBottom: '1px solid #cbd5e1',
-    borderRight: '1px solid #cbd5e1',
-    textAlign: 'center'
-  };
-
-  const cellStyle: React.CSSProperties = {
-    padding: '12px 8px',
-    borderBottom: '1px solid #cbd5e1',
-    borderRight: '1px solid #cbd5e1',
-    textAlign: 'center',
-    verticalAlign: 'middle',
-    color: '#1e293b',
-    fontSize: '13px'
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      <div style={{
-        textAlign: 'center',
-        fontSize: '14px',
-        fontWeight: 600,
-        color: '#ffffff',
-        margin: '8px 0 4px 0',
-      }}>
+      <div className="pricing-table-title">
         Bảng giá sân
       </div>
 
-      <div style={containerStyle}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="pricing-table-container">
+        <table className="pricing-table-root">
           <thead>
             <tr>
-              <th colSpan={4} style={{
-                backgroundColor: '#ffffff',
-                color: '#0f172a',
-                fontWeight: 700,
-                fontSize: '14px',
-                padding: '12px 8px',
-                borderBottom: '1px solid #cbd5e1',
-                textAlign: 'center'
-              }}>
+              <th colSpan={4} className="pricing-table-main-header">
                 {sportName}
               </th>
             </tr>
             <tr>
-              <th style={headerStyle}>Thứ</th>
-              <th style={headerStyle}>Khung giờ</th>
-              <th style={headerStyle}>Cố định</th>
-              <th style={headerStyle}>Vãng lai</th>
+              <th className="pricing-table-header">Thứ</th>
+              <th className="pricing-table-header">Khung giờ</th>
+              <th className="pricing-table-header">Cố định</th>
+              <th className="pricing-table-header" style={{ borderRight: 'none' }}>Vãng lai</th>
             </tr>
           </thead>
           <tbody>
@@ -211,25 +166,21 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
                 {row.isFirstOfGroup && (
                   <td
                     rowSpan={row.rowSpan}
-                    style={{
-                      ...cellStyle,
-                      fontWeight: 500,
-                      backgroundColor: '#ffffff',
-                      borderRight: '1px solid #cbd5e1'
-                    }}
+                    className="pricing-table-cell pricing-table-cell-bold"
+                    style={{ backgroundColor: '#ffffff' }}
                   >
                     {row.daysText}
                   </td>
                 )}
-                <td style={cellStyle}>{row.timeSlot}</td>
-                <td style={{ ...cellStyle, fontWeight: 500 }}>
+                <td className="pricing-table-cell">{row.timeSlot}</td>
+                <td className="pricing-table-cell pricing-table-cell-bold">
                   {row.fixedPrice !== null ? (
                     `${row.fixedPrice.toLocaleString('vi-VN')} đ`
                   ) : (
                     '-'
                   )}
                 </td>
-                <td style={{ ...cellStyle, fontWeight: 500, borderRight: 'none' }}>
+                <td className="pricing-table-cell pricing-table-cell-bold pricing-table-cell-last">
                   {row.casualPrice !== null ? (
                     `${row.casualPrice.toLocaleString('vi-VN')} đ`
                   ) : (

@@ -344,31 +344,248 @@ export default function VenueConfigPage() {
     }
   };
 
+  useEffect(() => {
+    if (activeTab === 'pricing') {
+      const originalBodyBg = document.body.style.backgroundColor;
+      const originalHtmlBg = document.documentElement.style.backgroundColor;
+      document.body.style.backgroundColor = '#2b6139';
+      document.documentElement.style.backgroundColor = '#2b6139';
+      return () => {
+        document.body.style.backgroundColor = originalBodyBg;
+        document.documentElement.style.backgroundColor = originalHtmlBg;
+      };
+    }
+  }, [activeTab]);
+
+  if (activeTab === 'pricing') {
+    return (
+      <div className="owner-venue-detail-page">
+        <div className="owner-pricing-content">
+          {/* Custom PWA Header */}
+          <div className="owner-pricing-header">
+            <button 
+              onClick={() => navigate(`/owner/venues/${venue.id}?tab=pricing`)}
+              className="owner-pricing-back-btn"
+            >
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <span className="owner-pricing-title-text">Chỉnh sửa bảng giá sân</span>
+            <button 
+              onClick={() => {
+                if (window.confirm('Bạn có muốn xóa toàn bộ bảng giá sân?')) {
+                  setGroupedRows([]);
+                }
+              }}
+              className="owner-pricing-delete-btn"
+            >
+              <Trash2 size={15} color="#ef4444" />
+            </button>
+          </div>
+
+          {/* Custom Tab buttons */}
+          <div className="owner-pricing-tabs">
+            <button 
+              onClick={() => alert('Chọn thêm loại sân.')}
+              className="owner-pricing-tab-btn-dotted"
+            >
+              Thêm loại sân +
+            </button>
+            <button 
+              className="owner-pricing-tab-btn-active"
+            >
+              Bảng giá sân ✏️
+            </button>
+          </div>
+
+          {/* Target Group */}
+          <div className="owner-pricing-section">
+            <div className="owner-pricing-section-title">Sân áp dụng</div>
+            <div className="owner-pricing-section-subtitle">Khung giờ bắt buộc</div>
+            <button 
+              onClick={() => alert('Chức năng cấu hình khung giờ bắt buộc sẽ sớm khả dụng.')}
+              className="owner-pricing-under-card-dotted-btn"
+              style={{ marginTop: 0 }}
+            >
+              + Thêm khung giờ
+            </button>
+          </div>
+
+          {/* Table Container */}
+          <div style={{ flex: 1 }}>
+            <div className="owner-pricing-section-title" style={{ marginBottom: 12 }}>Bảng giá</div>
+            
+            {/* White card container */}
+            <div className="owner-pricing-card">
+              {/* Card Header */}
+              <div className="owner-pricing-card-header">
+                <div className="owner-pricing-card-arrows">
+                  <span style={{ cursor: 'pointer' }}>↑</span>
+                  <span style={{ cursor: 'pointer' }}>↓</span>
+                </div>
+                <div className="owner-pricing-card-sport-title">
+                  {venue.sportTypes?.[0] || 'Cầu lông'}
+                </div>
+                <div className="owner-pricing-card-actions">
+                  <span onClick={() => alert('Chỉnh sửa tên loại sân.')}><Edit2 size={16} color="#475569" /></span>
+                  <span onClick={() => alert('Xóa bảng giá loại sân này.')}><Trash2 size={16} color="#ef4444" /></span>
+                </div>
+              </div>
+
+              {/* Notice row */}
+              <div className="owner-pricing-card-notice">
+                <span>👤 Đang hiển thị bảng giá với khách chơi</span>
+              </div>
+
+              {/* Table wrapper for horizontal scrollability */}
+              <div className="owner-pricing-table-wrapper">
+                <table className="owner-pricing-table">
+                  <thead>
+                    <tr>
+                      <th>Khung giờ</th>
+                      <th>Cố định</th>
+                      <th>Vãng lai</th>
+                      <th style={{ width: '36px' }}></th>
+                      <th style={{ width: '36px' }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groupedRows.map((row, idx) => (
+                      <tr key={idx}>
+                        <td>
+                          {row.isEditing ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
+                              <input 
+                                type="time" 
+                                value={row.startHour} 
+                                onChange={e => updateGroupRow(idx, 'startHour', e.target.value)}
+                                className="owner-pricing-input-time"
+                              />
+                              <input 
+                                type="time" 
+                                value={row.endHour} 
+                                onChange={e => updateGroupRow(idx, 'endHour', e.target.value)}
+                                className="owner-pricing-input-time"
+                              />
+                            </div>
+                          ) : (
+                            row.timeDisplay
+                          )}
+                        </td>
+                        <td>
+                          {row.isEditing ? (
+                            <input 
+                              type="number" 
+                              value={row.fixedPrice} 
+                              onChange={e => updateGroupRow(idx, 'fixedPrice', Number(e.target.value))}
+                              className="owner-pricing-input-number"
+                            />
+                          ) : (
+                            `${row.fixedPrice.toLocaleString('vi-VN')} đ`
+                          )}
+                        </td>
+                        <td>
+                          {row.isEditing ? (
+                            <input 
+                              type="number" 
+                              value={row.casualPrice} 
+                              onChange={e => updateGroupRow(idx, 'casualPrice', Number(e.target.value))}
+                              className="owner-pricing-input-number"
+                            />
+                          ) : (
+                            `${row.casualPrice.toLocaleString('vi-VN')} đ`
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 4px' }}>
+                          {row.isEditing ? (
+                            <button 
+                              onClick={() => saveGroupRow(idx)}
+                              className="owner-pricing-action-btn"
+                              title="Lưu dòng này"
+                            >
+                              <Check size={18} color="#10b981" />
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => editGroupRow(idx)}
+                              className="owner-pricing-action-btn"
+                              title="Sửa dòng này"
+                            >
+                              <Edit2 size={16} color="#2b6139" />
+                            </button>
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 4px' }}>
+                          <button 
+                            onClick={() => deleteGroupRow(idx)}
+                            className="owner-pricing-action-btn"
+                            title="Xóa dòng này"
+                          >
+                            <Eye size={18} color="#2b6139" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Dotted button inside card */}
+              <button 
+                onClick={addNewGroupRow}
+                className="owner-pricing-card-dotted-btn"
+              >
+                + Thêm khung giờ
+              </button>
+            </div>
+
+            {/* Dotted button under card */}
+            <button 
+              onClick={() => alert('Chức năng thêm đối tượng sẽ sớm khả dụng.')}
+              className="owner-pricing-under-card-dotted-btn"
+            >
+              + Thêm đối tượng
+            </button>
+          </div>
+
+          {/* Bottom Save Button - Flowing layout */}
+          <div className="owner-pricing-save-container">
+            <button 
+              onClick={handleSavePricingGrouped}
+              className="owner-pricing-save-btn"
+            >
+              LƯU
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <OwnerLayout 
-      title={activeTab === 'pricing' ? 'Chỉnh sửa bảng giá sân' : `Cấu hình: ${venue.name}`} 
-      showSystemHeader={activeTab !== 'pricing'}
-      showBottomNav={activeTab !== 'pricing'}
+      title={`Cấu hình: ${venue.name}`} 
+      showSystemHeader={true}
+      showBottomNav={false}
     >
       {/* Back button removed as 1 Owner = 1 Venue */}
-      {activeTab !== 'pricing' && (
-        <div className="admin-tabs" style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
-          <button 
-            className={`admin-tab-btn ${activeTab === 'courts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('courts')}
-            style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'courts' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'courts' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'courts' ? 600 : 400, cursor: 'pointer' }}
-          >
-            Danh sách Sân con
-          </button>
-          <button 
-            className={`admin-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-            style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'profile' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'profile' ? 600 : 400, cursor: 'pointer' }}
-          >
-            Thông tin cơ sở
-          </button>
-        </div>
-      )}
+      <div className="admin-tabs" style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
+        <button 
+          className={`admin-tab-btn ${activeTab === 'courts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('courts')}
+          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'courts' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'courts' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'courts' ? 600 : 400, cursor: 'pointer' }}
+        >
+          Danh sách Sân con
+        </button>
+        <button 
+          className={`admin-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
+          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'profile' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'profile' ? 600 : 400, cursor: 'pointer' }}
+        >
+          Thông tin cơ sở
+        </button>
+      </div>
 
       {activeTab === 'courts' && (
         <div className="admin-section">
@@ -475,16 +692,17 @@ export default function VenueConfigPage() {
         </div>
       )}
 
-      {activeTab === 'pricing' && (
+      {false && (
         <div style={{
-          margin: '-16px -16px',
+          margin: 0,
           padding: '16px 16px 24px 16px',
           backgroundColor: '#2b6139',
           color: '#ffffff',
           display: 'flex',
           flexDirection: 'column',
-          minHeight: 'calc(100vh - 60px)',
-          boxSizing: 'border-box'
+          minHeight: '100vh',
+          boxSizing: 'border-box',
+          width: '100%'
         }}>
           {/* Custom PWA Header */}
           <div style={{
@@ -634,8 +852,9 @@ export default function VenueConfigPage() {
                 <span>👤 Đang hiển thị bảng giá với khách chơi</span>
               </div>
 
-              {/* Table */}
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              {/* Table wrapper for horizontal scrollability */}
+              <div style={{ overflowX: 'auto', width: '100%' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '340px' }}>
                 <thead>
                   <tr>
                     <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Khung giờ</th>
@@ -724,6 +943,7 @@ export default function VenueConfigPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
 
               {/* Dotted button inside card */}
               <button 

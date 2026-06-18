@@ -1,0 +1,63 @@
+/* ========================================================
+   PRICING TABLE COMPONENT STYLES
+   ======================================================== */
+.pricing-table-title {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 8px 0 4px 0;
+}
+
+.pricing-table-container {
+  width: 100%;
+  margin: 12px 0 16px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.pricing-table-root {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pricing-table-main-header {
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 8px;
+  border-bottom: 1px solid #cbd5e1;
+  text-align: center;
+}
+
+.pricing-table-header {
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 12px 8px;
+  border-bottom: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+  text-align: center;
+}
+
+.pricing-table-cell {
+  padding: 12px 8px;
+  border-bottom: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+  text-align: center;
+  vertical-align: middle;
+  color: #1e293b;
+  font-size: 13px;
+}
+
+.pricing-table-cell-bold {
+  font-weight: 500;
+}
+
+.pricing-table-cell-last {
+  border-right: none;
+}
