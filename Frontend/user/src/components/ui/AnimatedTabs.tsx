@@ -45,6 +45,7 @@ interface TabUnderlineProps {
   stiffness?: number;
   damping?: number;
   style?: React.CSSProperties;
+  transition?: any;
 }
 
 export function TabUnderline({
@@ -57,7 +58,8 @@ export function TabUnderline({
   borderRadius = '2px',
   stiffness = 350,
   damping = 28,
-  style
+  style,
+  transition
 }: TabUnderlineProps) {
   return (
     <motion.div
@@ -72,7 +74,7 @@ export function TabUnderline({
         borderRadius,
         ...style
       }}
-      transition={{ type: 'spring', stiffness, damping }}
+      transition={transition || { type: 'spring', stiffness, damping }}
     />
   );
 }
@@ -85,6 +87,7 @@ interface TabContentSliderProps {
   className?: string;
   stiffness?: number;
   damping?: number;
+  transition?: any;
 }
 
 export function TabContentSlider({ 
@@ -93,7 +96,8 @@ export function TabContentSlider({
   children, 
   className,
   stiffness = 350,
-  damping = 28
+  damping = 28,
+  transition
 }: TabContentSliderProps) {
   return (
     <div className={className} style={{ overflow: 'hidden', position: 'relative', width: '100%' }}>
@@ -105,7 +109,7 @@ export function TabContentSlider({
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{
+          transition={transition || {
             x: { type: 'spring', stiffness, damping },
             opacity: { duration: 0.12 }
           }}
