@@ -1389,7 +1389,7 @@ input[type="password"]::-ms-clear {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-bottom: 24px;  
+  padding-bottom: 24px;
   margin-top: -13px;
 }
 
@@ -1625,7 +1625,8 @@ input[type="password"]::-ms-clear {
   max-width: 480px;
   margin: 0 auto;
   position: relative;
-  padding-bottom: 80px; /* Spacer for bottom nav */
+  padding-bottom: 80px;
+  /* Spacer for bottom nav */
 }
 
 /* Banner Area */
@@ -1771,7 +1772,7 @@ input[type="password"]::-ms-clear {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* Identity Name/Email */
@@ -2583,7 +2584,7 @@ input[type="password"]::-ms-clear {
   align-items: center;
   justify-content: center;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
 }
 
@@ -3472,6 +3473,7 @@ input[type="password"]::-ms-clear {
     height: auto;
     overflow: visible;
   }
+
   .admin-sidebar {
     width: 100% !important;
     height: auto;
@@ -3479,28 +3481,34 @@ input[type="password"]::-ms-clear {
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   }
+
   .admin-sidebar-logo {
     height: 60px;
     padding: 12px;
   }
+
   .admin-sidebar-toggle {
     display: none;
   }
+
   .admin-sidebar-nav {
     flex-direction: row;
     padding: 8px 12px;
     overflow-x: auto;
     gap: 8px;
   }
+
   .admin-nav-section-label {
     display: none;
   }
+
   .admin-nav-item {
     padding: 8px 12px;
     font-size: 13px;
     width: auto;
     border-radius: 6px;
   }
+
   .admin-sidebar-footer {
     flex-direction: row;
     border-top: none;
@@ -3509,23 +3517,28 @@ input[type="password"]::-ms-clear {
     align-items: center;
     gap: 8px;
   }
+
   .admin-sidebar-footer .admin-nav-item {
     margin: 0;
   }
+
   .admin-main {
     min-height: calc(100vh - 120px);
     height: auto;
     overflow: visible;
   }
+
   .admin-header {
     padding: 0 20px;
     height: 60px;
   }
+
   .admin-content {
     padding: 20px;
     overflow-y: visible;
     height: auto;
   }
+
   .admin-stats-grid {
     grid-template-columns: 1fr;
   }
@@ -3672,7 +3685,8 @@ input[type="password"]::-ms-clear {
 
 .owner-dashboard-banner {
   background: linear-gradient(rgba(4, 120, 87, 0.4), rgba(6, 78, 59, 0.85)), url('https://images.unsplash.com/photo-1626224484214-e0c1f6087d3d?w=800&fit=crop') center/cover no-repeat;
-  padding: 24px 16px 48px; /* Combined top left bottom right */
+  padding: 24px 16px 48px;
+  /* Combined top left bottom right */
   position: relative;
   text-align: center;
   border-bottom: 1px solid rgba(4, 120, 87, 0.15);
@@ -3710,7 +3724,7 @@ input[type="password"]::-ms-clear {
 
 .owner-banner-avatar-frame {
   width: 110px;
-  height:110px;
+  height: 110px;
   border: 3px solid #ffffff;
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
@@ -3724,7 +3738,8 @@ input[type="password"]::-ms-clear {
 }
 
 .owner-banner-venue-name {
-  margin: 16px 0 0; /* Shorthand */
+  margin: 16px 0 0;
+  /* Shorthand */
   color: #ffffff;
   font-size: 25px;
   font-weight: 800;
@@ -3735,7 +3750,8 @@ input[type="password"]::-ms-clear {
 .owner-dashboard-content-card {
   background-color: #ffffff;
   border-radius: 28px 28px 0 0;
-  padding: 24px 20px 90px; /* Combined padding-bottom */
+  padding: 24px 20px 90px;
+  /* Combined padding-bottom */
   margin-top: -24px;
   position: relative;
   z-index: 10;
@@ -3818,7 +3834,8 @@ input[type="password"]::-ms-clear {
    ======================================================== */
 .owner-venue-detail-page {
   min-height: 100vh;
-  background-color: #2b6139; /* Forest Green exactly as in screenshot */
+  background-color: #2b6139;
+  /* Forest Green exactly as in screenshot */
   color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   position: relative;
@@ -3997,7 +4014,8 @@ input[type="password"]::-ms-clear {
 .owner-venue-link-title {
   font-size: 15px;
   font-weight: 700;
-  color: #facc15; /* Yellow-400 */
+  color: #facc15;
+  /* Yellow-400 */
   margin: 0 0 10px 0;
   letter-spacing: 0.2px;
 }
@@ -4057,10 +4075,12 @@ input[type="password"]::-ms-clear {
 
 .owner-venue-fab {
   pointer-events: auto;
-  background: #f1b23e; /* Golden-yellow */
+  background: #f1b23e;
+  /* Golden-yellow */
   color: #ffffff;
   border: none;
-  border-radius: 12px; /* Not pill-shaped, matches screenshot */
+  border-radius: 12px;
+  /* Not pill-shaped, matches screenshot */
   padding: 12px 18px;
   font-size: 14px;
   font-weight: 700;
@@ -4127,11 +4147,13 @@ input[type="password"]::-ms-clear {
 }
 
 .bottom-sheet.state-half {
-  transform: translate(-50%, 44.44%); /* Leaves 50% of viewport visible (90% total height - 40% translation = 50% visible) */
+  transform: translate(-50%, 44.44%);
+  /* Leaves 50% of viewport visible (90% total height - 40% translation = 50% visible) */
 }
 
 .bottom-sheet.state-full {
-  transform: translate(-50%, 0%); /* Leaves 90% of viewport visible (90% total height - 0% translation = 90% visible) */
+  transform: translate(-50%, 0%);
+  /* Leaves 90% of viewport visible (90% total height - 0% translation = 90% visible) */
 }
 
 /* Drag Handle Bar */
@@ -4177,7 +4199,7 @@ input[type="password"]::-ms-clear {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.1) 100%);
 }
 
 .bottom-sheet-header-actions {
@@ -4191,7 +4213,8 @@ input[type="password"]::-ms-clear {
   z-index: 1005;
 }
 
-.bottom-sheet-close-btn, .bottom-sheet-action-btn {
+.bottom-sheet-close-btn,
+.bottom-sheet-action-btn {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -4202,11 +4225,12 @@ input[type="password"]::-ms-clear {
   justify-content: center;
   color: #333;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: background-color 0.2s;
 }
 
-.bottom-sheet-close-btn:hover, .bottom-sheet-action-btn:hover {
+.bottom-sheet-close-btn:hover,
+.bottom-sheet-action-btn:hover {
   background: #ffffff;
 }
 
@@ -4216,7 +4240,8 @@ input[type="password"]::-ms-clear {
 }
 
 .bottom-sheet-book-header-btn {
-  background: #f1b23e; /* Golden-yellow */
+  background: #f1b23e;
+  /* Golden-yellow */
   color: white;
   border: none;
   padding: 8px 16px;
@@ -4224,7 +4249,7 @@ input[type="password"]::-ms-clear {
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s;
 }
 
@@ -4269,7 +4294,8 @@ input[type="password"]::-ms-clear {
   border-radius: 24px;
   padding: 20px 16px 10px 16px;
   box-shadow: 0 12px 30px rgba(6, 78, 59, 0.08);
-  margin-top: -95px; /* Overlaps cover image like in UserProfile */
+  margin-top: -95px;
+  /* Overlaps cover image like in UserProfile */
   position: relative;
   z-index: 1006;
   display: flex;
@@ -4281,7 +4307,8 @@ input[type="password"]::-ms-clear {
   width: 84px;
   height: 84px;
   border-radius: 50%;
-  border: 3.5px solid #10b981; /* Theme green border */
+  border: 3.5px solid #10b981;
+  /* Theme green border */
   background: white;
   padding: 2.5px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
@@ -4372,7 +4399,7 @@ input[type="password"]::-ms-clear {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   background: #f1b23e;
   display: flex;
   align-items: center;
@@ -4440,7 +4467,7 @@ input[type="password"]::-ms-clear {
   /* background: #ffffff; */
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   border: 1px solid #f1f5f9;
 }
 
@@ -4556,7 +4583,7 @@ input[type="password"]::-ms-clear {
   background: #ffffff;
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   border: 1px solid #f1f5f9;
 }
 
@@ -4768,4 +4795,402 @@ input[type="password"]::-ms-clear {
   display: inline-block;
 }
 
+/* UserBooking layout & components */
+.user-booking-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 0 180px 0;
+  font-family: 'Montserrat', sans-serif;
+  color: #1e293b;
+  background-color: #ffffff;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
 
+.booking-header-box {
+  background-color: #006d38;
+  padding: 16px;
+  color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.booking-header-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.booking-back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.booking-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.booking-header-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 2px 0 0 0;
+  font-weight: 600;
+}
+
+.booking-legend-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 18px;
+}
+
+.booking-legend-color {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.booking-legend-color.available {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.booking-legend-color.selected {
+  background: #30b876;
+  border: 1px solid #000;
+}
+
+.booking-legend-color.booked {
+  background: #ff6464;
+}
+
+.booking-legend-color.locked {
+  background: #999999;
+}
+
+.booking-header-link-row {
+  margin-top: 18px;
+  font-size: 12px;
+  font-weight: 550;
+  text-align: end;
+}
+
+.booking-warning-banner {
+  background-color: #edfff6;
+  padding: 6px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.booking-date-carousel {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 0px 8px;
+  background-color: #edfff6;
+  border-bottom: 1px solid #e2e8f0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.booking-date-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sliding active indicator background */
+.booking-date-active-indicator {
+  position: absolute;
+  left: 8px;
+  width: 56px;
+  height: 64px;
+  border-radius: 8px;
+  background-color: #41a072;
+  box-shadow: 0 4px 6px -1px rgba(2, 71, 31, 0.2);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.booking-date-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #334155;
+  cursor: pointer;
+  padding: 6px 4px;
+  position: relative;
+  z-index: 2;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.booking-date-btn.active {
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.booking-date-custom-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  box-sizing: border-box;
+  z-index: 2;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.booking-date-custom-wrapper.active {
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.booking-date-custom-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.booking-bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease-in-out;
+}
+
+.booking-bottom-action-bar.has-slots {
+  background-color: #006d38;
+  border-top: none;
+  color: #ffffff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Child elements formatting - unified under stylesheets */
+.booking-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.booking-legend-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.booking-header-link {
+  color: #ffec88;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.booking-warning-banner .warning-label {
+  color: #dd4c4cff;
+  font-weight: 600;
+}
+
+.booking-warning-banner .warning-text {
+  color: #0a4d28;
+  font-weight: 500;
+}
+
+.booking-date-btn-day {
+  font-size: 11px;
+  font-weight: 550;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.booking-date-btn.active .booking-date-btn-day {
+  opacity: 0.9;
+}
+
+.booking-date-btn-num {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.booking-summary-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 0;
+  width: 100%;
+}
+
+.booking-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.booking-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.booking-bottom-action-bar.has-slots .booking-summary-row {
+  color: #ffffff;
+}
+
+.booking-summary-row span strong {
+  color: #0f5132;
+}
+
+.booking-summary-price {
+  font-weight: 700;
+  color: #0f5132;
+}
+
+.booking-summary-divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 4px 0;
+}
+
+.booking-bottom-action-bar.has-slots .booking-summary-divider {
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 18px 10px;
+}
+
+.booking-confirm-btn-wrapper {
+  padding: 8px;
+}
+
+.booking-bottom-action-bar.has-slots .booking-confirm-btn-wrapper {
+  padding: 8px;
+}
+
+.booking-summary-panel {
+  padding: 12px 14px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.booking-bottom-action-bar.has-slots .booking-summary-panel {
+  background-color: transparent;
+  border-bottom: none;
+  max-height: 180px;
+  padding: 4px 14px 12px 14px;
+}
+
+.booking-summary-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #02471f;
+  margin-bottom: 6px;
+}
+
+.booking-summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: #02471f;
+}
+
+.booking-bottom-action-bar.has-slots .booking-summary-total-row {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 0 14px;
+}
+
+.booking-confirm-btn {
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 500;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+}
+
+.booking-bottom-action-bar.has-slots .booking-confirm-btn {
+  border-radius: 6px;
+}
+
+.booking-confirm-btn:not(:disabled) {
+  background-color: #e3b02c;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(202, 163, 56, 0.2);
+}
+
+.booking-bottom-action-bar.has-slots .booking-confirm-btn:not(:disabled) {
+  background-color: #e3b02c;
+  box-shadow: 0 4px 12px rgba(224, 171, 50, 0.25);
+}
+
+.booking-bottom-action-bar.has-slots .booking-confirm-btn:not(:disabled):hover {
+  background-color:#e3b02c;
+}
+
+.booking-confirm-btn:disabled {
+  background-color: #e2e8f0;
+  color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.booking-bottom-action-bar.has-slots .booking-confirm-btn:disabled {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { useVenueAvailability } from '../../hooks/queries/useBookingQueries';
@@ -25,6 +25,8 @@ export default function UserBooking() {
     endTime: string;
     price: number;
   }[]>([]);
+
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(true);
 
   // API Queries & Mutations
   const { data: venue } = usePublicVenueDetail(venueId || '');
@@ -97,6 +99,16 @@ export default function UserBooking() {
   const groupedBookings = getGroupedBookings();
   const totalPriceSum = selectedSlots.reduce((sum, s) => sum + s.price, 0);
 
+  const totalHoursStr = (() => {
+    const totalMinutes = selectedSlots.reduce((sum, slot) => {
+      const diff = new Date(slot.endTime).getTime() - new Date(slot.startTime).getTime();
+      return sum + (diff / 60000);
+    }, 0);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}h${minutes.toString().padStart(2, '0')}`;
+  })();
+
   const handleBookNext = async () => {
     if (groupedBookings.length === 0) return;
 
@@ -137,7 +149,7 @@ export default function UserBooking() {
     const dateObj = new Date(timeStr);
     const hours = dateObj.getHours();
     const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    return `${hours}h${minutes}`;
   };
 
   // Generate next 14 days for date carousel
@@ -167,130 +179,63 @@ export default function UserBooking() {
     );
   }
 
+  const activeIndex = (() => {
+    const idx = dateList.findIndex(d => d.toISOString().split('T')[0] === selectedDate);
+    if (idx !== -1) return idx;
+    return 14;
+  })();
+
   return (
     <MainLayout noPaddingBottom={true}>
-      <div className="user-booking-container" style={{
-        width: '100%',
-        maxWidth: '480px',
-        margin: '0 auto',
-        padding: '0 0 180px 0', // larger padding to clear summary + action buttons
-        fontFamily: "'Montserrat', sans-serif",
-        color: '#1e293b',
-        backgroundColor: '#ffffff',
-        minHeight: '100vh',
-        boxSizing: 'border-box'
-      }}>
+      <div className="user-booking-container">
         {/* Dark Green Header Box */}
-        <div style={{
-          backgroundColor: '#02471f',
-          padding: '16px 16px 14px 16px',
-          color: '#ffffff',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
+        <div className="booking-header-box">
           {/* Top Row: Back arrow, Title */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '4px'
-          }}>
+          <div className="booking-header-top-row">
             <button
               onClick={() => navigate(-1)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                display: 'flex',
-                alignItems: 'center'
-              }}
+              className="booking-back-btn"
             >
               <ChevronLeft size={24} color="#ffffff" />
             </button>
             
             <div style={{ flex: 1, textAlign: 'center' }}>
-              <h1 style={{
-                fontSize: '17px',
-                fontWeight: '700',
-                margin: 0,
-                color: '#ffffff'
-              }}>
+              <h1 className="booking-header-title">
                 Đặt lịch ngày trực quan
               </h1>
-              {venue && (
-                <p style={{
-                  fontSize: '12px',
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  margin: '2px 0 0 0',
-                  fontWeight: '600'
-                }}>
-                  {venue.name}
-                </p>
-              )}
             </div>
 
             <div style={{ width: 24 }} /> {/* Spacer to balance back arrow */}
           </div>
 
           {/* Middle Row: Legend indicators */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            flexWrap: 'wrap',
-            paddingTop: '8px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-            marginTop: '8px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '14px', height: '14px', borderRadius: '3px', background: '#ffffff', border: '1px solid #cbd5e1' }} />
-              <span style={{ fontSize: '11px', fontWeight: '600', color: '#ffffff' }}>Trống</span>
+          <div className="booking-legend-container">
+            <div className="booking-legend-item">
+              <div className="booking-legend-color available" />
+              <span className="booking-legend-text">Trống</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '14px', height: '14px', borderRadius: '3px', background: '#14b8a6', border: '1px solid #000' }} />
-              <span style={{ fontSize: '11px', fontWeight: '600', color: '#ffffff' }}>Đang chọn</span>
+            <div className="booking-legend-item">
+              <div className="booking-legend-color selected" />
+              <span className="booking-legend-text">Đang chọn</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '14px', height: '14px', borderRadius: '3px', background: '#ff6b6b' }} />
-              <span style={{ fontSize: '11px', fontWeight: '600', color: '#ffffff' }}>Đã đặt</span>
+            <div className="booking-legend-item">
+              <div className="booking-legend-color booked" />
+              <span className="booking-legend-text">Đã đặt</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{
-                width: '14px',
-                height: '14px',
-                borderRadius: '3px',
-                background: 'repeating-linear-gradient(45deg, #a0aec0, #a0aec0 2px, #cbd5e1 2px, #cbd5e1 4px)'
-              }} />
-              <span style={{ fontSize: '11px', fontWeight: '600', color: '#ffffff' }}>Khoá</span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{
-                width: '14px',
-                height: '14px',
-                borderRadius: '50%',
-                backgroundColor: '#9f7aea',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                fontSize: '9px',
-                fontWeight: 'bold'
-              }}>!</div>
-              <span style={{ fontSize: '11px', fontWeight: '600', color: '#ffffff' }}>Sự kiện</span>
+            <div className="booking-legend-item">
+              <div className="booking-legend-color locked" />
+              <span className="booking-legend-text">Khoá</span>
             </div>
           </div>
 
           {/* Bottom Row: Link */}
-          <div style={{ marginTop: '10px', fontSize: '12px', fontWeight: '700', textAlign: 'center' }}>
+          <div className="booking-header-link-row">
             <a
               onClick={() => navigate(`/venue/${venueId}`)}
-              style={{ color: '#f6ad55', textDecoration: 'underline', cursor: 'pointer' }}
+              className="booking-header-link"
             >
               Xem sân & bảng giá
             </a>
@@ -298,34 +243,19 @@ export default function UserBooking() {
         </div>
 
         {/* Warning Banner block */}
-        <div style={{
-          backgroundColor: '#ebfaf0',
-          borderBottom: '1px solid #c3e6cb',
-          padding: '10px 16px',
-          fontSize: '12px',
-          lineHeight: '1.4',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
-          <span style={{ color: '#ef4444', fontWeight: '700' }}>Lưu ý: </span>
-          <span style={{ color: '#0a4d28', fontWeight: '600' }}>
-            Nếu bạn cần đặt lịch cố định vui lòng liên hệ: 0764.002.002 để được hỗ trợ
+        <div className="booking-warning-banner">
+          <span className="warning-label">Lưu ý: </span>
+          <span className="warning-text">
+            Nếu bạn cần đặt lịch cố định vui lòng liên hệ: {venue?.contactPhone || 'SĐT liên hệ'} để được hỗ trợ
           </span>
         </div>
 
         {/* Horizontal Date Picker Carousel */}
-        <div style={{
-          display: 'flex',
-          overflowX: 'auto',
-          gap: '10px',
-          padding: '12px 16px',
-          backgroundColor: '#f8fafc',
-          borderBottom: '1px solid #e2e8f0',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch',
-          boxSizing: 'border-box'
-        }}>
+        <div className="booking-date-carousel">
+          <div 
+            className="booking-date-active-indicator"
+            style={{ transform: `translateX(${activeIndex * 66}px)` }}
+          />
           {dateList.map((dateObj) => {
             const dateStr = dateObj.toISOString().split('T')[0];
             const isSelected = dateStr === selectedDate;
@@ -336,28 +266,12 @@ export default function UserBooking() {
               <button
                 key={dateStr}
                 onClick={() => setSelectedDate(dateStr)}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  width: '56px',
-                  height: '64px',
-                  borderRadius: '8px',
-                  border: isSelected ? '1px solid #02471f' : '1px solid #e2e8f0',
-                  backgroundColor: isSelected ? '#02471f' : '#ffffff',
-                  color: isSelected ? '#ffffff' : '#334155',
-                  cursor: 'pointer',
-                  padding: '6px 4px',
-                  boxShadow: isSelected ? '0 4px 6px -1px rgba(2, 71, 31, 0.2)' : 'none',
-                  transition: 'all 0.15s ease'
-                }}
+                className={`booking-date-btn ${isSelected ? 'active' : ''}`}
               >
-                <span style={{ fontSize: '11px', fontWeight: '600', opacity: isSelected ? 0.9 : 0.7 }}>
+                <span className="booking-date-btn-day">
                   {dayName}
                 </span>
-                <span style={{ fontSize: '18px', fontWeight: '700', marginTop: '2px' }}>
+                <span className="booking-date-btn-num">
                   {dayNum}
                 </span>
               </button>
@@ -365,36 +279,14 @@ export default function UserBooking() {
           })}
           
           {/* Custom Date Input wrapper button */}
-          <div style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            width: '56px',
-            height: '64px',
-            borderRadius: '8px',
-            border: '1px solid #e2e8f0',
-            backgroundColor: '#ffffff',
-            cursor: 'pointer',
-            boxSizing: 'border-box'
-          }}>
+          <div className={`booking-date-custom-wrapper ${activeIndex === 14 ? 'active' : ''}`}>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                opacity: 0,
-                cursor: 'pointer',
-                zIndex: 10
-              }}
+              className="booking-date-custom-input"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
               <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -415,91 +307,60 @@ export default function UserBooking() {
         </div>
 
         {/* Floating/Fixed bottom area containing Summary + Confirm Button */}
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '100%',
-          maxWidth: '480px',
-          backgroundColor: '#ffffff',
-          borderTop: '1px solid #e2e8f0',
-          boxShadow: '0 -4px 10px rgba(0,0,0,0.05)',
-          zIndex: 100,
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          {/* Summary Panel inside the sticky bar */}
+        <div className={`booking-bottom-action-bar ${selectedSlots.length > 0 ? 'has-slots' : ''}`}>
           {selectedSlots.length > 0 && (
-            <div style={{
-              padding: '12px 16px',
-              backgroundColor: '#f8fafc',
-              borderBottom: '1px solid #e2e8f0',
-              maxHeight: '120px',
-              overflowY: 'auto'
-            }}>
-              <h3 style={{ fontSize: '12px', fontWeight: '700', color: '#02471f', marginBottom: '6px' }}>
-                Chi tiết lịch đặt ({selectedSlots.length} ô giờ):
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {groupedBookings.map((booking, idx) => {
-                  const startHourStr = formatTimeHeader(booking.startTime);
-                  const endHourStr = formatTimeHeader(booking.endTime);
-                  return (
-                    <div key={idx} style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: '11px',
-                      color: '#475569'
-                    }}>
-                      <span>
-                        {booking.courtName}: <strong style={{ color: '#0f5132' }}>{startHourStr} - {endHourStr}</strong>
-                      </span>
-                      <span style={{ fontWeight: '700', color: '#0f5132' }}>
-                        {booking.price.toLocaleString()}đ
-                      </span>
-                    </div>
-                  );
-                })}
-                <div style={{
-                  height: '1px',
-                  backgroundColor: '#e2e8f0',
-                  margin: '4px 0'
-                }} />
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  color: '#02471f'
-                }}>
-                  <span>Tổng tiền tạm tính:</span>
-                  <span>{totalPriceSum.toLocaleString()}đ</span>
-                </div>
+            <>
+              {/* Expand/Collapse Toggle */}
+              <div 
+                className="booking-summary-toggle"
+                onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
+              >
+                {isSummaryExpanded ? (
+                  <ChevronDown size={20} color="#ffffff" />
+                ) : (
+                  <ChevronUp size={20} color="#ffffff" />
+                )}
               </div>
-            </div>
+
+              {/* Summary Panel inside the sticky bar */}
+              {isSummaryExpanded && (
+                <div className="booking-summary-panel">
+                  <div className="booking-summary-list">
+                    {groupedBookings.map((booking, idx) => {
+                      const startHourStr = formatTimeHeader(booking.startTime);
+                      const endHourStr = formatTimeHeader(booking.endTime);
+                      return (
+                        <div key={idx} className="booking-summary-row">
+                          <span>
+                            {booking.courtName}: {startHourStr} - {endHourStr}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Thin white divider line */}
+              {isSummaryExpanded && <div className="booking-summary-divider" />}
+
+              {/* Total hours and total price */}
+              <div className="booking-summary-total-row">
+                <span>Tổng giờ: {totalHoursStr}</span>
+                <span>
+                  Tổng tiền: {totalPriceSum.toLocaleString()}{' '}
+                  <span style={{ textDecoration: 'underline' }}>đ</span>
+                </span>
+              </div>
+            </>
           )}
 
           {/* Action Button */}
-          <div style={{ padding: '12px 16px' }}>
+          <div className="booking-confirm-btn-wrapper">
             <button
               onClick={handleBookNext}
               disabled={createBookingMutation.isPending || selectedSlots.length === 0}
-              style={{
-                width: '100%',
-                backgroundColor: selectedSlots.length > 0 ? '#caa338' : '#e2e8f0',
-                color: selectedSlots.length > 0 ? '#ffffff' : '#a0aec0',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '14px',
-                fontSize: '15px',
-                fontWeight: '700',
-                cursor: selectedSlots.length > 0 ? 'pointer' : 'not-allowed',
-                textTransform: 'uppercase',
-                boxShadow: selectedSlots.length > 0 ? '0 4px 12px rgba(202, 163, 56, 0.2)' : 'none',
-                transition: 'all 0.15s ease'
-              }}
+              className="booking-confirm-btn"
             >
               {createBookingMutation.isPending ? 'Đang xử lý...' : 'TIẾP THEO'}
             </button>
