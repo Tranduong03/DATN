@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, MoreVertical, MapPin, Clock, Phone, Copy, Check, Edit3, Star, Layers, Calendar, Image as ImageIcon, FileText } from 'lucide-react';
 import { useVenueDetail, useCourts, usePriceRules } from '../../hooks/queries/useOwnerQueries';
 import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
+import PricingTable from '../../components/ui/PricingTable';
 import ownerDefaultImg from '../../assets/images/owner-default.webp';
 import backdropImg from '../../assets/images/bg-default.webp';
 
@@ -124,9 +125,16 @@ export default function OwnerVenueDetailPage() {
 
       {/* 4. Tab Content Area */}
       <div className="owner-venue-content">
-        <TabContentSlider activeTab={activeTab} direction={direction} transition={tabTransition}>
+        <TabContentSlider 
+          activeTab={activeTab} 
+          direction={direction} 
+          transition={tabTransition}
+          enableSwipe={true}
+          tabs={tabsOrder}
+          onTabChange={changeTab}
+        >
           {activeTab === 'info' && (
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <div className="owner-venue-info-list">
                 <div className="owner-venue-info-item">
                   <MapPin size={20} className="owner-venue-info-icon" />
@@ -157,7 +165,7 @@ export default function OwnerVenueDetailPage() {
           )}
 
           {activeTab === 'pricing' && (
-            <div className="owner-venue-pricing-tab">
+            <div className="owner-venue-pricing-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               {/* Courts management summary */}
               <div style={{ marginBottom: 20 }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -183,38 +191,25 @@ export default function OwnerVenueDetailPage() {
               </div>
 
               {/* Price list */}
-              <div>
+              <div style={{ marginTop: 10 }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <Calendar size={18} /> Bảng giá cấu hình
                 </h3>
                 {loadingPrices ? (
                   <p style={{ opacity: 0.7, fontSize: 14 }}>Đang tải bảng giá...</p>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {priceRules?.map((rule: any) => (
-                      <div key={rule.id} style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.06)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div style={{ fontWeight: 600, fontSize: 14 }}>{getDayName(rule.dayOfWeek)}</div>
-                          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
-                            {rule.startHour} - {rule.endHour} {rule.description ? `(${rule.description})` : ''}
-                          </div>
-                        </div>
-                        <div style={{ fontWeight: 700, color: '#f5d061', fontSize: 15 }}>
-                          {rule.price.toLocaleString('vi-VN')} đ/h
-                        </div>
-                      </div>
-                    ))}
-                    {(!priceRules || priceRules.length === 0) && (
-                      <p style={{ opacity: 0.7, fontSize: 14, textAlign: 'center' }}>Chưa cấu hình khung giá.</p>
-                    )}
-                  </div>
+                  <PricingTable 
+                    priceRules={priceRules || []} 
+                    sportTypes={venue?.sportTypes || []} 
+                    isDark={true}
+                  />
                 )}
               </div>
             </div>
           )}
 
           {activeTab === 'images' && (
-            <div className="owner-venue-images-tab">
+            <div className="owner-venue-images-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <ImageIcon size={18} /> Hình ảnh cơ sở ({venue.images?.length || 0})
               </h3>
@@ -235,7 +230,7 @@ export default function OwnerVenueDetailPage() {
           )}
 
           {activeTab === 'reviews' && (
-            <div className="owner-venue-reviews-tab">
+            <div className="owner-venue-reviews-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: 12, background: 'rgba(255,255,255,0.06)', borderRadius: 8 }}>
                 <div style={{ fontSize: 36, fontWeight: 800, color: '#f5d061' }}>{venue.averageRating || '5.0'}</div>
                 <div>
@@ -252,7 +247,7 @@ export default function OwnerVenueDetailPage() {
           )}
 
           {activeTab === 'terms' && (
-            <div className="owner-venue-terms-tab" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, lineHeight: 1.5, opacity: 0.9 }}>
+            <div className="owner-venue-terms-tab" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, lineHeight: 1.5, opacity: 0.9, flex: 1 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <FileText size={18} /> Nội quy & Điều khoản đặt sân
               </h3>

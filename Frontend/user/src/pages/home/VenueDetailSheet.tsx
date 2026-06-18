@@ -6,6 +6,7 @@ import { useTabDirection, TabUnderline, TabContentSlider } from '../../component
 import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
 import { getSportEmojiFromCategories, getSportColorFromCategories } from '../../utils/sport';
+import PricingTable from '../../components/ui/PricingTable';
 
 interface VenueDetailSheetProps {
   venueId: string | null;
@@ -28,15 +29,18 @@ export default function VenueDetailSheet({
   // Touch Gestures State
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
+  const [startX, setStartX] = useState(0);
   const [translateY, setTranslateY] = useState(typeof window !== 'undefined' ? window.innerHeight : 1000);
   const [isTransitioning, setIsTransitioning] = useState(true);
 
   // Tabs
+  const tabsOrder = ['info', 'services', 'images', 'rules', 'reviews'];
   const { activeTab, direction, changeTab, setActiveTab } = useTabDirection<'info' | 'services' | 'images' | 'rules' | 'reviews'>(
     'info',
-    ['info', 'services', 'images', 'rules', 'reviews']
+    tabsOrder as any
   );
   const [copied, setCopied] = useState(false);
+  const tabTransition = { type: 'tween', ease: 'easeOut', duration: 0.22 };
 
   // Refs
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -95,16 +99,23 @@ export default function VenueDetailSheet({
 
     const touch = e.touches[0];
     setStartY(touch.clientY);
+    setStartX(touch.clientX);
     setIsDragging(true);
     setIsTransitioning(false);
-
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !sheetRef.current) return;
     const touch = e.touches[0];
     const diffY = touch.clientY - startY;
+    const diffX = touch.clientX - startX;
     const height = sheetRef.current.offsetHeight;
+
+    // Resolve gesture conflict: if horizontal swipe is stronger than vertical swipe/drag,
+    // ignore this touch move event for dragging the bottom sheet.
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      return;
+    }
 
     if (sheetState === 'half') {
       // Swiping UP (diffY < -15) triggers FULL state (91% height) immediately
@@ -379,15 +390,25 @@ export default function VenueDetailSheet({
                         style={{ position: 'relative' }}
                       >
                         {tab.label}
-                        {isActive && <TabUnderline />}
+                        {isActive && <TabUnderline layoutId="venueSheetUnderline" transition={tabTransition} />}
                       </button>
                     );
                   })}
                 </div>
 
-                <TabContentSlider activeTab={activeTab} direction={direction} className="sheet-tab-pane">
+                <TabContentSlider 
+                  activeTab={activeTab} 
+                  direction={direction} 
+                  className="sheet-tab-pane"
+                  transition={tabTransition}
+                  enableSwipe={true}
+                  tabs={tabsOrder}
+                  onTabChange={changeTab}
+                  style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '350px' }}
+                  contentStyle={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+                >
                   {activeTab === 'info' && (
-                    <div>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <h4 style={{ fontSize: 15, fontWeight: 550, color: '#e06e1b', margin: '8px 0 8px 0' }}>Link đặt sân online</h4>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
                         <a
@@ -409,19 +430,16 @@ export default function VenueDetailSheet({
                   )}
 
                   {activeTab === 'services' && (
-                    <div>
-                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#475569', lineHeight: '1.8' }}>
-                        <li>Wifi miễn phí</li>
-                        <li>Bãi đỗ xe ô tô, xe máy rộng rãi</li>
-                        <li>Cho thuê vợt, bóng/quả cầu lông</li>
-                        <li>Căng tin phục vụ nước uống & đồ ăn nhẹ</li>
-                        <li>Hệ thống đèn LED đạt tiêu chuẩn thi đấu</li>
-                      </ul>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <PricingTable 
+                        priceRules={venue?.priceRules || []} 
+                        sportTypes={venue?.sportTypes || []} 
+                      />
                     </div>
                   )}
 
                   {activeTab === 'images' && (
-                    <div className="sheet-gallery-grid">
+                    <div className="sheet-gallery-grid" style={{ display: 'grid', flex: 1 }}>
                       {venue.galleryImages && venue.galleryImages.length > 0 ? (
                         venue.galleryImages.map((img: string, idx: number) => (
                           <img key={idx} src={img} alt={`Gallery ${idx}`} className="sheet-gallery-img" />
@@ -433,7 +451,7 @@ export default function VenueDetailSheet({
                   )}
 
                   {activeTab === 'rules' && (
-                    <div>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#475569', lineHeight: '1.8' }}>
                         <li>Đến đúng giờ đã đặt lịch.</li>
                         <li>Mang giày chuyên dụng cho các loại sân tương ứng để bảo vệ mặt thảm.</li>
@@ -444,7 +462,7 @@ export default function VenueDetailSheet({
                   )}
 
                   {activeTab === 'reviews' && (
-                    <div>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       {reviews && reviews.length > 0 ? (
                         reviews.map((review: any) => (
                           <div key={review.id} className="sheet-review-item">

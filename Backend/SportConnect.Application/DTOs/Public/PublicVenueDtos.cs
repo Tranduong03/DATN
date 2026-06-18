@@ -44,6 +44,7 @@ public class PublicPriceRuleDto
     public string StartHour { get; set; } = string.Empty;
     public string EndHour { get; set; } = string.Empty;
     public decimal Price { get; set; }
+    public string? Description { get; set; }
 }
 
 public class TimeSlotDto

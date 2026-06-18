@@ -94,7 +94,9 @@ const BrandLogo = () => (
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<UserInfo | null>(null);
-  const { activeTab, direction, changeTab } = useTabDirection<'overview' | 'links'>('overview', ['overview', 'links']);
+  const tabsOrder = ['overview', 'links'];
+  const { activeTab, direction, changeTab } = useTabDirection<'overview' | 'links'>('overview', tabsOrder as any);
+  const tabTransition = { type: 'tween', ease: 'easeOut', duration: 0.22 };
 
   // Interactive profile states
   const [name, setName] = useState('Username');
@@ -443,6 +445,7 @@ export default function ProfilePage() {
                 borderRadius="12px"
                 bottom={0}
                 style={{ zIndex: -1, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}
+                transition={tabTransition}
               />
             )}
           </button>
@@ -462,13 +465,22 @@ export default function ProfilePage() {
                 borderRadius="12px"
                 bottom={0}
                 style={{ zIndex: -1, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}
+                transition={tabTransition}
               />
             )}
           </button>
         </div>
 
         {/* Sliding Tab Body Wrapper */}
-        <TabContentSlider activeTab={activeTab} direction={direction} className="profile-tab-body-wrapper">
+        <TabContentSlider 
+          activeTab={activeTab} 
+          direction={direction} 
+          className="profile-tab-body-wrapper"
+          transition={tabTransition}
+          enableSwipe={true}
+          tabs={tabsOrder}
+          onTabChange={changeTab}
+        >
               {activeTab === 'overview' ? (
                 <div className="overview-tab-content">
                   

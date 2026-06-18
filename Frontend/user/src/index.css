@@ -3977,6 +3977,8 @@ input[type="password"]::-ms-clear {
   padding: 10px 20px;
   flex: 1;
   background-color: #2b6139;
+  display: flex;
+  flex-direction: column;
 }
 
 .owner-venue-info-list {

@@ -115,7 +115,8 @@ public class PublicVenueService : IPublicVenueService
                 DayOfWeek = p.DayOfWeek,
                 StartHour = p.StartHour.ToString(@"hh\:mm"),
                 EndHour = p.EndHour.ToString(@"hh\:mm"),
-                Price = p.Price
+                Price = p.Price,
+                Description = p.Description
             }).ToList()
         };
     }
