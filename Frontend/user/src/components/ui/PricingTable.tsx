@@ -137,38 +137,36 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
       rowSpan
     };
   });
+  const sportName = sportTypes.length > 0 ? sportTypes.join(' & ') : 'Mặc định';
 
-  const sportName = sportTypes.length > 0 ? sportTypes.join(' & ') : 'Cơ sở';
-
-  // Theme styles
+  // Theme styles - always solid white background cards to stand out on green page
   const containerStyle: React.CSSProperties = {
     width: '100%',
-    margin: '16px 0',
-    border: `1px solid ${isDark ? '#4b6b55' : '#10b981'}`,
-    borderRadius: '12px',
+    margin: '12px 0 16px 0',
+    border: '1px solid #cbd5e1',
+    borderRadius: '4px',
     overflow: 'hidden',
-    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#ffffff',
-    boxShadow: isDark ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.03)'
+    backgroundColor: '#ffffff'
   };
 
   const headerStyle: React.CSSProperties = {
-    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f8fafc',
-    color: isDark ? '#34d399' : '#064e3b',
+    backgroundColor: '#ffffff',
+    color: '#0f172a',
     fontWeight: 700,
-    fontSize: '12px',
-    padding: '10px 8px',
-    borderBottom: `1.5px solid ${isDark ? '#4b6b55' : '#10b981'}`,
-    borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+    fontSize: '13px',
+    padding: '12px 8px',
+    borderBottom: '1px solid #cbd5e1',
+    borderRight: '1px solid #cbd5e1',
     textAlign: 'center'
   };
 
   const cellStyle: React.CSSProperties = {
     padding: '12px 8px',
-    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`,
-    borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`,
+    borderBottom: '1px solid #cbd5e1',
+    borderRight: '1px solid #cbd5e1',
     textAlign: 'center',
     verticalAlign: 'middle',
-    color: isDark ? '#ffffff' : '#1e293b',
+    color: '#1e293b',
     fontSize: '13px'
   };
 
@@ -177,27 +175,29 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
       <div style={{
         textAlign: 'center',
         fontSize: '14px',
-        fontWeight: 700,
-        color: isDark ? '#34d399' : '#064e3b',
-        margin: '12px 0 4px 0',
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px'
+        fontWeight: 600,
+        color: '#ffffff',
+        margin: '8px 0 4px 0',
       }}>
-        BẢNG GIÁ SÂN
-      </div>
-      <div style={{
-        textAlign: 'center',
-        fontSize: '12px',
-        fontWeight: 500,
-        color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748b',
-        marginBottom: '12px'
-      }}>
-        {sportName}
+        Bảng giá sân
       </div>
 
       <div style={containerStyle}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
+            <tr>
+              <th colSpan={4} style={{
+                backgroundColor: '#ffffff',
+                color: '#0f172a',
+                fontWeight: 700,
+                fontSize: '14px',
+                padding: '12px 8px',
+                borderBottom: '1px solid #cbd5e1',
+                textAlign: 'center'
+              }}>
+                {sportName}
+              </th>
+            </tr>
             <tr>
               <th style={headerStyle}>Thứ</th>
               <th style={headerStyle}>Khung giờ</th>
@@ -213,9 +213,9 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
                     rowSpan={row.rowSpan}
                     style={{
                       ...cellStyle,
-                      fontWeight: 600,
-                      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(248, 250, 252, 0.5)',
-                      borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`
+                      fontWeight: 500,
+                      backgroundColor: '#ffffff',
+                      borderRight: '1px solid #cbd5e1'
                     }}
                   >
                     {row.daysText}
@@ -224,18 +224,14 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
                 <td style={cellStyle}>{row.timeSlot}</td>
                 <td style={{ ...cellStyle, fontWeight: 500 }}>
                   {row.fixedPrice !== null ? (
-                    <>
-                      {row.fixedPrice.toLocaleString('vi-VN')}<span style={{ textDecoration: 'underline', fontSize: '11px', marginLeft: '2px' }}>đ</span>
-                    </>
+                    `${row.fixedPrice.toLocaleString('vi-VN')} đ`
                   ) : (
                     '-'
                   )}
                 </td>
-                <td style={{ ...cellStyle, fontWeight: 500 }}>
+                <td style={{ ...cellStyle, fontWeight: 500, borderRight: 'none' }}>
                   {row.casualPrice !== null ? (
-                    <>
-                      {row.casualPrice.toLocaleString('vi-VN')}<span style={{ textDecoration: 'underline', fontSize: '11px', marginLeft: '2px' }}>đ</span>
-                    </>
+                    `${row.casualPrice.toLocaleString('vi-VN')} đ`
                   ) : (
                     '-'
                   )}

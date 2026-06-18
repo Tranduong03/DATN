@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, MoreVertical, MapPin, Clock, Phone, Copy, Check, Edit3, Star, Layers, Calendar, Image as ImageIcon, FileText } from 'lucide-react';
-import { useVenueDetail, useCourts, usePriceRules } from '../../hooks/queries/useOwnerQueries';
+import { ChevronLeft, MoreVertical, MapPin, Clock, Phone, Copy, Check, Star, Image as ImageIcon, FileText } from 'lucide-react';
+import { useVenueDetail, usePriceRules } from '../../hooks/queries/useOwnerQueries';
 import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
 import PricingTable from '../../components/ui/PricingTable';
 import ownerDefaultImg from '../../assets/images/owner-default.webp';
@@ -19,7 +19,6 @@ export default function OwnerVenueDetailPage() {
 
   // Queries
   const { data: venue, isLoading: loadingVenue } = useVenueDetail(venueId!);
-  const { data: courts, isLoading: loadingCourts } = useCourts(venueId!);
   const { data: priceRules, isLoading: loadingPrices } = usePriceRules(venueId!);
 
   if (loadingVenue) {
@@ -52,13 +51,6 @@ export default function OwnerVenueDetailPage() {
   // Determine avatar and backdrop
   const avatarUrl = venue.images?.find((img: any) => img.imageType === 'Avatar')?.imageUrl || ownerDefaultImg;
   const coverUrl = venue.images?.find((img: any) => img.imageType === 'Cover' || img.imageType === 'Gallery')?.imageUrl || backdropImg;
-
-  // Format Day of Week for pricing
-  const getDayName = (day: number | null | undefined) => {
-    if (day === null || day === undefined) return 'Tất cả các ngày';
-    if (day === 0) return 'Chủ nhật';
-    return `Thứ ${day + 1}`;
-  };
 
   return (
     <div className="owner-venue-detail-page">
@@ -166,44 +158,91 @@ export default function OwnerVenueDetailPage() {
 
           {activeTab === 'pricing' && (
             <div className="owner-venue-pricing-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-              {/* Courts management summary */}
-              <div style={{ marginBottom: 20 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Layers size={18} /> Danh sách sân con ({courts?.length || 0})
-                </h3>
-                {loadingCourts ? (
-                  <p style={{ opacity: 0.7, fontSize: 14 }}>Đang tải danh sách sân...</p>
-                ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                    {courts?.map((c: any) => (
-                      <div key={c.id} style={{ padding: 12, background: 'rgba(255,255,255,0.06)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600, fontSize: 14 }}>{c.courtName}</span>
-                        <span style={{ fontSize: 12, padding: '2px 6px', borderRadius: 4, background: c.status === 'AVAILABLE' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)', color: c.status === 'AVAILABLE' ? '#34d399' : '#f87171' }}>
-                          {c.status === 'AVAILABLE' ? 'Hoạt động' : 'Bảo trì'}
-                        </span>
-                      </div>
-                    ))}
-                    {(!courts || courts.length === 0) && (
-                      <p style={{ gridColumn: 'span 2', opacity: 0.7, fontSize: 14, textAlign: 'center' }}>Chưa cấu hình sân con.</p>
-                    )}
-                  </div>
-                )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <button 
+                  onClick={() => navigate(`/owner/venues/${venue.id}/edit?tab=pricing`)}
+                  style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '15px', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                >
+                  Chỉnh sửa bảng giá
+                </button>
+                <span style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', textDecoration: 'underline', textUnderlineOffset: '4px' }}>
+                  BẢNG GIÁ SÂN
+                </span>
               </div>
 
-              {/* Price list */}
-              <div style={{ marginTop: 10 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Calendar size={18} /> Bảng giá cấu hình
-                </h3>
-                {loadingPrices ? (
-                  <p style={{ opacity: 0.7, fontSize: 14 }}>Đang tải bảng giá...</p>
-                ) : (
-                  <PricingTable 
-                    priceRules={priceRules || []} 
-                    sportTypes={venue?.sportTypes || []} 
-                    isDark={true}
-                  />
-                )}
+              {loadingPrices ? (
+                <p style={{ opacity: 0.7, fontSize: 14, color: '#ffffff' }}>Đang tải bảng giá...</p>
+              ) : (
+                <PricingTable 
+                  priceRules={priceRules || []} 
+                  sportTypes={venue?.sportTypes || []} 
+                />
+              )}
+
+              <div style={{ marginTop: 24, marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    DANH SÁCH DỊCH VỤ
+                  </h3>
+                  <button 
+                    onClick={() => navigate('/owner/inventory')}
+                    style={{ background: 'none', border: 'none', color: 'rgba(255, 255, 255, 0.6)', fontSize: '13px', fontWeight: 500, cursor: 'pointer', padding: 0 }}
+                  >
+                    Xem thêm &gt;&gt;
+                  </button>
+                </div>
+
+                <div style={{
+                  width: '100%',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                  backgroundColor: '#ffffff'
+                }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <tbody>
+                      {/* Group 1 */}
+                      <tr>
+                        <td colSpan={2} style={{
+                          padding: '10px 12px',
+                          backgroundColor: '#eaeaea',
+                          fontWeight: 700,
+                          fontSize: '13px',
+                          color: '#0f172a',
+                          borderBottom: '1px solid #cbd5e1'
+                        }}>
+                          A cho thue
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '12px', fontSize: '13px', color: '#1e293b', borderBottom: '1px solid #cbd5e1' }}>A 7UP</td>
+                        <td style={{ padding: '12px', fontSize: '13px', color: '#1e293b', textAlign: 'right', fontWeight: 500, borderBottom: '1px solid #cbd5e1' }}>20.000 đ / Chai</td>
+                      </tr>
+
+                      {/* Group 2 */}
+                      <tr>
+                        <td colSpan={2} style={{
+                          padding: '10px 12px',
+                          backgroundColor: '#eaeaea',
+                          fontWeight: 700,
+                          fontSize: '13px',
+                          color: '#0f172a',
+                          borderBottom: '1px solid #cbd5e1'
+                        }}>
+                          A máy bắn bóng
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '12px', fontSize: '13px', color: '#1e293b', borderBottom: '1px solid #cbd5e1' }}>Thuê máy bắn bóng Pickleball</td>
+                        <td style={{ padding: '12px', fontSize: '13px', color: '#1e293b', textAlign: 'right', fontWeight: 500, borderBottom: '1px solid #cbd5e1' }}>100.000 đ / Giờ</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '12px', fontSize: '13px', color: '#1e293b' }}>...</td>
+                        <td style={{ padding: '12px', fontSize: '13px', color: '#1e293b', textAlign: 'right' }}>...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -268,13 +307,7 @@ export default function OwnerVenueDetailPage() {
         </TabContentSlider>
       </div>
 
-      {/* 5. Floating Action Button Container */}
-      <div className="owner-venue-fab-container">
-        <button className="owner-venue-fab" onClick={() => navigate(`/owner/venues/${venue.id}/edit`)}>
-          <Edit3 size={16} />
-          Chỉnh sửa thông tin
-        </button>
-      </div>
+
     </div>
   );
 }

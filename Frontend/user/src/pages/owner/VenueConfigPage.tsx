@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { Plus, Edit2, Check, X, Trash2, Image, Camera, Save, Globe, Phone, MapPin, Clock } from 'lucide-react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { Plus, Edit2, Check, X, Trash2, Image, Camera, Save, Globe, Phone, MapPin, Clock, Eye } from 'lucide-react';
 import OwnerLayout from './OwnerLayout';
 import { useVenueDetail, useCourts, usePriceRules } from '../../hooks/queries/useOwnerQueries';
 import { useAddCourt, useUpdateCourt, useUpsertPriceRules, useUpdateVenue, useAddVenueImage, useDeleteVenueImage } from '../../hooks/mutations/useOwnerMutations';
@@ -8,6 +8,7 @@ import { useAddCourt, useUpdateCourt, useUpsertPriceRules, useUpdateVenue, useAd
 export default function VenueConfigPage() {
   const { id: venueId } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const tabParam = searchParams.get('tab') as 'courts' | 'pricing' | 'profile' | null;
   const [activeTab, setActiveTab] = useState<'courts' | 'pricing' | 'profile'>('courts');
 
@@ -36,8 +37,7 @@ export default function VenueConfigPage() {
   const [editCourtName, setEditCourtName] = useState('');
   const [editCourtStatus, setEditCourtStatus] = useState('AVAILABLE');
 
-  // Pricing State
-  const [draftPrices, setDraftPrices] = useState<any[]>([]);
+
 
   // Venue Profile State
   const [profileName, setProfileName] = useState('');
@@ -53,12 +53,140 @@ export default function VenueConfigPage() {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageType, setNewImageType] = useState<'Avatar' | 'Gallery'>('Gallery');
 
-  // Init prices when loaded
+  // Grouped Pricing Table States & Helpers
+  const [groupedRows, setGroupedRows] = useState<any[]>([]);
+
   useEffect(() => {
     if (priceRules && !loadingPrices) {
-      setDraftPrices(priceRules);
+      if (priceRules.length > 0) {
+        const tempGroups: Record<string, any> = {};
+        priceRules.forEach((rule: any) => {
+          const key = `${rule.startHour.substring(0, 5)}_${rule.endHour.substring(0, 5)}_${rule.dayOfWeek}`;
+          if (!tempGroups[key]) {
+            tempGroups[key] = {
+              startHour: rule.startHour.substring(0, 5),
+              endHour: rule.endHour.substring(0, 5),
+              dayOfWeek: rule.dayOfWeek,
+              fixedPrice: 0,
+              casualPrice: 0,
+              isEditing: false,
+              timeDisplay: rule.startHour.startsWith('00') && (rule.endHour.startsWith('23:59') || rule.endHour.startsWith('24:00')) ? 'Mặc định' : `${rule.startHour.substring(0, 5)} - ${rule.endHour.substring(0, 5)}`
+            };
+          }
+          const desc = (rule.description || '').toLowerCase();
+          if (desc.includes('cố định') || desc.includes('co dinh') || desc.includes('cố')) {
+            tempGroups[key].fixedPrice = rule.price;
+          } else {
+            tempGroups[key].casualPrice = rule.price;
+          }
+        });
+        setGroupedRows(Object.values(tempGroups));
+      } else {
+        // Automatically save default rules to database if not present
+        const defaultRules = [
+          {
+            dayOfWeek: null,
+            startHour: '00:00:00',
+            endHour: '23:59:00',
+            price: 100000,
+            description: 'Cố định'
+          },
+          {
+            dayOfWeek: null,
+            startHour: '00:00:00',
+            endHour: '23:59:00',
+            price: 110000,
+            description: 'Vãng lai'
+          }
+        ];
+        
+        upsertPricesMutation.mutate({ venueId: venueId!, data: defaultRules });
+
+        setGroupedRows([
+          {
+            startHour: '00:00',
+            endHour: '23:59',
+            dayOfWeek: null,
+            fixedPrice: 100000,
+            casualPrice: 110000,
+            isEditing: false,
+            timeDisplay: 'Mặc định'
+          }
+        ]);
+      }
     }
-  }, [priceRules, loadingPrices]);
+  }, [priceRules, loadingPrices, venueId]);
+
+  const editGroupRow = (idx: number) => {
+    setGroupedRows(groupedRows.map((r, i) => i === idx ? { ...r, isEditing: true } : r));
+  };
+
+  const updateGroupRow = (idx: number, field: string, value: any) => {
+    setGroupedRows(groupedRows.map((r, i) => {
+      if (i === idx) {
+        const updated = { ...r, [field]: value };
+        if (field === 'startHour' || field === 'endHour') {
+          updated.timeDisplay = updated.startHour === '00:00' && (updated.endHour === '23:59' || updated.endHour === '24:00') ? 'Mặc định' : `${updated.startHour} - ${updated.endHour}`;
+        }
+        return updated;
+      }
+      return r;
+    }));
+  };
+
+  const saveGroupRow = (idx: number) => {
+    setGroupedRows(groupedRows.map((r, i) => i === idx ? { ...r, isEditing: false } : r));
+  };
+
+  const deleteGroupRow = (idx: number) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa khung giờ này?')) {
+      setGroupedRows(groupedRows.filter((_, i) => i !== idx));
+    }
+  };
+
+  const addNewGroupRow = () => {
+    setGroupedRows([
+      ...groupedRows,
+      {
+        startHour: '17:00',
+        endHour: '22:00',
+        dayOfWeek: null,
+        fixedPrice: 120000,
+        casualPrice: 130000,
+        isEditing: true,
+        timeDisplay: '17:00 - 22:00'
+      }
+    ]);
+  };
+
+  const handleSavePricingGrouped = async () => {
+    const flatRules: any[] = [];
+    groupedRows.forEach((row) => {
+      flatRules.push({
+        dayOfWeek: row.dayOfWeek,
+        startHour: row.startHour.includes(':') ? `${row.startHour}:00` : row.startHour,
+        endHour: row.endHour.includes(':') ? `${row.endHour}:00` : row.endHour,
+        price: row.fixedPrice,
+        description: 'Cố định'
+      });
+      flatRules.push({
+        dayOfWeek: row.dayOfWeek,
+        startHour: row.startHour.includes(':') ? `${row.startHour}:00` : row.startHour,
+        endHour: row.endHour.includes(':') ? `${row.endHour}:00` : row.endHour,
+        price: row.casualPrice,
+        description: 'Vãng lai'
+      });
+    });
+
+    try {
+      await upsertPricesMutation.mutateAsync({ venueId: venueId!, data: flatRules });
+      alert('Đã lưu cấu hình bảng giá thành công!');
+      navigate(`/owner/venues/${venueId}?tab=pricing`);
+    } catch (error) {
+      console.error(error);
+      alert('Lỗi khi lưu cấu hình bảng giá');
+    }
+  };
 
   // Init profile when loaded
   useEffect(() => {
@@ -144,15 +272,7 @@ export default function VenueConfigPage() {
     setEditCourtStatus(court.status);
   };
 
-  const handleSavePricing = async () => {
-    try {
-      await upsertPricesMutation.mutateAsync({ venueId: venueId!, data: draftPrices });
-      alert('Đã lưu cấu hình giá!');
-    } catch (error) {
-      console.error(error);
-      alert('Lỗi lưu cấu hình giá');
-    }
-  };
+
 
   const handleSaveProfile = async () => {
     if (!profileName.trim()) {
@@ -226,33 +346,29 @@ export default function VenueConfigPage() {
 
   return (
     <OwnerLayout 
-      title={`Cấu hình: ${venue.name}`} 
-      subtitle={`Quản lý Sân con, Bảng giá và Hồ sơ cho ${venue.name}`}
+      title={activeTab === 'pricing' ? 'Chỉnh sửa bảng giá sân' : `Cấu hình: ${venue.name}`} 
+      showSystemHeader={activeTab !== 'pricing'}
+      showBottomNav={activeTab !== 'pricing'}
     >
       {/* Back button removed as 1 Owner = 1 Venue */}
-      <div className="admin-tabs" style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
-        <button 
-          className={`admin-tab-btn ${activeTab === 'courts' ? 'active' : ''}`}
-          onClick={() => setActiveTab('courts')}
-          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'courts' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'courts' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'courts' ? 600 : 400, cursor: 'pointer' }}
-        >
-          Danh sách Sân con
-        </button>
-        <button 
-          className={`admin-tab-btn ${activeTab === 'pricing' ? 'active' : ''}`}
-          onClick={() => setActiveTab('pricing')}
-          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'pricing' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'pricing' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'pricing' ? 600 : 400, cursor: 'pointer' }}
-        >
-          Cấu hình Bảng giá
-        </button>
-        <button 
-          className={`admin-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setActiveTab('profile')}
-          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'profile' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'profile' ? 600 : 400, cursor: 'pointer' }}
-        >
-          Thông tin cơ sở
-        </button>
-      </div>
+      {activeTab !== 'pricing' && (
+        <div className="admin-tabs" style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'courts' ? 'active' : ''}`}
+            onClick={() => setActiveTab('courts')}
+            style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'courts' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'courts' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'courts' ? 600 : 400, cursor: 'pointer' }}
+          >
+            Danh sách Sân con
+          </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+            onClick={() => setActiveTab('profile')}
+            style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'profile' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'profile' ? 600 : 400, cursor: 'pointer' }}
+          >
+            Thông tin cơ sở
+          </button>
+        </div>
+      )}
 
       {activeTab === 'courts' && (
         <div className="admin-section">
@@ -360,103 +476,318 @@ export default function VenueConfigPage() {
       )}
 
       {activeTab === 'pricing' && (
-        <div className="admin-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h2 className="admin-section-title" style={{ margin: 0 }}>Cấu hình Bảng giá</h2>
+        <div style={{
+          margin: '-16px -16px',
+          padding: '16px 16px 24px 16px',
+          backgroundColor: '#2b6139',
+          color: '#ffffff',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 'calc(100vh - 60px)',
+          boxSizing: 'border-box'
+        }}>
+          {/* Custom PWA Header */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 4px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            marginBottom: '16px'
+          }}>
             <button 
-              className="admin-btn-primary" 
-              style={{ backgroundColor: '#10b981' }}
-              onClick={handleSavePricing}
-              disabled={upsertPricesMutation.isPending}
+              onClick={() => navigate(`/owner/venues/${venue.id}?tab=pricing`)}
+              style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
             >
-              Lưu bảng giá
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <span style={{ fontSize: '16px', fontWeight: 700 }}>Chỉnh sửa bảng giá sân</span>
+            <button 
+              onClick={() => {
+                if (window.confirm('Bạn có muốn xóa toàn bộ bảng giá sân?')) {
+                  setGroupedRows([]);
+                }
+              }}
+              style={{ 
+                background: 'rgba(239, 68, 68, 0.2)', 
+                border: '1px solid #ef4444', 
+                borderRadius: '4px', 
+                width: '28px', 
+                height: '28px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                cursor: 'pointer' 
+              }}
+            >
+              <Trash2 size={15} color="#ef4444" />
             </button>
           </div>
 
-          <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 24 }}>
-            Thêm các khung giờ và mức giá tương ứng. Nếu không chọn "Ngày trong tuần", giá sẽ áp dụng cho tất cả các ngày.
-          </p>
+          {/* Custom Tab buttons */}
+          <div style={{ display: 'flex', gap: 12, marginBottom: '20px' }}>
+            <button 
+              onClick={() => alert('Thêm loại sân mới sẽ khả dụng sớm.')}
+              style={{
+                flex: 1,
+                padding: '10px 0',
+                borderRadius: '6px',
+                border: '1px dashed rgba(255, 255, 255, 0.4)',
+                background: 'transparent',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Thêm loại sân +
+            </button>
+            <button 
+              style={{
+                flex: 1,
+                padding: '10px 0',
+                borderRadius: '6px',
+                border: 'none',
+                background: '#f5d061',
+                color: '#0f172a',
+                fontSize: '13px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4
+              }}
+            >
+              Bảng giá sân ✏️
+            </button>
+          </div>
 
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Loại ngày</th>
-                <th>Giờ bắt đầu (HH:mm)</th>
-                <th>Giờ kết thúc (HH:mm)</th>
-                <th>Giá (VNĐ)</th>
-                <th>Ghi chú</th>
-                <th>Xóa</th>
-              </tr>
-            </thead>
-            <tbody>
-              {draftPrices.map((rule, idx) => (
-                <tr key={idx}>
-                  <td>
-                    <select 
-                      value={rule.dayOfWeek || ''} 
-                      onChange={e => {
-                        const newRules = [...draftPrices];
-                        newRules[idx].dayOfWeek = e.target.value ? parseInt(e.target.value) : null;
-                        setDraftPrices(newRules);
-                      }}
-                      style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc' }}
-                    >
-                      <option value="">Tất cả các ngày</option>
-                      <option value="1">Thứ 2</option>
-                      <option value="2">Thứ 3</option>
-                      <option value="3">Thứ 4</option>
-                      <option value="4">Thứ 5</option>
-                      <option value="5">Thứ 6</option>
-                      <option value="6">Thứ 7</option>
-                      <option value="0">Chủ nhật</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input type="time" value={rule.startHour} onChange={e => {
-                      const newRules = [...draftPrices];
-                      newRules[idx].startHour = e.target.value;
-                      setDraftPrices(newRules);
-                    }} style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc' }} />
-                  </td>
-                  <td>
-                    <input type="time" value={rule.endHour} onChange={e => {
-                      const newRules = [...draftPrices];
-                      newRules[idx].endHour = e.target.value;
-                      setDraftPrices(newRules);
-                    }} style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc' }} />
-                  </td>
-                  <td>
-                    <input type="number" value={rule.price} onChange={e => {
-                      const newRules = [...draftPrices];
-                      newRules[idx].price = Number(e.target.value);
-                      setDraftPrices(newRules);
-                    }} style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc', width: 100 }} />
-                  </td>
-                  <td>
-                    <input type="text" value={rule.description || ''} onChange={e => {
-                      const newRules = [...draftPrices];
-                      newRules[idx].description = e.target.value;
-                      setDraftPrices(newRules);
-                    }} placeholder="VD: Giờ vàng" style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc' }} />
-                  </td>
-                  <td>
-                    <button onClick={() => {
-                      const newRules = draftPrices.filter((_, i) => i !== idx);
-                      setDraftPrices(newRules);
-                    }} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <X size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button 
-            onClick={() => setDraftPrices([...draftPrices, { dayOfWeek: null, startHour: '05:00', endHour: '22:00', price: 100000, description: '' }])}
-            style={{ marginTop: 12, padding: '8px 16px', borderRadius: 6, border: '1px dashed #d1d5db', background: 'transparent', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}
-          >
-            <Plus size={16} /> Thêm khung giá mới
-          </button>
+          {/* Sân áp dụng */}
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>Sân áp dụng</div>
+            <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '8px' }}>Khung giờ bắt buộc</div>
+            <button 
+              onClick={() => alert('Chức năng thêm khung giờ bắt buộc sẽ sớm được hỗ trợ.')}
+              style={{
+                width: '100%',
+                padding: '12px 0',
+                borderRadius: '6px',
+                border: '1.5px dashed rgba(255, 255, 255, 0.4)',
+                background: 'transparent',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              + Thêm khung giờ
+            </button>
+          </div>
+
+          {/* Bảng giá */}
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>Bảng giá</div>
+            
+            {/* Card white */}
+            <div style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '4px',
+              overflow: 'hidden',
+              border: '1px solid #cbd5e1'
+            }}>
+              {/* Card Header */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '12px 16px',
+                borderBottom: '1px solid #cbd5e1'
+              }}>
+                <div style={{ display: 'flex', gap: 12, color: '#475569', fontWeight: 800 }}>
+                  <span style={{ cursor: 'pointer' }}>↑</span>
+                  <span style={{ cursor: 'pointer' }}>↓</span>
+                </div>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '14px' }}>
+                  {venue.sportTypes?.[0] || 'Cầu lông'}
+                </div>
+                <div style={{ display: 'flex', gap: 12, color: '#475569' }}>
+                  <span style={{ cursor: 'pointer' }} onClick={() => alert('Chỉnh sửa tên loại sân.')}><Edit2 size={16} color="#475569" /></span>
+                  <span style={{ cursor: 'pointer' }} onClick={() => alert('Xóa bảng giá loại sân này.')}><Trash2 size={16} color="#ef4444" /></span>
+                </div>
+              </div>
+
+              {/* Notice row */}
+              <div style={{
+                padding: '8px 16px',
+                backgroundColor: '#ffffff',
+                fontSize: '12px',
+                color: '#334155',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                borderBottom: '1px solid #cbd5e1',
+                fontWeight: 500
+              }}>
+                <span>👤 Đang hiển thị bảng giá với khách chơi</span>
+              </div>
+
+              {/* Table */}
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Khung giờ</th>
+                    <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Cố định</th>
+                    <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Vãng lai</th>
+                    <th style={{ padding: '10px 8px', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', width: '36px' }}></th>
+                    <th style={{ padding: '10px 8px', borderBottom: '1px solid #cbd5e1', width: '36px' }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groupedRows.map((row, idx) => (
+                    <tr key={idx}>
+                      <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                        {row.isEditing ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
+                            <input 
+                              type="time" 
+                              value={row.startHour} 
+                              onChange={e => updateGroupRow(idx, 'startHour', e.target.value)}
+                              style={{ padding: '2px 4px', fontSize: '11px', width: '60px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                            />
+                            <input 
+                              type="time" 
+                              value={row.endHour} 
+                              onChange={e => updateGroupRow(idx, 'endHour', e.target.value)}
+                              style={{ padding: '2px 4px', fontSize: '11px', width: '60px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                            />
+                          </div>
+                        ) : (
+                          row.timeDisplay
+                        )}
+                      </td>
+                      <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                        {row.isEditing ? (
+                          <input 
+                            type="number" 
+                            value={row.fixedPrice} 
+                            onChange={e => updateGroupRow(idx, 'fixedPrice', Number(e.target.value))}
+                            style={{ padding: '2px 4px', fontSize: '11px', width: '65px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center' }}
+                          />
+                        ) : (
+                          `${row.fixedPrice.toLocaleString('vi-VN')} đ`
+                        )}
+                      </td>
+                      <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                        {row.isEditing ? (
+                          <input 
+                            type="number" 
+                            value={row.casualPrice} 
+                            onChange={e => updateGroupRow(idx, 'casualPrice', Number(e.target.value))}
+                            style={{ padding: '2px 4px', fontSize: '11px', width: '65px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center' }}
+                          />
+                        ) : (
+                          `${row.casualPrice.toLocaleString('vi-VN')} đ`
+                        )}
+                      </td>
+                      <td style={{ padding: '12px 4px', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                        {row.isEditing ? (
+                          <button 
+                            onClick={() => saveGroupRow(idx)}
+                            style={{ background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
+                            title="Lưu dòng này"
+                          >
+                            <Check size={18} color="#10b981" />
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => editGroupRow(idx)}
+                            style={{ background: 'none', border: 'none', color: '#2b6139', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
+                            title="Sửa dòng này"
+                          >
+                            <Edit2 size={16} color="#2b6139" />
+                          </button>
+                        )}
+                      </td>
+                      <td style={{ padding: '12px 4px', textAlign: 'center', borderBottom: '1px solid #cbd5e1' }}>
+                        <button 
+                          onClick={() => deleteGroupRow(idx)}
+                          style={{ background: 'none', border: 'none', color: '#2b6139', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
+                          title="Xóa dòng này"
+                        >
+                          <Eye size={18} color="#2b6139" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Dotted button inside card */}
+              <button 
+                onClick={addNewGroupRow}
+                style={{
+                  width: '100%',
+                  padding: '12px 0',
+                  border: 'none',
+                  borderTop: '1.5px dashed #cbd5e1',
+                  background: '#ffffff',
+                  color: '#0f172a',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                + Thêm khung giờ
+              </button>
+            </div>
+
+            {/* Dotted button under card */}
+            <button 
+              onClick={() => alert('Chức năng thêm đối tượng sẽ sớm khả dụng.')}
+              style={{
+                width: '100%',
+                padding: '12px 0',
+                marginTop: '16px',
+                borderRadius: '8px',
+                border: '1.5px dashed rgba(255, 255, 255, 0.4)',
+                background: 'transparent',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              + Thêm đối tượng
+            </button>
+          </div>
+
+          {/* Bottom Save Button - Flowing layout */}
+          <div style={{
+            padding: '24px 0 12px 0',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
+            <button 
+              onClick={handleSavePricingGrouped}
+              style={{
+                width: '100%',
+                padding: '14px 0',
+                borderRadius: '6px',
+                border: 'none',
+                background: '#f5d061',
+                color: '#0f172a',
+                fontSize: '15px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}
+            >
+              LƯU
+            </button>
+          </div>
         </div>
       )}
 

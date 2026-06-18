@@ -119,7 +119,7 @@ export function TabContentSlider({
     right: isFirst ? 0 : 0.4
   } : 0.4;
 
-  const handleDragEnd = (event: any, info: any) => {
+  const handleDragEnd = (_event: any, info: any) => {
     if (!tabs || !onTabChange || currentIdx === -1) return;
 
     const swipeThreshold = 80;

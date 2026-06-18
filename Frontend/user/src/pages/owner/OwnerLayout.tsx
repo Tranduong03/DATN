@@ -7,9 +7,10 @@ interface OwnerLayoutProps {
   title?: string;
   subtitle?: string;
   showSystemHeader?: boolean;
+  showBottomNav?: boolean;
 }
 
-export default function OwnerLayout({ children, title, showSystemHeader = true }: OwnerLayoutProps) {
+export default function OwnerLayout({ children, title, showSystemHeader = true, showBottomNav = true }: OwnerLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -46,37 +47,39 @@ export default function OwnerLayout({ children, title, showSystemHeader = true }
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="owner-mobile-bottom-nav">
-        <NavLink 
-          to="/owner" 
-          end 
-          className={`owner-bottom-nav-item ${isHomeActive ? 'active' : ''}`}
-        >
-          <Home size={22} />
-          <span>Trang chủ</span>
-        </NavLink>
-        
-        <NavLink 
-          to="/owner/bookings" 
-          className={`owner-bottom-nav-item ${isBookingsActive ? 'active' : ''}`}
-        >
-          <Calendar size={22} />
-          <span>Lịch đặt</span>
-        </NavLink>
-        
-        <NavLink 
-          to="/owner/bookings?status=PENDING" 
-          className={`owner-bottom-nav-item ${isApprovalsActive ? 'active' : ''}`}
-        >
-          <div style={{ position: 'relative', display: 'inline-flex' }}>
-            <ClipboardCheck size={22} />
-            {pendingCount > 0 && (
-              <span className="owner-nav-badge">{pendingCount}</span>
-            )}
-          </div>
-          <span>Duyệt đơn</span>
-        </NavLink>
-      </nav>
+      {showBottomNav && (
+        <nav className="owner-mobile-bottom-nav">
+          <NavLink 
+            to="/owner" 
+            end 
+            className={`owner-bottom-nav-item ${isHomeActive ? 'active' : ''}`}
+          >
+            <Home size={22} />
+            <span>Trang chủ</span>
+          </NavLink>
+          
+          <NavLink 
+            to="/owner/bookings" 
+            className={`owner-bottom-nav-item ${isBookingsActive ? 'active' : ''}`}
+          >
+            <Calendar size={22} />
+            <span>Lịch đặt</span>
+          </NavLink>
+          
+          <NavLink 
+            to="/owner/bookings?status=PENDING" 
+            className={`owner-bottom-nav-item ${isApprovalsActive ? 'active' : ''}`}
+          >
+            <div style={{ position: 'relative', display: 'inline-flex' }}>
+              <ClipboardCheck size={22} />
+              {pendingCount > 0 && (
+                <span className="owner-nav-badge">{pendingCount}</span>
+              )}
+            </div>
+            <span>Duyệt đơn</span>
+          </NavLink>
+        </nav>
+      )}
     </div>
   );
 }
