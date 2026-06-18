@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useRef, lazy, Suspense, useState, useEffect } from 'react';
 import PageTransition from './components/layout/PageTransition';
@@ -57,6 +57,7 @@ const tabRoutes = ['/', '/map', '/explore', '/matches', '/account', '/me'];
 
 function AppRoutes() {
   const location = useLocation();
+  const navigationType = useNavigationType();
   const prevPathRef = useRef(location.pathname);
   const directionRef = useRef(1);
 
@@ -73,7 +74,7 @@ function AppRoutes() {
 
     if (wasOwner !== isOwner) {
       setIsPreloading(true);
-      
+
       const timer = setTimeout(() => {
         setIsPreloading(false);
       }, 2450); // 2450ms to allow Preloader's internal 2s + 0.4s fadeout to complete
@@ -86,25 +87,46 @@ function AppRoutes() {
   }, [location.pathname]);
 
   if (location.pathname !== prevPathRef.current) {
-    const prevIndex = tabRoutes.indexOf(prevPathRef.current);
-    const nextIndex = tabRoutes.indexOf(location.pathname);
-    
-    // Chỉ tính hướng slide khi cả hai đều nằm trong danh sách các tab
-    if (prevIndex !== -1 && nextIndex !== -1) {
+    const prevPath = prevPathRef.current;
+    const currentPath = location.pathname;
+
+    const prevIndex = tabRoutes.indexOf(prevPath);
+    const nextIndex = tabRoutes.indexOf(currentPath);
+
+    if (navigationType === 'POP') {
+      // Browser back button or navigate(-1)
+      directionRef.current = -1;
+    } else if (prevIndex !== -1 && nextIndex !== -1) {
+      // Transitioning between main tabs: order-based slide
       directionRef.current = nextIndex > prevIndex ? 1 : -1;
-    } else {
-      // Mặc định
+    } else if (prevIndex === -1 && nextIndex !== -1) {
+      // Transitioning from a subpage back to a main tab
+      directionRef.current = -1;
+    } else if (prevIndex !== -1 && nextIndex === -1) {
+      // Transitioning from a main tab to a subpage
       directionRef.current = 1;
+    } else {
+      // Transitioning between two subpages: compare path depth/length or default
+      directionRef.current = currentPath.length < prevPath.length ? -1 : 1;
     }
-    prevPathRef.current = location.pathname;
+    prevPathRef.current = currentPath;
   }
 
   const direction = directionRef.current;
 
-  // Hàm bọc các component với PageTransition để tái sử dụng
+  // Helper bọc Suspense cho các component nạp lazy
+  const withSuspense = (Component: any) => (
+    <Suspense fallback={<LoadingOverlay isLoading={true} text="Đang tải trang..." />}>
+      <Component />
+    </Suspense>
+  );
+
+  // Hàm bọc các component với PageTransition và Suspense để chuyển cảnh mượt mà
   const withTransition = (Component: any) => (
     <PageTransition direction={direction}>
-      <Component />
+      <Suspense fallback={<LoadingOverlay isLoading={true} text="Đang tải trang..." />}>
+        <Component />
+      </Suspense>
     </PageTransition>
   );
 
@@ -113,58 +135,56 @@ function AppRoutes() {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
-      <Suspense fallback={<LoadingOverlay isLoading={true} text="Đang tải trang..." />}>
-        <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-          <Routes location={location} key={location.pathname}>
-            {/* Public routes */}
-            <Route path="/" element={withTransition(HomePage)} />
-            <Route path="/map" element={withTransition(MapPage)} />
-            <Route path="/explore" element={withTransition(ExplorePage)} />
-            <Route path="/venue/:id" element={<VenueDetailPage />} />
-            <Route path="/UserBooking" element={<UserBooking />} />
-            <Route path="/payment-result" element={<PaymentResultPage />} />
-            <Route path="/matches" element={withTransition(MatchListPage)} />
-            <Route path="/matches/:id" element={<MatchDetailPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/account" element={withTransition(AccountPage)} />
+      <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+        <Routes location={location} key={location.pathname}>
+          {/* Public routes */}
+          <Route path="/" element={withTransition(HomePage)} />
+          <Route path="/map" element={withTransition(MapPage)} />
+          <Route path="/explore" element={withTransition(ExplorePage)} />
+          <Route path="/venue/:id" element={withTransition(VenueDetailPage)} />
+          <Route path="/UserBooking" element={withTransition(UserBooking)} />
+          <Route path="/payment-result" element={withTransition(PaymentResultPage)} />
+          <Route path="/matches" element={withTransition(MatchListPage)} />
+          <Route path="/matches/:id" element={withTransition(MatchDetailPage)} />
+          <Route path="/register" element={withTransition(RegisterPage)} />
+          <Route path="/login" element={withTransition(LoginPage)} />
+          <Route path="/forgot-password" element={withTransition(ForgotPasswordPage)} />
+          <Route path="/account" element={withTransition(AccountPage)} />
 
-            <Route path="/reservedBooking" element={<MyBookingsPage />} />
-            <Route path="/teams" element={withTransition(TeamListPage)} />
-            <Route path="/teams/:id" element={<TeamDetailPage />} />
+          <Route path="/reservedBooking" element={withTransition(MyBookingsPage)} />
+          <Route path="/teams" element={withTransition(TeamListPage)} />
+          <Route path="/teams/:id" element={withTransition(TeamDetailPage)} />
 
-            {/* User Protected Routes */}
-            <Route element={<AuthGuard />}>
-              <Route path="/me" element={withTransition(MePage)} />
-              <Route path="/UserProfile" element={<UserProfile />} />
-              <Route path="/member" element={<MemberPage />} />
-              <Route path="/notifications" element={withTransition(NotificationsPage)} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/settings/change-password" element={<ChangePasswordPage />} />
-              <Route path="/owner/onboarding" element={<OwnerOnboardingFlow />} />
-            </Route>
+          {/* User Protected Routes */}
+          <Route element={<AuthGuard />}>
+            <Route path="/me" element={withTransition(MePage)} />
+            <Route path="/UserProfile" element={withTransition(UserProfile)} />
+            <Route path="/member" element={withTransition(MemberPage)} />
+            <Route path="/notifications" element={withTransition(NotificationsPage)} />
+            <Route path="/settings" element={withTransition(SettingsPage)} />
+            <Route path="/settings/change-password" element={withTransition(ChangePasswordPage)} />
+            <Route path="/owner/onboarding" element={withTransition(OwnerOnboardingFlow)} />
+          </Route>
 
-            {/* Owner Only Routes */}
-            <Route element={<OwnerGuard />}>
-              <Route path="/owner" element={<OwnerDashboardPage />} />
-              <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
-              <Route path="/owner/venues" element={<OwnerVenuesPage />} />
-              <Route path="/owner/venues/:id" element={<OwnerVenueDetailPage />} />
-              <Route path="/owner/venues/:id/edit" element={<VenueConfigPage />} />
-              <Route path="/owner/pos" element={<OwnerSubFeaturePage />} />
-              <Route path="/owner/inventory" element={<OwnerSubFeaturePage />} />
-              <Route path="/owner/analytics" element={<OwnerSubFeaturePage />} />
-              <Route path="/owner/customers" element={<OwnerSubFeaturePage />} />
-              <Route path="/owner/vouchers" element={<OwnerSubFeaturePage />} />
-              <Route path="/owner/monthly-bookings" element={<OwnerSubFeaturePage />} />
-            </Route>
+          {/* Owner Only Routes */}
+          <Route element={<OwnerGuard />}>
+            <Route path="/owner" element={withSuspense(OwnerDashboardPage)} />
+            <Route path="/owner/bookings" element={withSuspense(OwnerBookingsPage)} />
+            <Route path="/owner/venues" element={withSuspense(OwnerVenuesPage)} />
+            <Route path="/owner/venues/:id" element={withSuspense(OwnerVenueDetailPage)} />
+            <Route path="/owner/venues/:id/edit" element={withSuspense(VenueConfigPage)} />
+            <Route path="/owner/pos" element={withSuspense(OwnerSubFeaturePage)} />
+            <Route path="/owner/inventory" element={withSuspense(OwnerSubFeaturePage)} />
+            <Route path="/owner/analytics" element={withSuspense(OwnerSubFeaturePage)} />
+            <Route path="/owner/customers" element={withSuspense(OwnerSubFeaturePage)} />
+            <Route path="/owner/vouchers" element={withSuspense(OwnerSubFeaturePage)} />
+            <Route path="/owner/monthly-bookings" element={withSuspense(OwnerSubFeaturePage)} />
+          </Route>
 
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </AnimatePresence>
-      </Suspense>
+          {/* Catch-all route */}
+          <Route path="*" element={withSuspense(NotFoundPage)} />
+        </Routes>
+      </AnimatePresence>
       {showBottomNav && <BottomNavigation />}
       <GlobalNotification />
       {isPreloading && <Preloader />}

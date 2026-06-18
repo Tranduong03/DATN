@@ -28,7 +28,7 @@ export default function VenueDetailSheet({
   // Touch Gestures State
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
-  const [translateY, setTranslateY] = useState(0);
+  const [translateY, setTranslateY] = useState(typeof window !== 'undefined' ? window.innerHeight : 1000);
   const [isTransitioning, setIsTransitioning] = useState(true);
 
   // Tabs
@@ -156,7 +156,9 @@ export default function VenueDetailSheet({
       setTranslateY(getSnapPx(state, sheetRef.current.offsetHeight));
     }
     if (state === 'closed') {
-      onClose();
+      setTimeout(() => {
+        onClose();
+      }, 350);
     }
   };
 
@@ -218,6 +220,10 @@ export default function VenueDetailSheet({
   const inlineStyles = {
     transform: `translate(-50%, ${translateY}px)`
   };
+
+  if (!isOpen && sheetState === 'closed') {
+    return null;
+  }
 
   return createPortal(
     <>
