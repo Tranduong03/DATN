@@ -1,4 +1,4 @@
-import { useState, InputHTMLAttributes } from 'react';
+import { useState, type InputHTMLAttributes } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import './PasswordInput.css';
 

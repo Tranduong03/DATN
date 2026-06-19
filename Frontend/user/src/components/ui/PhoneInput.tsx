@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, CSSProperties } from 'react';
+import type { InputHTMLAttributes, CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import vnFlag from '../../assets/images/vn-flag.svg';
 import './PhoneInput.css';
