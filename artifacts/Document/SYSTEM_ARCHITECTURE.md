@@ -75,10 +75,12 @@ Bảng điều khiển dành cho Admin (Next.js Portal `/dashboard`):
 - **Quản lý Owner Requests:** Nơi Admin xem chi tiết thông tin đơn đăng ký chủ sân. Admin có thể thực hiện Mutation **Duyệt (Approve)** hoặc **Từ chối (Reject - kèm lý do)**.
 - **Breadcrumb động & Xử lý lỗi**: Tích hợp dynamic breadcrumb định vị tiếng Việt và hệ thống các trang lỗi (404, runtime error) chuyên nghiệp giúp ứng dụng hoạt động ổn định và thân thiện.
 
-### D. Luồng Cấu hình Sân (Venue Configuration)
+### D. Luồng Cấu hình & Chi Tiết Sân (Venue Configuration & Details)
 Dành cho Owner sau khi được duyệt:
-- **Quản lý Sân con (Courts):** Cho phép tự động khởi tạo danh sách sân mẫu dựa trên quy mô (Venue Scale) đã kê khai. Có cảnh báo khi tạo vượt quy mô.
-- **Cấu hình Bảng giá (Price Rules):** Thiết lập giá theo khung giờ và ngày trong tuần. Backend tự động áp dụng logic ưu tiên: **Khung giờ cụ thể/ngắn sẽ ghi đè khung giờ chung (All day)**, đảm bảo tính toán giá chính xác.
+- **Đồng bộ trạng thái Tab hoạt động (Tab State Sync)**: Tích hợp query parameter `?tab=...` vào URL trang chi tiết sân chủ (`OwnerVenueDetailPage`). Trạng thái tab đang mở sẽ được cập nhật mượt mà khi đổi tab và được lưu trữ lại khi chủ sân đi tới trang cấu hình hoặc quay lại.
+- **Quản lý Sân con (Courts)**: Cho phép tự động khởi tạo danh sách sân mẫu dựa trên quy mô (Venue Scale) đã kê khai. Có cảnh báo khi tạo vượt quy mô.
+- **Cấu hình Bảng giá (Price Rules)**: Thiết lập giá theo khung giờ và ngày trong tuần. Backend tự động áp dụng logic ưu tiên: **Khung giờ cụ thể/ngắn sẽ ghi đè khung giờ chung (All day)**, đảm bảo tính toán giá chính xác.
+
 
 ### E. Luồng Đặt Sân (Booking Flow)
 Dành cho người dùng (Default User):

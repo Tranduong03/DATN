@@ -411,7 +411,14 @@ frontend/src/
 
   {/* Owner routes */}
   <Route element={<RoleGuard roles={['OWNER']} />}>
-    <Route path="/owner/venues" element={<OwnerVenueManagement />} />
+    <Route path="/owner" element={<OwnerDashboardPage />} />
+    <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
+    <Route path="/owner/venues" element={<OwnerVenuesPage />} />
+    <Route path="/owner/venues/:id" element={<OwnerVenueDetailPage />} />
+    <Route path="/owner/venues/:id/edit" element={<VenueConfigPage />} />
+    <Route path="/owner/pos" element={<OwnerSubFeaturePage />} />
+    <Route path="/owner/inventory" element={<OwnerSubFeaturePage />} />
+    <Route path="/owner/analytics" element={<OwnerSubFeaturePage />} />
   </Route>
 </Routes>
 ```
