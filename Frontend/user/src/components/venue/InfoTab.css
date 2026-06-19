@@ -1,0 +1,73 @@
+.owner-venue-info-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-venue-info-item {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 300;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+.owner-venue-info-icon {
+  color: #ffffff;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.owner-venue-link-section {
+  margin-top: 18px;
+}
+
+.owner-venue-link-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #d9e18e;
+  margin: 0 0 10px 0;
+  letter-spacing: 0.2px;
+}
+
+.owner-venue-link-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background-color: transparent;
+  border-radius: 8px;
+}
+
+.owner-venue-link-text {
+  font-size: 13px;
+  font-style: italic;
+  color: rgb(195, 215, 195);
+  word-break: break-all;
+  line-height: 2;
+  flex: 1;
+  margin: 0;
+}
+
+.owner-venue-copy-btn {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  opacity: 0.8;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.owner-venue-copy-btn:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}

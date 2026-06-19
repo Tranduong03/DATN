@@ -1,0 +1,98 @@
+.owner-venue-rating-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.owner-venue-rating-val {
+  fontSize: 36px;
+  font-weight: 800;
+  color: #f5d061;
+}
+
+.owner-venue-rating-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-venue-rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.owner-venue-rating-count {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+}
+
+.owner-venue-reviews-placeholder {
+  font-size: 14px;
+  opacity: 0.8;
+  text-align: center;
+  padding: 10px 0;
+  color: #ffffff;
+}
+
+/* User Bottom Sheet Reviews classes */
+.sheet-review-item {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 0;
+}
+
+.sheet-review-item:last-child {
+  border-bottom: none;
+}
+
+.sheet-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.sheet-review-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sheet-review-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sheet-review-username {
+  font-size: 13px;
+  font-weight: 550;
+  color: #1e293b;
+}
+
+.sheet-review-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #d97706;
+}
+
+.sheet-review-comment {
+  font-size: 13px;
+  color: #475569;
+  margin: 4px 0 0 0;
+  line-height: 1.4;
+  font-weight: 300;
+}
+
+.sheet-tab-text {
+  font-size: 13px;
+  color: #64748b;
+  padding: 12px 0;
+}

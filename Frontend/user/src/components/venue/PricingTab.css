@@ -1,0 +1,106 @@
+.owner-venue-pricing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.owner-venue-pricing-btn-edit {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.owner-venue-pricing-btn-edit:hover {
+  opacity: 0.8;
+}
+
+.owner-venue-pricing-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.owner-venue-services-section {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.owner-venue-services-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.owner-venue-services-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.owner-venue-services-more-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.owner-venue-services-more-btn:hover {
+  color: #ffffff;
+}
+
+.owner-venue-services-table-wrapper {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.owner-venue-services-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.owner-venue-services-group-row {
+  padding: 10px 12px;
+  background-color: #eaeaea;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0f172a;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.owner-venue-services-item-name {
+  padding: 12px;
+  font-size: 13px;
+  color: #1e293b;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.owner-venue-services-item-price {
+  padding: 12px;
+  font-size: 13px;
+  color: #1e293b;
+  text-align: right;
+  font-weight: 500;
+  border-bottom: 1px solid #cbd5e1;
+}

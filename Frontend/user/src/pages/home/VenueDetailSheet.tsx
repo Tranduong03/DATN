@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Share2, Heart, MapPin, Clock, Star, Phone, ArrowLeft, Copy, Check } from 'lucide-react';
+import { Share2, Heart, MapPin, Clock, Star, Phone, ArrowLeft, Check } from 'lucide-react';
 import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
 import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
 import { getSportEmojiFromCategories, getSportColorFromCategories } from '../../utils/sport';
-import PricingTable from '../../components/ui/PricingTable';
+import { InfoTab, PricingTab, ImagesTab, ReviewsTab, TermsTab } from '../../components/venue';
 
 interface VenueDetailSheetProps {
   venueId: string | null;
@@ -408,87 +408,41 @@ export default function VenueDetailSheet({
                   contentStyle={{ display: 'flex', flexDirection: 'column', flex: 1 }}
                 >
                   {activeTab === 'info' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <h4 style={{ fontSize: 15, fontWeight: 550, color: '#e06e1b', margin: '8px 0 8px 0' }}>Link đặt sân online</h4>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
-                        <a
-                          href={`https://datlich.alobo.vn/san/${venue.id || ''}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ fontSize: 13, color: '#02471fff', wordBreak: 'break-all', textDecoration: 'none', fontWeight: 300 }}
-                        >
-                          https://datlich.alobo.vn/san/{venue.id || ''}
-                        </a>
-                        <button
-                          onClick={handleCopyLink}
-                          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: copied ? '#10b981' : '#64748b', display: 'flex', alignItems: 'center', padding: '4px' }}
-                        >
-                          {copied ? <span style={{ fontSize: 12, color: '#10b981', fontWeight: 500 }}>Đã chép</span> : <Copy size={24} />}
-                        </button>
-                      </div>
-                    </div>
+                    <InfoTab
+                      venue={venue}
+                      isOwner={false}
+                      copied={copied}
+                      onCopyLink={handleCopyLink}
+                      onlineLink={`https://datlich.alobo.vn/san/${venue.id || ''}`}
+                    />
                   )}
 
                   {activeTab === 'services' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <PricingTable 
-                        priceRules={venue?.priceRules || []} 
-                        sportTypes={venue?.sportTypes || []} 
-                      />
-                    </div>
+                    <PricingTab
+                      venue={venue}
+                      priceRules={venue?.priceRules || []}
+                      isOwner={false}
+                    />
                   )}
 
                   {activeTab === 'images' && (
-                    <div className="sheet-gallery-grid" style={{ display: 'grid', flex: 1 }}>
-                      {venue.galleryImages && venue.galleryImages.length > 0 ? (
-                        venue.galleryImages.map((img: string, idx: number) => (
-                          <img key={idx} src={img} alt={`Gallery ${idx}`} className="sheet-gallery-img" />
-                        ))
-                      ) : (
-                        <span className="sheet-tab-text" style={{ gridColumn: 'span 2' }}>Không có hình ảnh cơ sở.</span>
-                      )}
-                    </div>
+                    <ImagesTab
+                      galleryImages={venue.galleryImages || []}
+                      isOwner={false}
+                    />
                   )}
 
                   {activeTab === 'rules' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#475569', lineHeight: '1.8' }}>
-                        <li>Đến đúng giờ đã đặt lịch.</li>
-                        <li>Mang giày chuyên dụng cho các loại sân tương ứng để bảo vệ mặt thảm.</li>
-                        <li>Không mang theo thức ăn nhiều dầu mỡ hay đồ có gas lên mặt sân.</li>
-                        <li>Giữ gìn vệ sinh chung, vứt rác đúng nơi quy định.</li>
-                      </ul>
-                    </div>
+                    <TermsTab
+                      isOwner={false}
+                    />
                   )}
 
                   {activeTab === 'reviews' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      {reviews && reviews.length > 0 ? (
-                        reviews.map((review: any) => (
-                          <div key={review.id} className="sheet-review-item">
-                            <div className="sheet-review-header">
-                              <div className="sheet-review-user">
-                                {review.userAvatar ? (
-                                  <img src={review.userAvatar} alt={review.userName} className="sheet-review-avatar" />
-                                ) : (
-                                  <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 'bold' }}>
-                                    {review.userName?.charAt(0).toUpperCase()}
-                                  </div>
-                                )}
-                                <span className="sheet-review-username">{review.userName}</span>
-                              </div>
-                              <div className="sheet-review-rating">
-                                <Star size={10} fill="#d97706" color="#d97706" />
-                                <span>{review.rating}</span>
-                              </div>
-                            </div>
-                            {review.comment && <p className="sheet-review-comment">{review.comment}</p>}
-                          </div>
-                        ))
-                      ) : (
-                        <span className="sheet-tab-text">Chưa có đánh giá nào.</span>
-                      )}
-                    </div>
+                    <ReviewsTab
+                      reviews={reviews || []}
+                      isOwner={false}
+                    />
                   )}
                 </TabContentSlider>
               </div>

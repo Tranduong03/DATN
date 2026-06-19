@@ -1,0 +1,60 @@
+.owner-venue-images-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.owner-venue-images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.owner-venue-image-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 80px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.owner-venue-image-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.owner-venue-image-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  fontSize: 8px;
+}
+
+/* User bottom sheet gallery grid overrides if index.css is loaded, or fallback */
+.sheet-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.sheet-gallery-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.sheet-tab-text {
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;
+  padding: 20px 0;
+}
