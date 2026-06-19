@@ -28,7 +28,7 @@ export default function OwnerVenuesPage() {
     <OwnerLayout title="Quản lý Cơ sở" subtitle="Chưa tìm thấy cơ sở nào.">
       <div className="admin-section">
         <div style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>
-          Tài khoản của bạn chưa được gắn với cơ sở thể thao nào. <br/>
+          Tài khoản của bạn chưa được gắn với cơ sở thể thao nào. <br />
           Vui lòng liên hệ quản trị viên (Admin) để được hỗ trợ.
         </div>
       </div>

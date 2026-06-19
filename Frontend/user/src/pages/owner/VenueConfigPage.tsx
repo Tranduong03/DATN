@@ -48,7 +48,7 @@ export default function VenueConfigPage() {
   const [profileEnd, setProfileEnd] = useState('22:00');
   const [profileQr, setProfileQr] = useState('');
   const [profileSports, setProfileSports] = useState<string[]>([]);
-  
+
   // Image addition state
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageType, setNewImageType] = useState<'Avatar' | 'Gallery'>('Gallery');
@@ -99,7 +99,7 @@ export default function VenueConfigPage() {
             description: 'Vãng lai'
           }
         ];
-        
+
         upsertPricesMutation.mutate({ venueId: venueId!, data: defaultRules });
 
         setGroupedRows([
@@ -239,7 +239,7 @@ export default function VenueConfigPage() {
     if (courts && courts.length === 0 && venue) {
       const confirmInit = window.confirm(`Bạn có muốn tự động khởi tạo ${venue.venueScale} sân mẫu không?`);
       if (!confirmInit) return;
-      
+
       try {
         for (let i = 1; i <= venue.venueScale; i++) {
           await addCourtMutation.mutateAsync({ venueId: venueId!, data: { courtName: `Sân ${i}`, status: 'AVAILABLE' } });
@@ -363,7 +363,7 @@ export default function VenueConfigPage() {
         <div className="owner-pricing-content">
           {/* Custom PWA Header */}
           <div className="owner-pricing-header">
-            <button 
+            <button
               onClick={() => navigate(`/owner/venues/${venue.id}?tab=pricing`)}
               className="owner-pricing-back-btn"
             >
@@ -372,7 +372,7 @@ export default function VenueConfigPage() {
               </svg>
             </button>
             <span className="owner-pricing-title-text">Chỉnh sửa bảng giá sân</span>
-            <button 
+            <button
               onClick={() => {
                 if (window.confirm('Bạn có muốn xóa toàn bộ bảng giá sân?')) {
                   setGroupedRows([]);
@@ -386,13 +386,13 @@ export default function VenueConfigPage() {
 
           {/* Custom Tab buttons */}
           <div className="owner-pricing-tabs">
-            <button 
+            <button
               onClick={() => alert('Chọn thêm loại sân.')}
               className="owner-pricing-tab-btn-dotted"
             >
               Thêm loại sân +
             </button>
-            <button 
+            <button
               className="owner-pricing-tab-btn-active"
             >
               Bảng giá sân ✏️
@@ -403,7 +403,7 @@ export default function VenueConfigPage() {
           <div className="owner-pricing-section">
             <div className="owner-pricing-section-title">Sân áp dụng</div>
             <div className="owner-pricing-section-subtitle">Khung giờ bắt buộc</div>
-            <button 
+            <button
               onClick={() => alert('Chức năng cấu hình khung giờ bắt buộc sẽ sớm khả dụng.')}
               className="owner-pricing-under-card-dotted-btn"
               style={{ marginTop: 0 }}
@@ -415,7 +415,7 @@ export default function VenueConfigPage() {
           {/* Table Container */}
           <div style={{ flex: 1 }}>
             <div className="owner-pricing-section-title" style={{ marginBottom: 12 }}>Bảng giá</div>
-            
+
             {/* White card container */}
             <div className="owner-pricing-card">
               {/* Card Header */}
@@ -456,15 +456,15 @@ export default function VenueConfigPage() {
                         <td>
                           {row.isEditing ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
-                              <input 
-                                type="time" 
-                                value={row.startHour} 
+                              <input
+                                type="time"
+                                value={row.startHour}
                                 onChange={e => updateGroupRow(idx, 'startHour', e.target.value)}
                                 className="owner-pricing-input-time"
                               />
-                              <input 
-                                type="time" 
-                                value={row.endHour} 
+                              <input
+                                type="time"
+                                value={row.endHour}
                                 onChange={e => updateGroupRow(idx, 'endHour', e.target.value)}
                                 className="owner-pricing-input-time"
                               />
@@ -475,9 +475,9 @@ export default function VenueConfigPage() {
                         </td>
                         <td>
                           {row.isEditing ? (
-                            <input 
-                              type="number" 
-                              value={row.fixedPrice} 
+                            <input
+                              type="number"
+                              value={row.fixedPrice}
                               onChange={e => updateGroupRow(idx, 'fixedPrice', Number(e.target.value))}
                               className="owner-pricing-input-number"
                             />
@@ -487,9 +487,9 @@ export default function VenueConfigPage() {
                         </td>
                         <td>
                           {row.isEditing ? (
-                            <input 
-                              type="number" 
-                              value={row.casualPrice} 
+                            <input
+                              type="number"
+                              value={row.casualPrice}
                               onChange={e => updateGroupRow(idx, 'casualPrice', Number(e.target.value))}
                               className="owner-pricing-input-number"
                             />
@@ -499,7 +499,7 @@ export default function VenueConfigPage() {
                         </td>
                         <td style={{ padding: '12px 4px' }}>
                           {row.isEditing ? (
-                            <button 
+                            <button
                               onClick={() => saveGroupRow(idx)}
                               className="owner-pricing-action-btn"
                               title="Lưu dòng này"
@@ -507,7 +507,7 @@ export default function VenueConfigPage() {
                               <Check size={18} color="#10b981" />
                             </button>
                           ) : (
-                            <button 
+                            <button
                               onClick={() => editGroupRow(idx)}
                               className="owner-pricing-action-btn"
                               title="Sửa dòng này"
@@ -517,7 +517,7 @@ export default function VenueConfigPage() {
                           )}
                         </td>
                         <td style={{ padding: '12px 4px' }}>
-                          <button 
+                          <button
                             onClick={() => deleteGroupRow(idx)}
                             className="owner-pricing-action-btn"
                             title="Xóa dòng này"
@@ -532,7 +532,7 @@ export default function VenueConfigPage() {
               </div>
 
               {/* Dotted button inside card */}
-              <button 
+              <button
                 onClick={addNewGroupRow}
                 className="owner-pricing-card-dotted-btn"
               >
@@ -541,7 +541,7 @@ export default function VenueConfigPage() {
             </div>
 
             {/* Dotted button under card */}
-            <button 
+            <button
               onClick={() => alert('Chức năng thêm đối tượng sẽ sớm khả dụng.')}
               className="owner-pricing-under-card-dotted-btn"
             >
@@ -551,7 +551,7 @@ export default function VenueConfigPage() {
 
           {/* Bottom Save Button - Flowing layout */}
           <div className="owner-pricing-save-container">
-            <button 
+            <button
               onClick={handleSavePricingGrouped}
               className="owner-pricing-save-btn"
             >
@@ -564,21 +564,21 @@ export default function VenueConfigPage() {
   }
 
   return (
-    <OwnerLayout 
-      title={`Cấu hình: ${venue.name}`} 
+    <OwnerLayout
+      title={`Cấu hình: ${venue.name}`}
       showSystemHeader={true}
       showBottomNav={false}
     >
       {/* Back button removed as 1 Owner = 1 Venue */}
       <div className="admin-tabs" style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
-        <button 
+        <button
           className={`admin-tab-btn ${activeTab === 'courts' ? 'active' : ''}`}
           onClick={() => setActiveTab('courts')}
           style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'courts' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'courts' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'courts' ? 600 : 400, cursor: 'pointer' }}
         >
           Danh sách Sân con
         </button>
-        <button 
+        <button
           className={`admin-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveTab('profile')}
           style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #f59e0b' : '2px solid transparent', color: activeTab === 'profile' ? '#f59e0b' : '#6b7280', fontWeight: activeTab === 'profile' ? 600 : 400, cursor: 'pointer' }}
@@ -592,15 +592,15 @@ export default function VenueConfigPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h2 className="admin-section-title" style={{ margin: 0 }}>Quản lý Sân con</h2>
             <div style={{ display: 'flex', gap: 8 }}>
-              <input 
-                type="text" 
-                placeholder="Tên sân mới (VD: Sân 1)" 
+              <input
+                type="text"
+                placeholder="Tên sân mới (VD: Sân 1)"
                 value={newCourtName}
                 onChange={e => setNewCourtName(e.target.value)}
                 style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #d1d5db' }}
               />
-              <button 
-                className="admin-btn-primary" 
+              <button
+                className="admin-btn-primary"
                 style={{ display: 'flex', alignItems: 'center', gap: 4, backgroundColor: '#f59e0b' }}
                 onClick={handleAddCourt}
                 disabled={addCourtMutation.isPending}
@@ -616,7 +616,7 @@ export default function VenueConfigPage() {
                 <h4 style={{ margin: '0 0 4px 0' }}>Chưa có sân nào</h4>
                 <p style={{ margin: 0, fontSize: 14, color: '#4b5563' }}>Bạn đã đăng ký quy mô {venue.venueScale} sân. Bạn có thể tự động tạo các sân mẫu này.</p>
               </div>
-              <button 
+              <button
                 onClick={handleAutoInitCourts}
                 style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 500 }}
               >
@@ -641,10 +641,10 @@ export default function VenueConfigPage() {
                   <tr key={court.id}>
                     <td>
                       {editingCourtId === court.id ? (
-                        <input 
-                          type="text" 
-                          value={editCourtName} 
-                          onChange={e => setEditCourtName(e.target.value)} 
+                        <input
+                          type="text"
+                          value={editCourtName}
+                          onChange={e => setEditCourtName(e.target.value)}
                           style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc' }}
                         />
                       ) : (
@@ -653,8 +653,8 @@ export default function VenueConfigPage() {
                     </td>
                     <td>
                       {editingCourtId === court.id ? (
-                        <select 
-                          value={editCourtStatus} 
+                        <select
+                          value={editCourtStatus}
                           onChange={e => setEditCourtStatus(e.target.value)}
                           style={{ padding: 4, borderRadius: 4, border: '1px solid #ccc' }}
                         >
@@ -713,7 +713,7 @@ export default function VenueConfigPage() {
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
             marginBottom: '16px'
           }}>
-            <button 
+            <button
               onClick={() => navigate(`/owner/venues/${venue.id}?tab=pricing`)}
               style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
             >
@@ -722,22 +722,22 @@ export default function VenueConfigPage() {
               </svg>
             </button>
             <span style={{ fontSize: '16px', fontWeight: 700 }}>Chỉnh sửa bảng giá sân</span>
-            <button 
+            <button
               onClick={() => {
                 if (window.confirm('Bạn có muốn xóa toàn bộ bảng giá sân?')) {
                   setGroupedRows([]);
                 }
               }}
-              style={{ 
-                background: 'rgba(239, 68, 68, 0.2)', 
-                border: '1px solid #ef4444', 
-                borderRadius: '4px', 
-                width: '28px', 
-                height: '28px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                cursor: 'pointer' 
+              style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid #ef4444',
+                borderRadius: '4px',
+                width: '28px',
+                height: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
               }}
             >
               <Trash2 size={15} color="#ef4444" />
@@ -746,7 +746,7 @@ export default function VenueConfigPage() {
 
           {/* Custom Tab buttons */}
           <div style={{ display: 'flex', gap: 12, marginBottom: '20px' }}>
-            <button 
+            <button
               onClick={() => alert('Thêm loại sân mới sẽ khả dụng sớm.')}
               style={{
                 flex: 1,
@@ -762,7 +762,7 @@ export default function VenueConfigPage() {
             >
               Thêm loại sân +
             </button>
-            <button 
+            <button
               style={{
                 flex: 1,
                 padding: '10px 0',
@@ -786,7 +786,7 @@ export default function VenueConfigPage() {
           <div style={{ marginBottom: '24px' }}>
             <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>Sân áp dụng</div>
             <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '8px' }}>Khung giờ bắt buộc</div>
-            <button 
+            <button
               onClick={() => alert('Chức năng thêm khung giờ bắt buộc sẽ sớm được hỗ trợ.')}
               style={{
                 width: '100%',
@@ -807,7 +807,7 @@ export default function VenueConfigPage() {
           {/* Bảng giá */}
           <div>
             <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>Bảng giá</div>
-            
+
             {/* Card white */}
             <div style={{
               backgroundColor: '#ffffff',
@@ -855,98 +855,98 @@ export default function VenueConfigPage() {
               {/* Table wrapper for horizontal scrollability */}
               <div style={{ overflowX: 'auto', width: '100%' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '340px' }}>
-                <thead>
-                  <tr>
-                    <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Khung giờ</th>
-                    <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Cố định</th>
-                    <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Vãng lai</th>
-                    <th style={{ padding: '10px 8px', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', width: '36px' }}></th>
-                    <th style={{ padding: '10px 8px', borderBottom: '1px solid #cbd5e1', width: '36px' }}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {groupedRows.map((row, idx) => (
-                    <tr key={idx}>
-                      <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
-                        {row.isEditing ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
-                            <input 
-                              type="time" 
-                              value={row.startHour} 
-                              onChange={e => updateGroupRow(idx, 'startHour', e.target.value)}
-                              style={{ padding: '2px 4px', fontSize: '11px', width: '60px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
-                            />
-                            <input 
-                              type="time" 
-                              value={row.endHour} 
-                              onChange={e => updateGroupRow(idx, 'endHour', e.target.value)}
-                              style={{ padding: '2px 4px', fontSize: '11px', width: '60px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
-                            />
-                          </div>
-                        ) : (
-                          row.timeDisplay
-                        )}
-                      </td>
-                      <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
-                        {row.isEditing ? (
-                          <input 
-                            type="number" 
-                            value={row.fixedPrice} 
-                            onChange={e => updateGroupRow(idx, 'fixedPrice', Number(e.target.value))}
-                            style={{ padding: '2px 4px', fontSize: '11px', width: '65px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center' }}
-                          />
-                        ) : (
-                          `${row.fixedPrice.toLocaleString('vi-VN')} đ`
-                        )}
-                      </td>
-                      <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
-                        {row.isEditing ? (
-                          <input 
-                            type="number" 
-                            value={row.casualPrice} 
-                            onChange={e => updateGroupRow(idx, 'casualPrice', Number(e.target.value))}
-                            style={{ padding: '2px 4px', fontSize: '11px', width: '65px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center' }}
-                          />
-                        ) : (
-                          `${row.casualPrice.toLocaleString('vi-VN')} đ`
-                        )}
-                      </td>
-                      <td style={{ padding: '12px 4px', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
-                        {row.isEditing ? (
-                          <button 
-                            onClick={() => saveGroupRow(idx)}
-                            style={{ background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
-                            title="Lưu dòng này"
-                          >
-                            <Check size={18} color="#10b981" />
-                          </button>
-                        ) : (
-                          <button 
-                            onClick={() => editGroupRow(idx)}
-                            style={{ background: 'none', border: 'none', color: '#2b6139', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
-                            title="Sửa dòng này"
-                          >
-                            <Edit2 size={16} color="#2b6139" />
-                          </button>
-                        )}
-                      </td>
-                      <td style={{ padding: '12px 4px', textAlign: 'center', borderBottom: '1px solid #cbd5e1' }}>
-                        <button 
-                          onClick={() => deleteGroupRow(idx)}
-                          style={{ background: 'none', border: 'none', color: '#2b6139', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
-                          title="Xóa dòng này"
-                        >
-                          <Eye size={18} color="#2b6139" />
-                        </button>
-                      </td>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Khung giờ</th>
+                      <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Cố định</th>
+                      <th style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 700, color: '#0f172a', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>Vãng lai</th>
+                      <th style={{ padding: '10px 8px', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', width: '36px' }}></th>
+                      <th style={{ padding: '10px 8px', borderBottom: '1px solid #cbd5e1', width: '36px' }}></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {groupedRows.map((row, idx) => (
+                      <tr key={idx}>
+                        <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                          {row.isEditing ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
+                              <input
+                                type="time"
+                                value={row.startHour}
+                                onChange={e => updateGroupRow(idx, 'startHour', e.target.value)}
+                                style={{ padding: '2px 4px', fontSize: '11px', width: '60px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                              />
+                              <input
+                                type="time"
+                                value={row.endHour}
+                                onChange={e => updateGroupRow(idx, 'endHour', e.target.value)}
+                                style={{ padding: '2px 4px', fontSize: '11px', width: '60px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                              />
+                            </div>
+                          ) : (
+                            row.timeDisplay
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                          {row.isEditing ? (
+                            <input
+                              type="number"
+                              value={row.fixedPrice}
+                              onChange={e => updateGroupRow(idx, 'fixedPrice', Number(e.target.value))}
+                              style={{ padding: '2px 4px', fontSize: '11px', width: '65px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center' }}
+                            />
+                          ) : (
+                            `${row.fixedPrice.toLocaleString('vi-VN')} đ`
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 8px', fontSize: '12px', color: '#1e293b', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                          {row.isEditing ? (
+                            <input
+                              type="number"
+                              value={row.casualPrice}
+                              onChange={e => updateGroupRow(idx, 'casualPrice', Number(e.target.value))}
+                              style={{ padding: '2px 4px', fontSize: '11px', width: '65px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center' }}
+                            />
+                          ) : (
+                            `${row.casualPrice.toLocaleString('vi-VN')} đ`
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 4px', textAlign: 'center', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
+                          {row.isEditing ? (
+                            <button
+                              onClick={() => saveGroupRow(idx)}
+                              style={{ background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
+                              title="Lưu dòng này"
+                            >
+                              <Check size={18} color="#10b981" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => editGroupRow(idx)}
+                              style={{ background: 'none', border: 'none', color: '#2b6139', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
+                              title="Sửa dòng này"
+                            >
+                              <Edit2 size={16} color="#2b6139" />
+                            </button>
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 4px', textAlign: 'center', borderBottom: '1px solid #cbd5e1' }}>
+                          <button
+                            onClick={() => deleteGroupRow(idx)}
+                            style={{ background: 'none', border: 'none', color: '#2b6139', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0 }}
+                            title="Xóa dòng này"
+                          >
+                            <Eye size={18} color="#2b6139" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
               {/* Dotted button inside card */}
-              <button 
+              <button
                 onClick={addNewGroupRow}
                 style={{
                   width: '100%',
@@ -965,7 +965,7 @@ export default function VenueConfigPage() {
             </div>
 
             {/* Dotted button under card */}
-            <button 
+            <button
               onClick={() => alert('Chức năng thêm đối tượng sẽ sớm khả dụng.')}
               style={{
                 width: '100%',
@@ -990,7 +990,7 @@ export default function VenueConfigPage() {
             width: '100%',
             boxSizing: 'border-box'
           }}>
-            <button 
+            <button
               onClick={handleSavePricingGrouped}
               style={{
                 width: '100%',
@@ -1018,14 +1018,14 @@ export default function VenueConfigPage() {
             <h2 className="admin-section-title" style={{ margin: '0 0 20px 0', borderBottom: '1px solid #f3f4f6', paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Globe size={20} color="#f59e0b" /> Thông tin chung cơ sở
             </h2>
-            
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               <div style={{ gridColumn: 'span 2' }}>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Tên cơ sở thể thao *</label>
-                <input 
-                  type="text" 
-                  value={profileName} 
-                  onChange={e => setProfileName(e.target.value)} 
+                <input
+                  type="text"
+                  value={profileName}
+                  onChange={e => setProfileName(e.target.value)}
                   style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
                   placeholder="VD: Sân Pickleball & Badminton Premium"
                 />
@@ -1035,10 +1035,10 @@ export default function VenueConfigPage() {
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Địa chỉ cơ sở *</label>
                 <div style={{ position: 'relative' }}>
                   <MapPin size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-                  <input 
-                    type="text" 
-                    value={profileAddress} 
-                    onChange={e => setProfileAddress(e.target.value)} 
+                  <input
+                    type="text"
+                    value={profileAddress}
+                    onChange={e => setProfileAddress(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
                     placeholder="Số nhà, Tên đường, Quận, Thành phố..."
                   />
@@ -1049,10 +1049,10 @@ export default function VenueConfigPage() {
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Số điện thoại liên hệ *</label>
                 <div style={{ position: 'relative' }}>
                   <Phone size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-                  <input 
-                    type="text" 
-                    value={profilePhone} 
-                    onChange={e => setProfilePhone(e.target.value)} 
+                  <input
+                    type="text"
+                    value={profilePhone}
+                    onChange={e => setProfilePhone(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
                     placeholder="09xx xxx xxx"
                   />
@@ -1061,10 +1061,10 @@ export default function VenueConfigPage() {
 
               <div>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>QR Code thanh toán (Link ảnh nhận chuyển khoản)</label>
-                <input 
-                  type="text" 
-                  value={profileQr} 
-                  onChange={e => setProfileQr(e.target.value)} 
+                <input
+                  type="text"
+                  value={profileQr}
+                  onChange={e => setProfileQr(e.target.value)}
                   style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
                   placeholder="URL mã QR (Ví dụ VietQR, MoMo...)"
                 />
@@ -1074,10 +1074,10 @@ export default function VenueConfigPage() {
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Giờ mở cửa *</label>
                 <div style={{ position: 'relative' }}>
                   <Clock size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-                  <input 
-                    type="time" 
-                    value={profileStart} 
-                    onChange={e => setProfileStart(e.target.value)} 
+                  <input
+                    type="time"
+                    value={profileStart}
+                    onChange={e => setProfileStart(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
                   />
                 </div>
@@ -1087,10 +1087,10 @@ export default function VenueConfigPage() {
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Giờ đóng cửa *</label>
                 <div style={{ position: 'relative' }}>
                   <Clock size={18} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-                  <input 
-                    type="time" 
-                    value={profileEnd} 
-                    onChange={e => setProfileEnd(e.target.value)} 
+                  <input
+                    type="time"
+                    value={profileEnd}
+                    onChange={e => setProfileEnd(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
                   />
                 </div>
@@ -1126,9 +1126,9 @@ export default function VenueConfigPage() {
 
               <div style={{ gridColumn: 'span 2' }}>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Mô tả ngắn</label>
-                <textarea 
-                  value={profileDesc} 
-                  onChange={e => setProfileDesc(e.target.value)} 
+                <textarea
+                  value={profileDesc}
+                  onChange={e => setProfileDesc(e.target.value)}
                   rows={4}
                   style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none', resize: 'vertical' }}
                   placeholder="Giới thiệu về cơ sở của bạn (tiện ích đi kèm, dịch vụ nước uống, bãi đỗ xe...)"
@@ -1137,20 +1137,20 @@ export default function VenueConfigPage() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
-              <button 
-                onClick={handleSaveProfile} 
+              <button
+                onClick={handleSaveProfile}
                 disabled={updateVenueMutation.isPending}
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 8, 
-                  backgroundColor: '#f59e0b', 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '12px 24px', 
-                  borderRadius: 8, 
-                  fontWeight: 600, 
-                  cursor: 'pointer' 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  backgroundColor: '#f59e0b',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  cursor: 'pointer'
                 }}
               >
                 <Save size={18} /> Lưu thông tin cơ sở
@@ -1167,35 +1167,35 @@ export default function VenueConfigPage() {
             <div style={{ background: '#f9fafb', padding: 20, borderRadius: 10, border: '1px dashed #d1d5db', marginBottom: 24 }}>
               <h3 style={{ margin: '0 0 12px 0', fontSize: 14, fontWeight: 600, color: '#374151' }}>Thêm hình ảnh mới</h3>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <input 
-                  type="text" 
-                  value={newImageUrl} 
-                  onChange={e => setNewImageUrl(e.target.value)} 
+                <input
+                  type="text"
+                  value={newImageUrl}
+                  onChange={e => setNewImageUrl(e.target.value)}
                   placeholder="Nhập URL hình ảnh (Ví dụ: https://example.com/image.jpg)"
                   style={{ flex: 1, minWidth: 200, padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', outline: 'none' }}
                 />
-                <select 
-                  value={newImageType} 
+                <select
+                  value={newImageType}
                   onChange={e => setNewImageType(e.target.value as any)}
                   style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: 'white' }}
                 >
                   <option value="Gallery">Ảnh thư viện (Gallery)</option>
                   <option value="Avatar">Ảnh Đại diện (Avatar)</option>
                 </select>
-                <button 
+                <button
                   onClick={handleAddImage}
                   disabled={addVenueImageMutation.isPending}
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 4, 
-                    backgroundColor: '#10b981', 
-                    color: 'white', 
-                    border: 'none', 
-                    padding: '10px 20px', 
-                    borderRadius: 8, 
-                    fontWeight: 600, 
-                    cursor: 'pointer' 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    backgroundColor: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    cursor: 'pointer'
                   }}
                 >
                   <Plus size={16} /> Thêm
@@ -1215,7 +1215,7 @@ export default function VenueConfigPage() {
                   <div style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#f59e0b', color: 'white', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>
                     AVATAR
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleDeleteImage(img.id)}
                     style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                   >
@@ -1231,7 +1231,7 @@ export default function VenueConfigPage() {
                   <div style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#3b82f6', color: 'white', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>
                     THƯ VIỆN
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleDeleteImage(img.id)}
                     style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                   >

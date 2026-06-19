@@ -22,7 +22,7 @@ export default function OwnerDashboardPage() {
   // Determine venue name and avatar
   const venue = venues && venues.length > 0 ? venues[0] : null;
   const venueName = venue?.name || 'Sân thể thao Sport Connect';
-  
+
 
 
   const handleScanQR = () => {
@@ -92,7 +92,7 @@ export default function OwnerDashboardPage() {
   return (
     <OwnerLayout showSystemHeader={false}>
       <div className="owner-dashboard-wrapper">
-        
+
         {/* Dynamic Green Banner Header exactly as pictured */}
         <div className="owner-dashboard-banner">
           {/* Header Action Buttons */}
@@ -149,7 +149,7 @@ export default function OwnerDashboardPage() {
 
                 {/* Background Pattern effect */}
                 <div className="owner-grid-item-pattern"></div>
-                
+
                 {/* Content */}
                 <div className="owner-grid-item-content">
                   <div className="owner-grid-item-icon-wrapper">

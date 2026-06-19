@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, MoreVertical, MapPin, Clock, Phone, Copy, Check, Star, Image as ImageIcon, FileText } from 'lucide-react';
 import { useVenueDetail, usePriceRules } from '../../hooks/queries/useOwnerQueries';
 import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
@@ -12,8 +12,27 @@ type TabType = 'info' | 'pricing' | 'images' | 'reviews' | 'terms';
 export default function OwnerVenueDetailPage() {
   const { id: venueId } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryTab = searchParams.get('tab') as TabType | null;
+
   const tabsOrder: TabType[] = ['info', 'pricing', 'images', 'reviews', 'terms'];
-  const { activeTab, direction, changeTab } = useTabDirection<TabType>('info', tabsOrder);
+  const { activeTab, direction, changeTab } = useTabDirection<TabType>(
+    (queryTab && tabsOrder.includes(queryTab)) ? queryTab : 'info',
+    tabsOrder
+  );
+
+  const handleTabChange = (tab: TabType) => {
+    if (tab === activeTab) return;
+    changeTab(tab);
+    setSearchParams({ tab });
+  };
+
+  useEffect(() => {
+    if (queryTab && queryTab !== activeTab && tabsOrder.includes(queryTab)) {
+      changeTab(queryTab);
+    }
+  }, [queryTab]);
+
   const [copied, setCopied] = useState(false);
   const tabTransition = { type: 'tween', ease: 'easeOut', duration: 0.22 };
 
@@ -78,37 +97,37 @@ export default function OwnerVenueDetailPage() {
 
       {/* 3. Horizontal Tab Bar */}
       <div className="owner-venue-tabs-bar">
-        <button 
+        <button
           className={`owner-venue-tab ${activeTab === 'info' ? 'active' : ''}`}
-          onClick={() => changeTab('info')}
+          onClick={() => handleTabChange('info')}
         >
           Thông tin
           {activeTab === 'info' && <TabUnderline layoutId="ownerVenueTabUnderline" color="#dee4d8" height="1.5px" left={0} right={0} transition={tabTransition} />}
         </button>
-        <button 
+        <button
           className={`owner-venue-tab ${activeTab === 'pricing' ? 'active' : ''}`}
-          onClick={() => changeTab('pricing')}
+          onClick={() => handleTabChange('pricing')}
         >
           Giá & D.vụ
           {activeTab === 'pricing' && <TabUnderline layoutId="ownerVenueTabUnderline" color="#dee4d8" height="1.5px" left={0} right={0} transition={tabTransition} />}
         </button>
-        <button 
+        <button
           className={`owner-venue-tab ${activeTab === 'images' ? 'active' : ''}`}
-          onClick={() => changeTab('images')}
+          onClick={() => handleTabChange('images')}
         >
           Hình ảnh
           {activeTab === 'images' && <TabUnderline layoutId="ownerVenueTabUnderline" color="#dee4d8" height="1.5px" left={0} right={0} transition={tabTransition} />}
         </button>
-        <button 
+        <button
           className={`owner-venue-tab ${activeTab === 'reviews' ? 'active' : ''}`}
-          onClick={() => changeTab('reviews')}
+          onClick={() => handleTabChange('reviews')}
         >
           Đánh giá
           {activeTab === 'reviews' && <TabUnderline layoutId="ownerVenueTabUnderline" color="#dee4d8" height="1.5px" left={0} right={0} transition={tabTransition} />}
         </button>
-        <button 
+        <button
           className={`owner-venue-tab ${activeTab === 'terms' ? 'active' : ''}`}
-          onClick={() => changeTab('terms')}
+          onClick={() => handleTabChange('terms')}
         >
           Điều khoản
           {activeTab === 'terms' && <TabUnderline layoutId="ownerVenueTabUnderline" color="#dee4d8" height="1.5px" left={0} right={0} transition={tabTransition} />}
@@ -117,13 +136,13 @@ export default function OwnerVenueDetailPage() {
 
       {/* 4. Tab Content Area */}
       <div className="owner-venue-content">
-        <TabContentSlider 
-          activeTab={activeTab} 
-          direction={direction} 
+        <TabContentSlider
+          activeTab={activeTab}
+          direction={direction}
           transition={tabTransition}
           enableSwipe={true}
           tabs={tabsOrder}
-          onTabChange={changeTab}
+          onTabChange={handleTabChange}
         >
           {activeTab === 'info' && (
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -159,7 +178,7 @@ export default function OwnerVenueDetailPage() {
           {activeTab === 'pricing' && (
             <div className="owner-venue-pricing-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                <button 
+                <button
                   onClick={() => navigate(`/owner/venues/${venue.id}/edit?tab=pricing`)}
                   style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '15px', fontWeight: 600, cursor: 'pointer', padding: 0 }}
                 >
@@ -173,9 +192,9 @@ export default function OwnerVenueDetailPage() {
               {loadingPrices ? (
                 <p style={{ opacity: 0.7, fontSize: 14, color: '#ffffff' }}>Đang tải bảng giá...</p>
               ) : (
-                <PricingTable 
-                  priceRules={priceRules || []} 
-                  sportTypes={venue?.sportTypes || []} 
+                <PricingTable
+                  priceRules={priceRules || []}
+                  sportTypes={venue?.sportTypes || []}
                 />
               )}
 
@@ -184,7 +203,7 @@ export default function OwnerVenueDetailPage() {
                   <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     DANH SÁCH DỊCH VỤ
                   </h3>
-                  <button 
+                  <button
                     onClick={() => navigate('/owner/inventory')}
                     style={{ background: 'none', border: 'none', color: 'rgba(255, 255, 255, 0.6)', fontSize: '13px', fontWeight: 500, cursor: 'pointer', padding: 0 }}
                   >

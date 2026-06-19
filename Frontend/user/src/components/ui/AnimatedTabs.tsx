@@ -113,7 +113,6 @@ export function TabContentSlider({
   const isFirst = currentIdx === 0;
   const isLast = tabs ? currentIdx === tabs.length - 1 : false;
 
-  // Lock boundary: 0 elasticity to stay static when dragging past boundaries, 0.4 elasticity for valid transitions
   const dragElasticValue = tabs ? {
     left: isLast ? 0 : 0.4,
     right: isFirst ? 0 : 0.4
