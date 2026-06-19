@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import './LanguageSelectModal.css';
 
 interface LanguageSelectModalProps {
   isOpen: boolean;
@@ -19,83 +20,31 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
   const modalContent = (
     <div 
       onClick={onClose}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '24px'
-      }}
+      className="lang-modal-overlay"
     >
       <div 
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: '320px',
-          backgroundColor: '#eeeeee',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-          display: 'flex',
-          flexDirection: 'column',
-          border: '1px solid #cccccc'
-        }}
+        className="lang-modal-box"
       >
         {/* Vietnamese Option */}
         <button
           onClick={() => handleLanguageChange('vi')}
-          style={{
-            width: '100%',
-            padding: '16px',
-            backgroundColor: '#ffffff',
-            border: 'none',
-            outline: 'none',
-            fontSize: '18px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            transition: 'background-color 0.2s'
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f8e9')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+          className="lang-modal-btn"
         >
-          <span style={{ color: '#064e3b', fontWeight: '500' }}>VN</span>
-          <span style={{ color: '#064e3b', fontWeight: '700' }}>Tiếng Việt</span>
+          <span className="lang-modal-code">VN</span>
+          <span className="lang-modal-name">Tiếng Việt</span>
         </button>
 
         {/* Divider */}
-        <div style={{ height: '1px', backgroundColor: '#e0e0e0' }} />
+        <div className="lang-modal-divider" />
 
         {/* English Option */}
         <button
           onClick={() => handleLanguageChange('en')}
-          style={{
-            width: '100%',
-            padding: '16px',
-            backgroundColor: '#ffffff',
-            border: 'none',
-            outline: 'none',
-            fontSize: '18px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            transition: 'background-color 0.2s'
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f8e9')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+          className="lang-modal-btn"
         >
-          <span style={{ color: '#064e3b', fontWeight: '500' }}>GB</span>
-          <span style={{ color: '#064e3b', fontWeight: '700' }}>English</span>
+          <span className="lang-modal-code">GB</span>
+          <span className="lang-modal-name">English</span>
         </button>
       </div>
     </div>
@@ -103,3 +52,4 @@ export default function LanguageSelectModal({ isOpen, onClose }: LanguageSelectM
 
   return createPortal(modalContent, document.body);
 }
+export type { LanguageSelectModalProps };

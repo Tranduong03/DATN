@@ -18,12 +18,13 @@ export default function SubPageHeader({ title, onBack }: SubPageHeaderProps) {
   };
 
   return (
-    <div className="settings-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+    <div className="settings-header">
       <button className="settings-back-btn" onClick={handleBack}>
         <ChevronLeft color="#fff" size={24} />
       </button>
       <h1 className="settings-title">{title}</h1>
-      <div style={{ width: 24 }}></div> {/* Placeholder for centering */}
+      <div className="settings-placeholder"></div>
     </div>
   );
 }
+export type { SubPageHeaderProps };

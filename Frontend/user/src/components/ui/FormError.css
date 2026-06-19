@@ -1,0 +1,14 @@
+.form-message-alert {
+  font-size: 13px;
+  margin-bottom: 12px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.form-message-alert.error {
+  color: #ef4444;
+}
+
+.form-message-alert.success {
+  color: #10b981;
+}

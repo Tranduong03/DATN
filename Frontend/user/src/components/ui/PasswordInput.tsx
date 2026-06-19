@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState, InputHTMLAttributes } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import './PasswordInput.css';
 
-interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface PasswordInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   wrapperClassName?: string;
 }
@@ -17,7 +18,7 @@ export default function PasswordInput({
   return (
     <div className={`form-group ${wrapperClassName}`}>
       {label && <label>{label}</label>}
-      <div className="input-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      <div className="input-wrapper">
         <input 
           type={showPassword ? "text" : "password"} 
           className={className}
@@ -27,17 +28,6 @@ export default function PasswordInput({
           type="button" 
           className="eye-btn" 
           onClick={() => setShowPassword(!showPassword)}
-          style={{
-            position: 'absolute',
-            right: '12px',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            height: '100%'
-          }}
         >
           {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
         </button>
@@ -45,3 +35,4 @@ export default function PasswordInput({
     </div>
   );
 }
+export type { PasswordInputProps };

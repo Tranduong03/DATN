@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import preloaderAnim from '../../assets/preload.lottie';
+import './Preloader.css';
 
 const SPORTS_POOL = ['🏸', '🎾', '⚽', '🏀', '🏐', '🏈', '🏓', '⛳'];
 const SPORT_COUNT = 8;
@@ -48,52 +49,67 @@ export default function Preloader() {
     const draw = (ts: number) => {
       const W = canvas.offsetWidth;
       const H = canvas.offsetHeight;
+      if (W === 0 || H === 0) return;
+
       ctx.clearRect(0, 0, W, H);
 
-      let i = particles.length;
-      while (i--) {
-        const p = particles[i];
-        if ((ts - p.spawnTime) / 1000 >= p.life) {
-          particles.splice(i, 1);
-          continue;
+      const toRemove: number[] = [];
+      particles.forEach((p, idx) => {
+        const age = (ts - p.spawnTime) / 1000;
+        if (age >= p.life) {
+          toRemove.push(idx);
+          return;
         }
 
-        const age = (ts - p.spawnTime) / 1000;
-        const ratio = age / p.life;
-        let alpha = 1;
-        if (ratio < 0.1) alpha = ratio / 0.1;
-        else if (ratio > 0.75) alpha = 1 - (ratio - 0.75) / 0.25;
+        const normAge = age / p.life; 
+        const opacity = Math.sin(normAge * Math.PI) * 0.8; 
 
-        const cx = p.x + Math.sin(p.wobbleOff + age * p.wobbleFreq) * p.wobbleAmp + p.drift * ratio;
-        const cy = p.y - age * p.speedY;
-        if (cy + p.size < 0) continue;
+        const curY = p.y - p.speedY * age;
+        const driftX = p.drift * age;
+        const wobble = Math.sin(age * p.wobbleFreq * Math.PI * 2 + p.wobbleOff) * p.wobbleAmp;
+        const curX = p.x + driftX + wobble;
+        const angle = p.rotSpeed * age * Math.PI * 2;
 
         ctx.save();
-        ctx.globalAlpha = alpha * 0.85;
-        ctx.translate(cx, cy);
-        ctx.rotate(age * p.rotSpeed);
-        ctx.font = `${p.size}px serif`;
+        ctx.globalAlpha = opacity;
+        ctx.translate(curX, curY);
+        ctx.rotate(angle);
+        ctx.font = `bold ${p.size}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 6;
         ctx.fillText(p.emoji, 0, 0);
         ctx.restore();
+      });
+
+      for (let i = toRemove.length - 1; i >= 0; i--) {
+        particles.splice(toRemove[i], 1);
       }
 
-      if (running) animId = requestAnimationFrame(draw);
+      if (particles.length < SPORT_COUNT * 2 && Math.random() < 0.25) {
+        const emoji = sports[Math.floor(Math.random() * sports.length)];
+        particles.push(createParticle(emoji));
+      }
+
+      if (running) {
+        animId = requestAnimationFrame(draw);
+      }
     };
 
-    const total = sports.length * 2;
-    const icons = Array.from({ length: total }, (_, i) => sports[i % sports.length])
-      .sort(() => Math.random() - 0.5);
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    icons.forEach((emoji, i) => {
-      const delay = 150 + (i / total) * 600;
-      timers.push(setTimeout(() => {
-        if (running) particles.push(createParticle(emoji));
-      }, delay));
-    });
-
-    animId = requestAnimationFrame(draw);
+    const timers: any[] = [];
+    const run = () => {
+      sports.forEach((emoji, idx) => {
+        timers.push(
+          setTimeout(() => {
+            if (running) particles.push(createParticle(emoji));
+          }, idx * 180)
+        );
+      });
+      animId = requestAnimationFrame(draw);
+    };
+    run();
 
     return () => {
       running = false;
@@ -123,31 +139,21 @@ export default function Preloader() {
   if (!visible) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 9999,
-      background: 'radial-gradient(ellipse at 50% 30%, #4a8f5f 0%, #326441 50%, #1b3823 100%)', // Option 1: Brand Theme
-      opacity: fadeOut ? 0 : 1,
-      transition: 'opacity 0.4s ease',
-    }}>
+    <div className={`preloader-container ${fadeOut ? 'fade-out' : ''}`}>
       <canvas
         ref={canvasRef}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+        className="preloader-canvas"
       />
-      <div style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 2,
-      }}>
+      <div className="preloader-animation-wrapper">
         <DotLottieReact
           src={preloaderAnim}
           autoplay
           loop
           speed={4}
-          style={{ width: 350, height: 350 }}
+          className="preloader-lottie-player"
         />
       </div>
     </div>
   );
 }
+export type { Preloader };

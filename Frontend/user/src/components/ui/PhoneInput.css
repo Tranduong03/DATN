@@ -1,0 +1,57 @@
+.phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.country-code {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.country-code img {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+}
+
+.country-code span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.country-code .dropdown-arrow {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-left: 2px;
+}
+
+.phone-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #e5e7eb;
+  margin: 0 8px;
+}
+
+.phone-input-wrapper input[type="tel"] {
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.phone-input-wrapper .clear-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  z-index: 2;
+}

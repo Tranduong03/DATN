@@ -976,6 +976,14 @@ input[type="password"]::-ms-clear {
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.settings-placeholder {
+  width: 24px;
+  flex-shrink: 0;
 }
 
 .settings-back-btn {

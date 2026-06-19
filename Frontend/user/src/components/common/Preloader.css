@@ -1,0 +1,33 @@
+.preloader-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(ellipse at 50% 30%, #4a8f5f 0%, #326441 50%, #1b3823 100%);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.preloader-container.fade-out {
+  opacity: 0;
+}
+
+.preloader-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.preloader-animation-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.preloader-animation-wrapper .preloader-lottie-player {
+  width: 350px;
+  height: 350px;
+}
