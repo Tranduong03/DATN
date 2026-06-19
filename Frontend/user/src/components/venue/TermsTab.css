@@ -1,3 +1,13 @@
+.owner-venue-terms-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+  flex: 1;
+}
+
 .owner-venue-terms-title {
   font-size: 16px;
   font-weight: 700;
@@ -19,6 +29,13 @@
   margin-bottom: 4px;
   color: #f5d061;
   font-weight: 700;
+}
+
+/* User view styles */
+.user-venue-rules-tab {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .user-venue-rules-list {

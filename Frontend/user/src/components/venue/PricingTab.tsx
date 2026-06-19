@@ -1,4 +1,3 @@
-import React from 'react';
 import PricingTable from '../ui/PricingTable';
 import './PricingTab.css';
 
@@ -21,7 +20,7 @@ export default function PricingTab({
 }: PricingTabProps) {
   if (isOwner) {
     return (
-      <div className="owner-venue-pricing-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div className="owner-venue-pricing-tab">
         <div className="owner-venue-pricing-header">
           <button
             onClick={onEditPricing}
@@ -35,7 +34,7 @@ export default function PricingTab({
         </div>
 
         {loadingPrices ? (
-          <p style={{ opacity: 0.7, fontSize: 14, color: '#ffffff' }}>Đang tải bảng giá...</p>
+          <p className="owner-venue-pricing-loading">Đang tải bảng giá...</p>
         ) : (
           <PricingTable
             priceRules={priceRules || []}
@@ -81,8 +80,8 @@ export default function PricingTab({
                   <td className="owner-venue-services-item-price">100.000 đ / Giờ</td>
                 </tr>
                 <tr>
-                  <td className="owner-venue-services-item-name" style={{ borderBottom: 'none' }}>...</td>
-                  <td className="owner-venue-services-item-price" style={{ textAlign: 'right', borderBottom: 'none' }}>...</td>
+                  <td className="owner-venue-services-item-name">...</td>
+                  <td className="owner-venue-services-item-price">...</td>
                 </tr>
               </tbody>
             </table>
@@ -94,7 +93,7 @@ export default function PricingTab({
 
   // User view
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div className="user-venue-pricing-tab">
       <PricingTable 
         priceRules={priceRules || []} 
         sportTypes={venue?.sportTypes || []} 

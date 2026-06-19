@@ -1,3 +1,9 @@
+.owner-venue-images-tab {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .owner-venue-images-title {
   font-size: 16px;
   font-weight: 700;
@@ -35,14 +41,24 @@
   color: white;
   padding: 1px 4px;
   border-radius: 3px;
-  fontSize: 8px;
+  font-size: 8px;
 }
 
-/* User bottom sheet gallery grid overrides if index.css is loaded, or fallback */
+.owner-venue-images-empty {
+  grid-column: span 3;
+  opacity: 0.7;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px 0;
+  color: #ffffff;
+}
+
+/* User bottom sheet gallery grid */
 .sheet-gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
+  flex: 1;
 }
 
 .sheet-gallery-img {
@@ -57,4 +73,5 @@
   color: #64748b;
   text-align: center;
   padding: 20px 0;
+  grid-column: span 2;
 }

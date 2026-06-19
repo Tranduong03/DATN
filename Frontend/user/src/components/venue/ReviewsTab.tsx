@@ -1,4 +1,3 @@
-import React from 'react';
 import { Star } from 'lucide-react';
 import './ReviewsTab.css';
 
@@ -18,7 +17,7 @@ export default function ReviewsTab({
     const reviewCount = venue?.reviewCount || 0;
 
     return (
-      <div className="owner-venue-reviews-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div className="owner-venue-reviews-tab">
         <div className="owner-venue-rating-box">
           <div className="owner-venue-rating-val">{avgRating}</div>
           <div className="owner-venue-rating-info">
@@ -46,7 +45,7 @@ export default function ReviewsTab({
 
   // User view
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div className="user-venue-reviews-tab">
       {reviews && reviews.length > 0 ? (
         reviews.map((review: any) => (
           <div key={review.id} className="sheet-review-item">
@@ -55,7 +54,7 @@ export default function ReviewsTab({
                 {review.userAvatar ? (
                   <img src={review.userAvatar} alt={review.userName} className="sheet-review-avatar" />
                 ) : (
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 'bold' }}>
+                  <div className="sheet-review-avatar-placeholder">
                     {review.userName?.charAt(0).toUpperCase()}
                   </div>
                 )}

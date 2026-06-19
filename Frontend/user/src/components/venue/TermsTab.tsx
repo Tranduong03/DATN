@@ -1,4 +1,3 @@
-import React from 'react';
 import { FileText } from 'lucide-react';
 import './TermsTab.css';
 
@@ -9,7 +8,7 @@ interface TermsTabProps {
 export default function TermsTab({ isOwner }: TermsTabProps) {
   if (isOwner) {
     return (
-      <div className="owner-venue-terms-tab" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, lineHeight: 1.5, opacity: 0.9, flex: 1 }}>
+      <div className="owner-venue-terms-tab">
         <h3 className="owner-venue-terms-title">
           <FileText size={18} /> Nội quy & Điều khoản đặt sân
         </h3>
@@ -31,7 +30,7 @@ export default function TermsTab({ isOwner }: TermsTabProps) {
 
   // User view
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div className="user-venue-rules-tab">
       <ul className="user-venue-rules-list">
         <li>Đến đúng giờ đã đặt lịch.</li>
         <li>Mang giày chuyên dụng cho các loại sân tương ứng để bảo vệ mặt thảm.</li>

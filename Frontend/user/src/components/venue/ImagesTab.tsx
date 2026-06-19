@@ -1,4 +1,3 @@
-import React from 'react';
 import { Image as ImageIcon } from 'lucide-react';
 import './ImagesTab.css';
 
@@ -15,7 +14,7 @@ export default function ImagesTab({
 }: ImagesTabProps) {
   if (isOwner) {
     return (
-      <div className="owner-venue-images-tab" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div className="owner-venue-images-tab">
         <h3 className="owner-venue-images-title">
           <ImageIcon size={18} /> Hình ảnh cơ sở ({images.length})
         </h3>
@@ -29,7 +28,7 @@ export default function ImagesTab({
             </div>
           ))}
           {images.length === 0 && (
-            <p style={{ gridColumn: 'span 3', opacity: 0.7, fontSize: 14, textAlign: 'center', padding: '20px 0', color: '#ffffff' }}>
+            <p className="owner-venue-images-empty">
               Chưa có hình ảnh nào.
             </p>
           )}
@@ -46,7 +45,7 @@ export default function ImagesTab({
           <img key={idx} src={img} alt={`Gallery ${idx}`} className="sheet-gallery-img" />
         ))
       ) : (
-        <span className="sheet-tab-text" style={{ gridColumn: 'span 2' }}>Không có hình ảnh cơ sở.</span>
+        <span className="sheet-tab-text">Không có hình ảnh cơ sở.</span>
       )}
     </div>
   );

@@ -1,3 +1,9 @@
+.owner-venue-info-tab {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .owner-venue-info-list {
   display: flex;
   flex-direction: column;
@@ -70,4 +76,56 @@
 .owner-venue-copy-btn:hover {
   opacity: 1;
   transform: scale(1.05);
+}
+
+/* User view styles */
+.user-venue-info-tab {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.user-venue-link-title {
+  font-size: 15px;
+  font-weight: 550;
+  color: #e06e1b;
+  margin: 8px 0 8px 0;
+}
+
+.user-venue-link-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+}
+
+.user-venue-link-url {
+  font-size: 13px;
+  color: #02471fff;
+  word-break: break-all;
+  text-decoration: none;
+  font-weight: 300;
+}
+
+.user-venue-copy-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.user-venue-copy-btn.copied {
+  color: #10b981;
+}
+
+.user-venue-copy-text {
+  font-size: 12px;
+  color: #10b981;
+  font-weight: 500;
 }
