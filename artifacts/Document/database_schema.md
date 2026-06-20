@@ -304,6 +304,7 @@ Quản lý các cụm sân thể thao (Ví dụ: Sân cầu lông ABC, Picklebal
 #### Bảng `Court` (Sân nhỏ lẻ)
 Các sân chi tiết trong một cụm sân (Ví dụ: Sân số 1, Sân số 2, Sân VIP).
 * `VenueId` (Guid, FK): Thuộc cụm sân nào.
+* `SportType` (string): Loại môn thể thao áp dụng cho sân con (Ví dụ: `Pickleball`, `Cầu lông`, `Bóng đá`).
 * `Status` (string): Trạng thái của sân lẻ (`AVAILABLE`, `MAINTENANCE`).
 
 #### Bảng `PriceRule` (Khung giá sân)

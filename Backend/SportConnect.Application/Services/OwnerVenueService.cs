@@ -158,19 +158,36 @@ public class OwnerVenueService : IOwnerVenueService
             Id = c.Id,
             VenueId = c.VenueId,
             CourtName = c.CourtName,
-            Status = c.Status
+            Status = c.Status,
+            SportType = c.SportType
         });
     }
 
     public async Task<CourtDto> AddCourtAsync(Guid venueId, Guid ownerId, CreateCourtDto dto)
     {
-        if (!await IsOwnerOfVenue(venueId, ownerId))
-            throw new Exception("Unauthorized access to venue.");
+        var venue = await _unitOfWork.Repository<Venue>().GetByIdAsync(venueId);
+        if (venue == null || venue.OwnerId != ownerId)
+            throw new Exception("Venue not found or unauthorized access.");
+
+        var sportType = dto.SportType;
+        if (string.IsNullOrWhiteSpace(sportType))
+        {
+            sportType = venue.SportTypes.FirstOrDefault() ?? string.Empty;
+        }
+        else
+        {
+            var isValidSport = venue.SportTypes.Any(s => s.Equals(sportType, StringComparison.OrdinalIgnoreCase));
+            if (!isValidSport)
+            {
+                throw new Exception($"Venue does not support the sport type: {sportType}");
+            }
+        }
 
         var court = new Court
         {
             VenueId = venueId,
             CourtName = dto.CourtName,
+            SportType = sportType,
             Status = string.IsNullOrWhiteSpace(dto.Status) ? "AVAILABLE" : dto.Status,
             CreatedAt = DateTime.UtcNow
         };
@@ -183,18 +200,31 @@ public class OwnerVenueService : IOwnerVenueService
             Id = court.Id,
             VenueId = court.VenueId,
             CourtName = court.CourtName,
-            Status = court.Status
+            Status = court.Status,
+            SportType = court.SportType
         };
     }
 
     public async Task<CourtDto> UpdateCourtAsync(Guid venueId, Guid courtId, Guid ownerId, UpdateCourtDto dto)
     {
-        if (!await IsOwnerOfVenue(venueId, ownerId))
-            throw new Exception("Unauthorized access to venue.");
+        var venue = await _unitOfWork.Repository<Venue>().GetByIdAsync(venueId);
+        if (venue == null || venue.OwnerId != ownerId)
+            throw new Exception("Venue not found or unauthorized access.");
 
         var court = await _unitOfWork.Repository<Court>().GetByIdAsync(courtId);
         if (court == null || court.VenueId != venueId)
             throw new Exception("Court not found in this venue.");
+
+        var sportType = dto.SportType;
+        if (!string.IsNullOrWhiteSpace(sportType))
+        {
+            var isValidSport = venue.SportTypes.Any(s => s.Equals(sportType, StringComparison.OrdinalIgnoreCase));
+            if (!isValidSport)
+            {
+                throw new Exception($"Venue does not support the sport type: {sportType}");
+            }
+            court.SportType = sportType;
+        }
 
         court.CourtName = dto.CourtName;
         court.Status = dto.Status;
@@ -207,7 +237,8 @@ public class OwnerVenueService : IOwnerVenueService
             Id = court.Id,
             VenueId = court.VenueId,
             CourtName = court.CourtName,
-            Status = court.Status
+            Status = court.Status,
+            SportType = court.SportType
         };
     }
 

@@ -108,7 +108,8 @@ public class PublicVenueService : IPublicVenueService
             {
                 Id = c.Id,
                 CourtName = c.CourtName,
-                Status = c.Status
+                Status = c.Status,
+                SportType = c.SportType
             }).ToList(),
             PriceRules = priceRules.Select(p => new PublicPriceRuleDto
             {

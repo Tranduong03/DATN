@@ -343,6 +343,12 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasMaxLength(100)
                 .IsRequired();
 
+            entity.Property(e => e.SportType)
+                .HasColumnName("sport_type")
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasDefaultValue(string.Empty);
+
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasMaxLength(50)

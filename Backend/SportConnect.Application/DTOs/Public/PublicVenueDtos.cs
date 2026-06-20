@@ -36,6 +36,7 @@ public class PublicCourtDto
     public Guid Id { get; set; }
     public string CourtName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public string SportType { get; set; } = string.Empty;
 }
 
 public class PublicPriceRuleDto

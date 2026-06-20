@@ -5,6 +5,7 @@ public class Court
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid VenueId { get; set; }
     public string CourtName { get; set; } = string.Empty; // Ví dụ: Sân số 1, Sân VIP
+    public string SportType { get; set; } = string.Empty; // Ví dụ: Pickleball, Cầu lông
     public string Status { get; set; } = "AVAILABLE"; // AVAILABLE, MAINTENANCE
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

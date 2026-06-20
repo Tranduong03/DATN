@@ -52,18 +52,21 @@ public class CourtDto
     public Guid VenueId { get; set; }
     public string CourtName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public string SportType { get; set; } = string.Empty;
 }
 
 public class CreateCourtDto
 {
     public string CourtName { get; set; } = string.Empty;
     public string Status { get; set; } = "AVAILABLE";
+    public string SportType { get; set; } = string.Empty;
 }
 
 public class UpdateCourtDto
 {
     public string CourtName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public string SportType { get; set; } = string.Empty;
 }
 
 public class PriceRuleDto
