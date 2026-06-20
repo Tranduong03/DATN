@@ -166,7 +166,7 @@ export default function OwnerVenueDetailPage() {
               loadingCourts={loadingCourts}
               isOwner={true}
               onEditPricing={() => navigate(`/owner/venues/${venue.id}/edit?tab=pricing`)}
-              onViewInventory={() => navigate('/owner/inventory')}
+              onViewInventory={() => navigate(`/owner/venues/${venue.id}/services`)}
               onViewCourts={() => navigate(`/owner/venues/${venue.id}/courts`)}
             />
           )}

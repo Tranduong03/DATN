@@ -32,6 +32,7 @@ const OwnerOnboardingFlow = lazy(() => import('./pages/owner/OwnerOnboardingFlow
 const OwnerDashboardPage = lazy(() => import('./pages/owner/OwnerDashboardPage'));
 const OwnerVenuesPage = lazy(() => import('./pages/owner/OwnerVenuesPage'));
 const VenuePricePage = lazy(() => import('./pages/owner/VenuePricePage'));
+const VenueListCourt = lazy(() => import('./pages/owner/VenueListCourt'));
 const OwnerVenueDetailPage = lazy(() => import('./pages/owner/OwnerVenueDetailPage'));
 const OwnerBookingsPage = lazy(() => import('./pages/owner/OwnerBookingsPage'));
 const OwnerSubFeaturePage = lazy(() => import('./pages/owner/OwnerSubFeaturePage'));
@@ -174,6 +175,7 @@ function AppRoutes() {
             <Route path="/owner/venues" element={withSuspense(OwnerVenuesPage)} />
             <Route path="/owner/venues/:id" element={withSuspense(OwnerVenueDetailPage)} />
             <Route path="/owner/venues/:id/edit" element={withSuspense(VenuePricePage)} />
+            <Route path="/owner/venues/:id/services" element={withSuspense(VenueListCourt)} />
             <Route path="/owner/venues/:id/courts" element={withSuspense(CreateCourtPage)} />
             <Route path="/owner/pos" element={withSuspense(OwnerSubFeaturePage)} />
             <Route path="/owner/inventory" element={withSuspense(OwnerSubFeaturePage)} />
