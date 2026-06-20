@@ -1,4 +1,5 @@
 import { MapPin, Clock, Phone, Copy, Check, Pencil } from 'lucide-react';
+import { formatOperatingHour } from '../../utils/time';
 import './InfoTab.css';
 
 interface InfoTabProps {
@@ -28,7 +29,7 @@ export default function InfoTab({
           </div>
           <div className="owner-venue-info-item">
             <Clock size={20} className="owner-venue-info-icon" />
-            <span>Giờ hoạt động: {venue.operatingStartHour || '05:00'} - {venue.operatingEndHour || '24:00'}</span>
+            <span>Giờ hoạt động: {formatOperatingHour(venue.operatingStartHour) || '5:00'} - {formatOperatingHour(venue.operatingEndHour) || '24:00'}</span>
           </div>
           <div className="owner-venue-info-item">
             <Phone size={20} className="owner-venue-info-icon" />

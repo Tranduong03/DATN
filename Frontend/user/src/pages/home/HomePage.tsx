@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import VenueDetailSheet from './VenueDetailSheet';
 import { ensureValidToken } from '../../utils/auth';
 import { FALLBACK_SPORTS } from '../../utils/sport';
+import { formatOperatingHour } from '../../utils/time';
 
 export default function HomePage() {
   const [activeSport, setActiveSport] = useState('');
@@ -334,7 +335,7 @@ export default function HomePage() {
                       <span className="distance">({venue.distance})</span> {venue.address}
                     </div>
                     <div className="venue-time">
-                      <Clock size={12} /> {venue.operatingStartHour} - {venue.operatingEndHour}
+                      <Clock size={12} /> {formatOperatingHour(venue.operatingStartHour)} - {formatOperatingHour(venue.operatingEndHour)}
                     </div>
                   </div>
                   <button 

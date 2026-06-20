@@ -6,6 +6,7 @@ import { useVenueDetail, useCourts, usePriceRules } from '../../hooks/queries/us
 import { useAddCourt, useUpdateCourt, useUpsertPriceRules, useUpdateVenue, useAddVenueImage, useDeleteVenueImage } from '../../hooks/mutations/useOwnerMutations';
 import AddPricingTypeModal from '../../components/venue/AddPricingTypeModal';
 import ConfirmModal from '../../components/venue/ConfirmModal';
+import { mapDefaultHoursToOperating } from '../../utils/time';
 
 export default function CreateCourtPage() {
   const { id: venueId } = useParams<{ id: string }>();
@@ -76,8 +77,13 @@ export default function CreateCourtPage() {
 
           const ruleStart = rule.startHour || '00:00';
           const ruleEnd = rule.endHour || '23:59';
-          const startStr = ruleStart.substring(0, 5);
-          const endStr = ruleEnd.substring(0, 5);
+          const { start: startStr, end: endStr } = mapDefaultHoursToOperating(
+            ruleStart,
+            ruleEnd,
+            venue.operatingStartHour,
+            venue.operatingEndHour
+          );
+
           const key = `${startStr}_${endStr}_${rule.dayOfWeek}`;
 
           let row = tempPricingData[sport].find(r => r.key === key);
@@ -90,7 +96,7 @@ export default function CreateCourtPage() {
               fixedPrice: 0,
               casualPrice: 0,
               isEditing: false,
-              timeDisplay: startStr.startsWith('00') && (endStr.startsWith('23:59') || endStr.startsWith('24:00')) ? 'Mặc định' : `${startStr} - ${endStr}`
+              timeDisplay: `${startStr} - ${endStr}`
             };
             tempPricingData[sport].push(row);
           }

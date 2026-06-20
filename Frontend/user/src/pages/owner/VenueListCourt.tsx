@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Trash2, Edit2, Check } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useVenueDetail, usePriceRules } from '../../hooks/queries/useOwnerQueries';
 import { useUpsertPriceRules } from '../../hooks/mutations/useOwnerMutations';
 import AddPricingTypeModal from '../../components/venue/AddPricingTypeModal';
 import ConfirmModal from '../../components/venue/ConfirmModal';
+import { formatOperatingHour, mapDefaultHoursToOperating } from '../../utils/time';
 
 export default function VenueListCourt() {
   const { id: venueId } = useParams<{ id: string }>();
@@ -52,8 +53,13 @@ export default function VenueListCourt() {
 
           const ruleStart = rule.startHour || '00:00';
           const ruleEnd = rule.endHour || '23:59';
-          const startStr = ruleStart.substring(0, 5);
-          const endStr = ruleEnd.substring(0, 5);
+          const { start: startStr, end: endStr } = mapDefaultHoursToOperating(
+            ruleStart,
+            ruleEnd,
+            venue.operatingStartHour,
+            venue.operatingEndHour
+          );
+
           const key = `${startStr}_${endStr}_${rule.dayOfWeek}`;
 
           let row = tempPricingData[sport].find(r => r.key === key);
@@ -66,7 +72,7 @@ export default function VenueListCourt() {
               fixedPrice: 0,
               casualPrice: 0,
               isEditing: false,
-              timeDisplay: startStr.startsWith('00') && (endStr.startsWith('23:59') || endStr.startsWith('24:00')) ? 'Mặc định' : `${startStr} - ${endStr}`
+              timeDisplay: `${formatOperatingHour(startStr)} - ${formatOperatingHour(endStr)}`
             };
             tempPricingData[sport].push(row);
           }
@@ -82,16 +88,18 @@ export default function VenueListCourt() {
 
       // Ensure at least the default sport tab exists
       if (!tempPricingData[defaultSport]) {
+        const venueStart = venue.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00';
+        const venueEnd = venue.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00';
         tempPricingData[defaultSport] = [
           {
-            key: '00:00_23:59_null',
-            startHour: '00:00',
-            endHour: '23:59',
+            key: `${venueStart}_${venueEnd}_null`,
+            startHour: venueStart,
+            endHour: venueEnd,
             dayOfWeek: null,
             fixedPrice: 100000,
             casualPrice: 110000,
             isEditing: false,
-            timeDisplay: 'Mặc định'
+            timeDisplay: `${formatOperatingHour(venueStart)} - ${formatOperatingHour(venueEnd)}`
           }
         ];
       }
@@ -118,58 +126,7 @@ export default function VenueListCourt() {
     }
   }, [priceRules, loadingPrices, venue, venueId, initialPricingData]);
 
-  const editGroupRow = (idx: number) => {
-    if (!activePricingTab || !pricingData[activePricingTab]) return;
-    const updated = pricingData[activePricingTab].map((r, i) => i === idx ? { ...r, isEditing: true } : r);
-    setPricingData({ ...pricingData, [activePricingTab]: updated });
-  };
 
-  const updateGroupRow = (idx: number, field: string, value: any) => {
-    if (!activePricingTab || !pricingData[activePricingTab]) return;
-    const updated = pricingData[activePricingTab].map((r, i) => {
-      if (i === idx) {
-        const u = { ...r, [field]: value };
-        if (field === 'startHour' || field === 'endHour') {
-          u.timeDisplay = u.startHour === '00:00' && (u.endHour === '23:59' || u.endHour === '24:00') ? 'Mặc định' : `${u.startHour} - ${u.endHour}`;
-        }
-        return u;
-      }
-      return r;
-    });
-    setPricingData({ ...pricingData, [activePricingTab]: updated });
-  };
-
-  const saveGroupRow = (idx: number) => {
-    if (!activePricingTab || !pricingData[activePricingTab]) return;
-    const updated = pricingData[activePricingTab].map((r, i) => i === idx ? { ...r, isEditing: false } : r);
-    setPricingData({ ...pricingData, [activePricingTab]: updated });
-  };
-
-  const deleteGroupRow = (idx: number) => {
-    if (!activePricingTab || !pricingData[activePricingTab]) return;
-    if (window.confirm('Bạn có chắc chắn muốn xóa khung giờ này?')) {
-      const updated = pricingData[activePricingTab].filter((_, i) => i !== idx);
-      setPricingData({ ...pricingData, [activePricingTab]: updated });
-    }
-  };
-
-  const addNewGroupRow = () => {
-    if (!activePricingTab || !pricingData[activePricingTab]) return;
-    const updated = [
-      ...pricingData[activePricingTab],
-      {
-        key: `new_${Date.now()}`,
-        startHour: '17:00',
-        endHour: '22:00',
-        dayOfWeek: null,
-        fixedPrice: 120000,
-        casualPrice: 130000,
-        isEditing: true,
-        timeDisplay: '17:00 - 22:00'
-      }
-    ];
-    setPricingData({ ...pricingData, [activePricingTab]: updated });
-  };
 
   const handleSavePricingGrouped = async () => {
     const flatRules: any[] = [];
@@ -177,8 +134,8 @@ export default function VenueListCourt() {
       const rows = pricingData[sportType];
       if (rows && Array.isArray(rows)) {
         rows.forEach((row) => {
-          const ruleStart = row.startHour || '00:00';
-          const ruleEnd = row.endHour || '23:59';
+          const ruleStart = row.startHour || (venue?.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00');
+          const ruleEnd = row.endHour || (venue?.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00');
           flatRules.push({
             dayOfWeek: row.dayOfWeek,
             startHour: ruleStart.includes(':') ? `${ruleStart}:00` : ruleStart,
@@ -218,16 +175,19 @@ export default function VenueListCourt() {
       return;
     }
 
+    const venueStart = venue?.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00';
+    const venueEnd = venue?.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00';
+
     const baseRules = (activePricingTab && pricingData[activePricingTab]) || Object.values(pricingData)[0] || [
       {
-        key: '00:00_23:59_null',
-        startHour: '00:00',
-        endHour: '23:59',
+        key: `${venueStart}_${venueEnd}_null`,
+        startHour: venueStart,
+        endHour: venueEnd,
         dayOfWeek: null,
         fixedPrice: 100000,
         casualPrice: 110000,
         isEditing: false,
-        timeDisplay: 'Mặc định'
+        timeDisplay: `${formatOperatingHour(venueStart)} - ${formatOperatingHour(venueEnd)}`
       }
     ];
 
@@ -267,24 +227,6 @@ export default function VenueListCourt() {
     }
   };
 
-  const handleRenamePricingType = (oldName: string) => {
-    if (!oldName) return;
-    const newName = prompt('Nhập tên mới cho loại sân / bảng giá:', oldName);
-    if (!newName || !newName.trim() || newName.trim() === oldName) return;
-    const trimmed = newName.trim();
-    if (pricingData[trimmed]) {
-      alert('Tên loại sân này đã tồn tại.');
-      return;
-    }
-    const copy = { ...pricingData };
-    copy[trimmed] = copy[oldName];
-    delete copy[oldName];
-    setPricingData(copy);
-    if (activePricingTab === oldName) {
-      setActivePricingTab(trimmed);
-    }
-  };
-
   if (loadingVenue || loadingPrices) {
     return (
       <div className="owner-venue-detail-page" style={{ backgroundColor: '#2b6139', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
@@ -314,7 +256,7 @@ export default function VenueListCourt() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <span className="owner-pricing-title-text">Chỉnh sửa bảng giá sân</span>
+          <span className="owner-pricing-title-text">Danh sách sân thể thao</span>
           <button
             onClick={() => handleDeletePricingType(activePricingTab)}
             className="owner-pricing-delete-btn"
@@ -324,175 +266,48 @@ export default function VenueListCourt() {
         </div>
 
         {/* Custom Tab buttons */}
-        <div className="owner-pricing-tabs">
+        <div className="owner-pricing-tabs" style={{ marginBottom: '10px' }}>
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="owner-pricing-tab-btn-dotted"
           >
-            Thêm loại sân +
+            Thêm sân <span style={{ fontSize: "18px", fontWeight: "700" }}>+</span>
           </button>
+          {/* TODO: CÓ THỂ THÊM TAB */}
           {Object.keys(pricingData).map((sportType) => (
             <button
               key={sportType}
               onClick={() => setActivePricingTab(sportType)}
               className={activePricingTab === sportType ? "owner-pricing-tab-btn-active" : "owner-pricing-tab-btn-dotted"}>
-              {sportType}
+                {/* TODO: Hiển thị số lượng sân theo từng loại */}
+              {sportType} (Số lượng sân setup sẵn)
             </button>
           ))}
         </div>
 
         {/* Target Group */}
         <div className="owner-pricing-section">
-          <div className="owner-pricing-section-title">Sân áp dụng</div>
-          <div className="owner-pricing-section-subtitle">Khung giờ bắt buộc</div>
-          <button
-            onClick={() => alert('Chức năng cấu hình khung giờ bắt buộc sẽ sớm khả dụng.')}
-            className="owner-pricing-under-card-dotted-btn"
-            style={{ marginTop: 0 }}
-          >
-            + Thêm khung giờ
-          </button>
+          <div className="owner-pricing-section-title">Tổng số loại sân thể thao: </div>
+          <div className="owner-pricing-section-subtitle">Tổng số sân hiện tại: {venue.totalCourts}</div>
         </div>
 
-        {/* Table Container */}
-        <div className="owner-pricing-table-container">
-          <div className="owner-pricing-section-title owner-pricing-section-title-margin">Bảng giá</div>
+        {/* TODO: HIỂN THỊ DANH SÁCH TỪNG LOẠI SÂN THỂ THAO THEO TAB */}
+        {/* TO DO: THÊM VÀ QUẢN LÝ SÂN MỚI */}
 
-          {/* White card container */}
-          <div className="owner-pricing-card">
-            {/* Card Header */}
-            <div className="owner-pricing-card-header">
-              <div className="owner-pricing-card-arrows">
-                <span>↑</span>
-                <span>↓</span>
-              </div>
-              <div className="owner-pricing-card-sport-title">
-                {'Mặc định'}
-              </div>
-              <div className="owner-pricing-card-actions">
-                <span title="Chỉnh sửa tên bảng giá này" onClick={() => handleRenamePricingType(activePricingTab)}><Edit2 size={16} color="#475569" /></span>
-                <span title="Xóa toàn bộ bảng giá này" onClick={() => handleDeletePricingType(activePricingTab)}><Trash2 size={16} color="#ef4444" /></span>
-              </div>
-            </div>
-
-            {/* Notice row */}
-            <div className="owner-pricing-card-notice">
-              <span>👤 Đang hiển thị bảng giá với khách chơi</span>
-            </div>
-
-            {/* Table wrapper for horizontal scrollability */}
-            <div className="owner-pricing-table-wrapper">
-              <table className="owner-pricing-table">
-                <thead>
-                  <tr>
-                    <th>Khung giờ</th>
-                    <th>Cố định</th>
-                    <th>Vãng lai</th>
-                    <th className="owner-pricing-th-action"></th>
-                    <th className="owner-pricing-th-action"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(pricingData[activePricingTab] || []).map((row, idx) => (
-                    <tr key={row.key || idx}>
-                      <td>
-                        {row.isEditing ? (
-                          <div className="owner-pricing-time-inputs-container">
-                            <input
-                              type="time"
-                              value={row.startHour}
-                              onChange={e => updateGroupRow(idx, 'startHour', e.target.value)}
-                              className="owner-pricing-input-time"
-                            />
-                            <input
-                              type="time"
-                              value={row.endHour}
-                              onChange={e => updateGroupRow(idx, 'endHour', e.target.value)}
-                              className="owner-pricing-input-time"
-                            />
-                          </div>
-                        ) : (
-                          row.timeDisplay
-                        )}
-                      </td>
-                      <td>
-                        {row.isEditing ? (
-                          <input
-                            type="number"
-                            value={row.fixedPrice}
-                            onChange={e => updateGroupRow(idx, 'fixedPrice', Number(e.target.value))}
-                            className="owner-pricing-input-number"
-                          />
-                        ) : (
-                          `${(row.fixedPrice || 0).toLocaleString('vi-VN')} đ`
-                        )}
-                      </td>
-                      <td>
-                        {row.isEditing ? (
-                          <input
-                            type="number"
-                            value={row.casualPrice}
-                            onChange={e => updateGroupRow(idx, 'casualPrice', Number(e.target.value))}
-                            className="owner-pricing-input-number"
-                          />
-                        ) : (
-                          `${(row.casualPrice || 0).toLocaleString('vi-VN')} đ`
-                        )}
-                      </td>
-                      <td className="owner-pricing-td-action">
-                        {row.isEditing ? (
-                          <button
-                            onClick={() => saveGroupRow(idx)}
-                            className="owner-pricing-action-btn"
-                            title="Lưu dòng này"
-                          >
-                            <Check size={18} color="#10b981" />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => editGroupRow(idx)}
-                            className="owner-pricing-action-btn"
-                            title="Sửa dòng này"
-                          >
-                            <Edit2 size={16} color="#2b6139" />
-                          </button>
-                        )}
-                      </td>
-                      <td className="owner-pricing-td-action">
-                        <button
-                          onClick={() => deleteGroupRow(idx)}
-                          className="owner-pricing-action-btn"
-                          title="Xóa dòng này"
-                        >
-                          <Trash2 size={18} color="#ef4444" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Dotted button inside card */}
-            <button
-              onClick={addNewGroupRow}
-              className="owner-pricing-card-dotted-btn"
-            >
-              + Thêm khung giờ
-            </button>
-          </div>
-
-          {/* Dotted button under card */}
-          <button
-            onClick={() => alert('Chức năng thêm đối tượng sẽ sớm khả dụng.')}
-            className="owner-pricing-under-card-dotted-btn"
-          >
-            + Thêm đối tượng
-          </button>
-        </div>
-
+       
         {/* Bottom Save Button - Flowing layout */}
-        <div className="owner-pricing-save-container">
+        <div 
+          className="owner-pricing-save-container"
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '12px',
+            right: '12px',
+            width: 'auto',
+            padding: 0,
+            zIndex: 1000
+          }}
+        >
           <button
             onClick={handleSavePricingGrouped}
             className="owner-pricing-save-btn"

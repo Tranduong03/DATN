@@ -5110,7 +5110,7 @@ input[type="password"]::-ms-clear {
 }
 
 .booking-bottom-action-bar.has-slots .booking-confirm-btn:not(:disabled):hover {
-  background-color:#e3b02c;
+  background-color: #e3b02c;
 }
 
 .booking-confirm-btn:disabled {

@@ -6,6 +6,7 @@ import { usePublicVenueDetail } from '../../hooks/queries/usePublicQueries';
 import { useVenueAvailability } from '../../hooks/queries/useBookingQueries';
 import { useCreateBooking, useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
 import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
+import { formatOperatingHour } from '../../utils/time';
 
 export default function VenueDetailPage() {
   const { id: venueId } = useParams<{ id: string }>();
@@ -132,7 +133,7 @@ export default function VenueDetailPage() {
             <h1 style={{ fontSize: 28, marginBottom: 8, fontWeight: 700 }}>{venue.name}</h1>
             <div style={{ display: 'flex', gap: 16, color: '#666', marginBottom: 12, flexWrap: 'wrap' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={16} /> {venue.address}</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={16} /> {venue.operatingStartHour} - {venue.operatingEndHour}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={16} /> {formatOperatingHour(venue.operatingStartHour)} - {formatOperatingHour(venue.operatingEndHour)}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F5A623' }}><Star size={16} fill="#F5A623" /> {venue.rating} ({venue.reviewCount} đánh giá)</span>
             </div>
             

@@ -89,6 +89,8 @@ export default function PricingTab({
           <PricingTable
             priceRules={priceRules || []}
             sportTypes={venue?.sportTypes || []}
+            operatingStartHour={venue?.operatingStartHour}
+            operatingEndHour={venue?.operatingEndHour}
           />
         )}
 
@@ -148,6 +150,8 @@ export default function PricingTab({
       <PricingTable 
         priceRules={priceRules || []} 
         sportTypes={venue?.sportTypes || []} 
+        operatingStartHour={venue?.operatingStartHour}
+        operatingEndHour={venue?.operatingEndHour}
       />
     </div>
   );

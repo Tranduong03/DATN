@@ -7,6 +7,7 @@ import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/us
 import { useVenueReviews } from '../../hooks/queries/useReviewQueries';
 import { getSportEmojiFromCategories, getSportColorFromCategories } from '../../utils/sport';
 import { InfoTab, PricingTab, ImagesTab, ReviewsTab, TermsTab } from '../../components/venue';
+import { formatOperatingHour } from '../../utils/time';
 
 interface VenueDetailSheetProps {
   venueId: string | null;
@@ -337,7 +338,7 @@ export default function VenueDetailSheet({
 
                   <div className="venue-sheet-detail-row">
                     <Clock size={16} className="venue-sheet-detail-icon" />
-                    <span className="venue-sheet-detail-text">Mở cửa: {venue.operatingStartHour} - {venue.operatingEndHour}</span>
+                    <span className="venue-sheet-detail-text">Mở cửa: {formatOperatingHour(venue.operatingStartHour)} - {formatOperatingHour(venue.operatingEndHour)}</span>
                   </div>
 
                   {/* Contact Hotline row */}

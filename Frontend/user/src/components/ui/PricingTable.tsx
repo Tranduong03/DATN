@@ -8,13 +8,34 @@ interface PriceRule {
   description?: string | null;
 }
 
+const formatOperatingHour = (timeStr?: string) => {
+  if (!timeStr) return '';
+  const parts = timeStr.split(':');
+  if (parts.length < 2) return timeStr;
+  const hour = parseInt(parts[0], 10);
+  const min = parseInt(parts[1], 10);
+  if (hour === 23 && min === 59) {
+    return '24:00';
+  }
+  const minStr = min.toString().padStart(2, '0');
+  return `${hour}:${minStr}`;
+};
+
 interface PricingTableProps {
   priceRules: PriceRule[];
   sportTypes?: string[];
   isDark?: boolean;
+  operatingStartHour?: string;
+  operatingEndHour?: string;
 }
 
-export default function PricingTable({ priceRules, sportTypes = [], isDark = false }: PricingTableProps) {
+export default function PricingTable({
+  priceRules,
+  sportTypes = [],
+  isDark = false,
+  operatingStartHour,
+  operatingEndHour,
+}: PricingTableProps) {
   if (!priceRules || priceRules.length === 0) {
     return (
       <div style={{ padding: '24px 16px', textAlign: 'center', opacity: 0.7, fontSize: '13px', color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#64748b' }}>
@@ -42,8 +63,18 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
   } = {};
 
   priceRules.forEach((rule) => {
-    const start = normalizeTime(rule.startHour);
-    const end = normalizeTime(rule.endHour);
+    let start = normalizeTime(rule.startHour);
+    let end = normalizeTime(rule.endHour);
+
+    if (start === '00:00' && (end === '23:59' || end === '24:00' || end === '23:59:59')) {
+      if (operatingStartHour) {
+        start = normalizeTime(operatingStartHour);
+      }
+      if (operatingEndHour) {
+        end = normalizeTime(operatingEndHour);
+      }
+    }
+
     const day = rule.dayOfWeek;
 
     let dayGroupKey = "all";
@@ -108,7 +139,7 @@ export default function PricingTable({ priceRules, sportTypes = [], isDark = fal
       return {
         daysText: g.dayGroup,
         daysOrder: g.daysOrder,
-        timeSlot: `${g.startHour} - ${g.endHour}`,
+        timeSlot: `${formatOperatingHour(g.startHour)} - ${formatOperatingHour(g.endHour)}`,
         fixedPrice: fixed,
         casualPrice: casual
       };

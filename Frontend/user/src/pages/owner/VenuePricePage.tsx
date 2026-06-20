@@ -5,6 +5,7 @@ import { useVenueDetail, usePriceRules } from '../../hooks/queries/useOwnerQueri
 import { useUpsertPriceRules } from '../../hooks/mutations/useOwnerMutations';
 import AddPricingTypeModal from '../../components/venue/AddPricingTypeModal';
 import ConfirmModal from '../../components/venue/ConfirmModal';
+import { formatOperatingHour, mapDefaultHoursToOperating } from '../../utils/time';
 
 export default function VenuePricePage() {
   const { id: venueId } = useParams<{ id: string }>();
@@ -52,8 +53,13 @@ export default function VenuePricePage() {
 
           const ruleStart = rule.startHour || '00:00';
           const ruleEnd = rule.endHour || '23:59';
-          const startStr = ruleStart.substring(0, 5);
-          const endStr = ruleEnd.substring(0, 5);
+          const { start: startStr, end: endStr } = mapDefaultHoursToOperating(
+            ruleStart,
+            ruleEnd,
+            venue.operatingStartHour,
+            venue.operatingEndHour
+          );
+
           const key = `${startStr}_${endStr}_${rule.dayOfWeek}`;
 
           let row = tempPricingData[sport].find(r => r.key === key);
@@ -66,7 +72,7 @@ export default function VenuePricePage() {
               fixedPrice: 0,
               casualPrice: 0,
               isEditing: false,
-              timeDisplay: startStr.startsWith('00') && (endStr.startsWith('23:59') || endStr.startsWith('24:00')) ? 'Mặc định' : `${startStr} - ${endStr}`
+              timeDisplay: `${formatOperatingHour(startStr)} - ${formatOperatingHour(endStr)}`
             };
             tempPricingData[sport].push(row);
           }
@@ -82,16 +88,18 @@ export default function VenuePricePage() {
 
       // Ensure at least the default sport tab exists
       if (!tempPricingData[defaultSport]) {
+        const venueStart = venue.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00';
+        const venueEnd = venue.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00';
         tempPricingData[defaultSport] = [
           {
-            key: '00:00_23:59_null',
-            startHour: '00:00',
-            endHour: '23:59',
+            key: `${venueStart}_${venueEnd}_null`,
+            startHour: venueStart,
+            endHour: venueEnd,
             dayOfWeek: null,
             fixedPrice: 100000,
             casualPrice: 110000,
             isEditing: false,
-            timeDisplay: 'Mặc định'
+            timeDisplay: `${formatOperatingHour(venueStart)} - ${formatOperatingHour(venueEnd)}`
           }
         ];
       }
@@ -130,7 +138,7 @@ export default function VenuePricePage() {
       if (i === idx) {
         const u = { ...r, [field]: value };
         if (field === 'startHour' || field === 'endHour') {
-          u.timeDisplay = u.startHour === '00:00' && (u.endHour === '23:59' || u.endHour === '24:00') ? 'Mặc định' : `${u.startHour} - ${u.endHour}`;
+          u.timeDisplay = `${formatOperatingHour(u.startHour)} - ${formatOperatingHour(u.endHour)}`;
         }
         return u;
       }
@@ -155,17 +163,19 @@ export default function VenuePricePage() {
 
   const addNewGroupRow = () => {
     if (!activePricingTab || !pricingData[activePricingTab]) return;
+    const venueStart = venue?.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00';
+    const venueEnd = venue?.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00';
     const updated = [
       ...pricingData[activePricingTab],
       {
         key: `new_${Date.now()}`,
-        startHour: '17:00',
-        endHour: '22:00',
+        startHour: venueStart,
+        endHour: venueEnd,
         dayOfWeek: null,
         fixedPrice: 120000,
         casualPrice: 130000,
         isEditing: true,
-        timeDisplay: '17:00 - 22:00'
+        timeDisplay: `${formatOperatingHour(venueStart)} - ${formatOperatingHour(venueEnd)}`
       }
     ];
     setPricingData({ ...pricingData, [activePricingTab]: updated });
@@ -177,8 +187,8 @@ export default function VenuePricePage() {
       const rows = pricingData[sportType];
       if (rows && Array.isArray(rows)) {
         rows.forEach((row) => {
-          const ruleStart = row.startHour || '00:00';
-          const ruleEnd = row.endHour || '23:59';
+          const ruleStart = row.startHour || (venue?.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00');
+          const ruleEnd = row.endHour || (venue?.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00');
           flatRules.push({
             dayOfWeek: row.dayOfWeek,
             startHour: ruleStart.includes(':') ? `${ruleStart}:00` : ruleStart,
@@ -218,16 +228,19 @@ export default function VenuePricePage() {
       return;
     }
 
+    const venueStart = venue?.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00';
+    const venueEnd = venue?.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00';
+
     const baseRules = (activePricingTab && pricingData[activePricingTab]) || Object.values(pricingData)[0] || [
       {
-        key: '00:00_23:59_null',
-        startHour: '00:00',
-        endHour: '23:59',
+        key: `${venueStart}_${venueEnd}_null`,
+        startHour: venueStart,
+        endHour: venueEnd,
         dayOfWeek: null,
         fixedPrice: 100000,
         casualPrice: 110000,
         isEditing: false,
-        timeDisplay: 'Mặc định'
+        timeDisplay: `${formatOperatingHour(venueStart)} - ${formatOperatingHour(venueEnd)}`
       }
     ];
 
