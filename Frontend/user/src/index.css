@@ -5128,7 +5128,7 @@ input[type="password"]::-ms-clear {
    OWNER PRICING EDIT PAGE STYLES (MOBILE-FIRST)
    ======================================================== */
 .owner-pricing-content {
-  padding: 16px 16px 24px 16px;
+  padding: 24px 8px 0 8px;
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -5140,8 +5140,7 @@ input[type="password"]::-ms-clear {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 16px;
   margin-bottom: 16px;
 }
 
@@ -5156,8 +5155,8 @@ input[type="password"]::-ms-clear {
 }
 
 .owner-pricing-title-text {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .owner-pricing-delete-btn {
@@ -5180,30 +5179,34 @@ input[type="password"]::-ms-clear {
 
 .owner-pricing-tab-btn-dotted {
   flex: 1;
-  padding: 10px 0;
+  padding: 12px 0;
   border-radius: 8px;
-  border: 1.5px dashed rgba(255, 255, 255, 0.3);
+  border: 1.5px dashed #f5d061;
   background: transparent;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
+  flex: none;
+  width: 30%;
 }
 
 .owner-pricing-tab-btn-active {
   flex: 1;
   padding: 10px 0;
-  border-radius: 8px;
+  border-radius: 4px;
   border: none;
   background: #f5d061;
-  color: #0f172a;
+  color: #fdfdff;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  flex: none;
+  width: 35%;
 }
 
 .owner-pricing-section {
@@ -5212,22 +5215,24 @@ input[type="password"]::-ms-clear {
 
 .owner-pricing-section-title {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
+  opacity: 0.8;
   margin-bottom: 4px;
+  padding: 8px 0;
 }
 
 .owner-pricing-section-subtitle {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
   opacity: 0.8;
   margin-bottom: 12px;
 }
 
 .owner-pricing-card {
   background-color: #ffffff;
-  border-radius: 8px;
-  padding: 16px;
   color: #0f172a;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
 }
 
 .owner-pricing-card-header {
@@ -5262,10 +5267,10 @@ input[type="password"]::-ms-clear {
 }
 
 .owner-pricing-card-notice {
-  padding: 8px 16px;
+  padding: 12px 16px;
   background-color: #ffffff;
-  font-size: 12px;
-  color: #334155;
+  font-size: 13px;
+  color: #2f4b39;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5286,7 +5291,7 @@ input[type="password"]::-ms-clear {
 }
 
 .owner-pricing-table th {
-  padding: 10px 8px;
+  padding: 12px 8px;
   font-size: 12px;
   font-weight: 700;
   color: #0f172a;
@@ -5353,14 +5358,13 @@ input[type="password"]::-ms-clear {
 
 .owner-pricing-under-card-dotted-btn {
   width: 100%;
-  padding: 12px 0;
+  padding: 14px 0;
   margin-top: 16px;
   border-radius: 8px;
-  border: 1.5px dashed rgba(255, 255, 255, 0.4);
-  background: transparent;
+  border: 1.5px dashed rgb(245 208 97);
+  background: #4c8864;
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
 }
 

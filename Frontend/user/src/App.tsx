@@ -35,6 +35,7 @@ const VenueConfigPage = lazy(() => import('./pages/owner/VenueConfigPage'));
 const OwnerVenueDetailPage = lazy(() => import('./pages/owner/OwnerVenueDetailPage'));
 const OwnerBookingsPage = lazy(() => import('./pages/owner/OwnerBookingsPage'));
 const OwnerSubFeaturePage = lazy(() => import('./pages/owner/OwnerSubFeaturePage'));
+const CreateCourtPage = lazy(() => import('./pages/owner/CreateCourtPage'));
 
 // General/Home pages
 const VenueDetailPage = lazy(() => import('./pages/home/VenueDetailPage'));
@@ -173,6 +174,7 @@ function AppRoutes() {
             <Route path="/owner/venues" element={withSuspense(OwnerVenuesPage)} />
             <Route path="/owner/venues/:id" element={withSuspense(OwnerVenueDetailPage)} />
             <Route path="/owner/venues/:id/edit" element={withSuspense(VenueConfigPage)} />
+            <Route path="/owner/venues/:id/courts" element={withSuspense(CreateCourtPage)} />
             <Route path="/owner/pos" element={withSuspense(OwnerSubFeaturePage)} />
             <Route path="/owner/inventory" element={withSuspense(OwnerSubFeaturePage)} />
             <Route path="/owner/analytics" element={withSuspense(OwnerSubFeaturePage)} />

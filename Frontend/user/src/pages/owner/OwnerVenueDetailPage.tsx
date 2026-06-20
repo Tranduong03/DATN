@@ -167,7 +167,7 @@ export default function OwnerVenueDetailPage() {
               isOwner={true}
               onEditPricing={() => navigate(`/owner/venues/${venue.id}/edit?tab=pricing`)}
               onViewInventory={() => navigate('/owner/inventory')}
-              onViewCourts={() => navigate(`/owner/venues/${venue.id}/edit?tab=courts`)}
+              onViewCourts={() => navigate(`/owner/venues/${venue.id}/courts`)}
             />
           )}
 
