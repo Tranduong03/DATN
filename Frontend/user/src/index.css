@@ -5128,7 +5128,7 @@ input[type="password"]::-ms-clear {
    OWNER PRICING EDIT PAGE STYLES (MOBILE-FIRST)
    ======================================================== */
 .owner-pricing-content {
-  padding: 24px 8px 0 8px;
+  padding: 30px 8px 12px 8px;
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -5175,11 +5175,13 @@ input[type="password"]::-ms-clear {
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .owner-pricing-tab-btn-dotted {
-  flex: 1;
-  padding: 12px 0;
+  flex: none;
+  padding: 10px 16px;
   border-radius: 8px;
   border: 1.5px dashed #f5d061;
   background: transparent;
@@ -5187,26 +5189,24 @@ input[type="password"]::-ms-clear {
   font-size: 13px;
   font-weight: 400;
   cursor: pointer;
-  flex: none;
-  width: 30%;
+  white-space: nowrap;
 }
 
 .owner-pricing-tab-btn-active {
-  flex: 1;
-  padding: 10px 0;
+  flex: none;
+  padding: 10px 16px;
   border-radius: 4px;
   border: none;
   background: #f5d061;
   color: #fdfdff;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  flex: none;
-  width: 35%;
+  white-space: nowrap;
 }
 
 .owner-pricing-section {
@@ -5217,7 +5217,6 @@ input[type="password"]::-ms-clear {
   font-size: 14px;
   font-weight: 500;
   opacity: 0.8;
-  margin-bottom: 4px;
   padding: 8px 0;
 }
 
@@ -5252,7 +5251,7 @@ input[type="password"]::-ms-clear {
 
 .owner-pricing-card-sport-title {
   font-weight: 700;
-  color: #0f172a;
+  color: #0c3625;
   font-size: 14px;
 }
 
@@ -5346,13 +5345,13 @@ input[type="password"]::-ms-clear {
 
 .owner-pricing-card-dotted-btn {
   width: 100%;
-  padding: 12px 0;
+  padding: 13px 0;
   border: none;
-  border-top: 1.5px dashed #cbd5e1;
+  border-top: 1px solid #cbd5e1;
   background: #ffffff;
-  color: #0f172a;
-  font-size: 13px;
-  font-weight: 600;
+  color: #0c3625;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -5385,4 +5384,31 @@ input[type="password"]::-ms-clear {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.owner-pricing-table-container {
+  flex: 1;
+}
+
+.owner-pricing-card-arrows span {
+  cursor: pointer;
+}
+
+.owner-pricing-th-action {
+  width: 36px;
+}
+
+.owner-pricing-time-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.owner-pricing-td-action {
+  padding: 12px 4px !important;
+}
+
+.owner-pricing-section-title-margin {
+  margin-bottom: 12px;
 }

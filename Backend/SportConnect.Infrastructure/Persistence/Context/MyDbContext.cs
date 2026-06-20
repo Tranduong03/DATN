@@ -388,6 +388,11 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasColumnName("description")
                 .HasMaxLength(255);
 
+            entity.Property(e => e.SportType)
+                .HasColumnName("sport_type")
+                .HasMaxLength(100)
+                .HasDefaultValue(string.Empty);
+
             entity.HasOne(e => e.Venue)
                 .WithMany(v => v.PriceRules)
                 .HasForeignKey(e => e.VenueId)

@@ -255,7 +255,8 @@ public class OwnerVenueService : IOwnerVenueService
             StartHour = p.StartHour.ToString(@"hh\:mm"),
             EndHour = p.EndHour.ToString(@"hh\:mm"),
             Price = p.Price,
-            Description = p.Description
+            Description = p.Description,
+            SportType = p.SportType
         });
     }
 
@@ -276,7 +277,8 @@ public class OwnerVenueService : IOwnerVenueService
             StartHour = TimeSpan.Parse(dto.StartHour),
             EndHour = TimeSpan.Parse(dto.EndHour),
             Price = dto.Price,
-            Description = dto.Description
+            Description = dto.Description,
+            SportType = dto.SportType ?? string.Empty
         });
 
         await _unitOfWork.Repository<PriceRule>().AddRangeAsync(newRules);

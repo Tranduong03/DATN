@@ -117,7 +117,8 @@ public class PublicVenueService : IPublicVenueService
                 StartHour = p.StartHour.ToString(@"hh\:mm"),
                 EndHour = p.EndHour.ToString(@"hh\:mm"),
                 Price = p.Price,
-                Description = p.Description
+                Description = p.Description,
+                SportType = p.SportType
             }).ToList()
         };
     }

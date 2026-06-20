@@ -46,6 +46,7 @@ public class PublicPriceRuleDto
     public string EndHour { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public string? Description { get; set; }
+    public string SportType { get; set; } = string.Empty;
 }
 
 public class TimeSlotDto

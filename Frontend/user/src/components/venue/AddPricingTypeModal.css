@@ -1,0 +1,115 @@
+.add-pricing-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.add-pricing-modal-container {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  color: #0c3625;
+  box-sizing: border-box;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.add-pricing-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-pricing-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0c3625;
+  flex: 1;
+  text-align: center;
+}
+
+.add-pricing-modal-close-btn {
+  background: none;
+  border: none;
+  color: #1e293b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -28px; /* Offset to center title correctly */
+}
+
+.add-pricing-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-pricing-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-pricing-modal-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0c3625;
+}
+
+.add-pricing-modal-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #4a6c53;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.add-pricing-modal-input:focus {
+  border-color: #2b6139;
+  box-shadow: 0 0 0 2px rgba(43, 97, 57, 0.1);
+}
+
+.add-pricing-modal-submit-btn {
+  width: 100%;
+  padding: 14px 0;
+  background-color: #2d663b;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+}
+
+.add-pricing-modal-submit-btn:hover {
+  background-color: #24522f;
+}

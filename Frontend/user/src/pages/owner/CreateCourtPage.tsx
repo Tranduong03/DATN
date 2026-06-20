@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, Trash2, HelpCircle } from 'lucide-react';
+import { ChevronLeft, Trash2, HelpCircle } from 'lucide-react';
 import { useVenueDetail, useCourts } from '../../hooks/queries/useOwnerQueries';
 import { useAddCourt, useUpdateCourt } from '../../hooks/mutations/useOwnerMutations';
 

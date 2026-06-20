@@ -15,6 +15,8 @@ public class PriceRule
     public decimal Price { get; set; }
     public string? Description { get; set; }
 
+    public string SportType { get; set; } = string.Empty;
+
     // Navigation properties
     public Venue Venue { get; set; } = null!;
 }
