@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, MoreVertical } from 'lucide-react';
-import { useVenueDetail, usePriceRules } from '../../hooks/queries/useOwnerQueries';
+import { useVenueDetail, usePriceRules, useCourts } from '../../hooks/queries/useOwnerQueries';
 import { useTabDirection, TabUnderline, TabContentSlider } from '../../components/ui/AnimatedTabs';
 import { InfoTab, PricingTab, ImagesTab, ReviewsTab, TermsTab } from '../../components/venue';
 import ownerDefaultImg from '../../assets/images/owner-default.webp';
@@ -40,6 +40,7 @@ export default function OwnerVenueDetailPage() {
   // Queries
   const { data: venue, isLoading: loadingVenue } = useVenueDetail(venueId!);
   const { data: priceRules, isLoading: loadingPrices } = usePriceRules(venueId!);
+  const { data: courts, isLoading: loadingCourts } = useCourts(venueId!);
 
   if (loadingVenue) {
     return (
@@ -152,6 +153,7 @@ export default function OwnerVenueDetailPage() {
               copied={copied}
               onCopyLink={handleCopyLink}
               onlineLink={`${window.location.origin}/venue/${venue.id}`}
+              onEditInfo={() => navigate(`/owner/venues/${venue.id}/edit?tab=info`)}
             />
           )}
 
@@ -160,9 +162,12 @@ export default function OwnerVenueDetailPage() {
               venue={venue}
               priceRules={priceRules || []}
               loadingPrices={loadingPrices}
+              courts={courts || []}
+              loadingCourts={loadingCourts}
               isOwner={true}
               onEditPricing={() => navigate(`/owner/venues/${venue.id}/edit?tab=pricing`)}
               onViewInventory={() => navigate('/owner/inventory')}
+              onViewCourts={() => navigate(`/owner/venues/${venue.id}/edit?tab=courts`)}
             />
           )}
 

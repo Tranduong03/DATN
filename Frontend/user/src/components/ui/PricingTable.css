@@ -3,17 +3,16 @@
    ======================================================== */
 .pricing-table-title {
   text-align: center;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   color: #ffffff;
-  margin: 8px 0 4px 0;
+  margin: 8px 0 0;
 }
 
 .pricing-table-container {
   width: 100%;
-  margin: 12px 0 16px 0;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
+  margin: 8px 0 16px 0;
+  border: 1px solid #a6b6ae;
   overflow: hidden;
   background-color: #ffffff;
 }
@@ -25,38 +24,38 @@
 
 .pricing-table-main-header {
   background-color: #ffffff;
-  color: #0f172a;
+  color: #1f3b24;
   font-weight: 700;
   font-size: 14px;
-  padding: 12px 8px;
-  border-bottom: 1px solid #cbd5e1;
+  padding: 11px 8px;
+  border-bottom: 1px solid #000;
   text-align: center;
 }
 
 .pricing-table-header {
   background-color: #ffffff;
-  color: #0f172a;
+  color: #1f3b24;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
   padding: 12px 8px;
-  border-bottom: 1px solid #cbd5e1;
-  border-right: 1px solid #cbd5e1;
+  border-bottom: 1px solid #000;
+  border-right: 1px solid #000;
   text-align: center;
 }
 
 .pricing-table-cell {
   padding: 12px 8px;
-  border-bottom: 1px solid #cbd5e1;
-  border-right: 1px solid #cbd5e1;
+  border-bottom: 1px solid #000;
+  border-right: 1px solid #000;
   text-align: center;
   vertical-align: middle;
-  color: #1e293b;
-  font-size: 13px;
+  color: #345344;
+  font-size: 14px;
 }
 
-.pricing-table-cell-bold {
+/* .pricing-table-cell-bold {
   font-weight: 500;
-}
+} */
 
 .pricing-table-cell-last {
   border-right: none;

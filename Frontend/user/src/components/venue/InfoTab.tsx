@@ -1,4 +1,4 @@
-import { MapPin, Clock, Phone, Copy, Check } from 'lucide-react';
+import { MapPin, Clock, Phone, Copy, Check, Pencil } from 'lucide-react';
 import './InfoTab.css';
 
 interface InfoTabProps {
@@ -7,6 +7,7 @@ interface InfoTabProps {
   copied: boolean;
   onCopyLink: () => void;
   onlineLink: string;
+  onEditInfo?: () => void;
 }
 
 export default function InfoTab({
@@ -15,6 +16,7 @@ export default function InfoTab({
   copied,
   onCopyLink,
   onlineLink,
+  onEditInfo,
 }: InfoTabProps) {
   if (isOwner) {
     return (
@@ -43,6 +45,11 @@ export default function InfoTab({
             </button>
           </div>
         </div>
+
+        <button className="owner-venue-info-edit-btn" onClick={onEditInfo}>
+          <Pencil size={18} />
+          <span>Chỉnh sửa thông tin</span>
+        </button>
       </div>
     );
   }

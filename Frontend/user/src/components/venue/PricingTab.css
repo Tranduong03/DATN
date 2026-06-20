@@ -1,6 +1,7 @@
 .owner-venue-pricing-tab {
   display: flex;
   flex-direction: column;
+  margin: 15px 0 0;
   flex: 1;
 }
 
@@ -8,33 +9,32 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 8px;
 }
 
-.owner-venue-pricing-btn-edit {
+.owner-venue-pricing-edit-label {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.owner-venue-pricing-title-btn {
   background: none;
   border: none;
-  color: #ffffff;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
+  color: #eceb9c;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
   cursor: pointer;
   padding: 0;
   transition: opacity 0.2s;
 }
 
-.owner-venue-pricing-btn-edit:hover {
+.owner-venue-pricing-title-btn:hover {
   opacity: 0.8;
-}
-
-.owner-venue-pricing-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #ffffff;
-  text-transform: uppercase;
-  text-decoration: underline;
-  text-underline-offset: 4px;
 }
 
 .owner-venue-pricing-loading {
@@ -55,29 +55,6 @@
   margin-bottom: 12px;
 }
 
-.owner-venue-services-title {
-  font-size: 14px;
-  font-weight: 700;
-  margin: 0;
-  color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.owner-venue-services-more-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.2s;
-}
-
-.owner-venue-services-more-btn:hover {
-  color: #ffffff;
-}
 
 .owner-venue-services-table-wrapper {
   width: 100%;
@@ -129,3 +106,89 @@
   flex-direction: column;
   flex: 1;
 }
+
+.user-venue-pricing-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #006d38;
+  margin: 8px 0 4px 0;
+  text-align: left;
+}
+
+/* Owner courts section styles */
+.owner-venue-courts-section {
+  margin-bottom: 24px;
+}
+
+.owner-venue-courts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+
+.owner-venue-courts-loading {
+  opacity: 0.7;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.owner-venue-courts-table-wrapper {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.owner-venue-courts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.owner-venue-court-row {
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.owner-venue-courts-table tr:last-child {
+  border-bottom: none;
+}
+
+.owner-venue-court-name {
+  padding: 12px;
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.owner-venue-court-status {
+  padding: 12px;
+  font-size: 13px;
+  text-align: right;
+}
+
+.owner-venue-court-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.owner-venue-court-badge--success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.owner-venue-court-badge--warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.owner-venue-courts-empty {
+  padding: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+}
+

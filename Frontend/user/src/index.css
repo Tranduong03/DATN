@@ -3985,7 +3985,7 @@ input[type="password"]::-ms-clear {
 }
 
 .owner-venue-content {
-  padding: 10px 20px;
+  padding: 10px 16px;
   flex: 1;
   background-color: #2b6139;
   display: flex;
