@@ -24,6 +24,28 @@ export default function PricingTab({
   onViewInventory,
   onViewCourts,
 }: PricingTabProps) {
+  // Group courts by sport type for the owner view
+  const groupedCourtsList = (() => {
+    const groups: { [key: string]: { total: number; active: number } } = {};
+    if (courts && courts.length > 0) {
+      courts.forEach((c: any) => {
+        const sport = c.sportType || 'Cầu lông';
+        if (!groups[sport]) {
+          groups[sport] = { total: 0, active: 0 };
+        }
+        groups[sport].total += 1;
+        if (c.status === 'AVAILABLE') {
+          groups[sport].active += 1;
+        }
+      });
+    }
+    return Object.entries(groups).map(([sportType, counts]) => ({
+      sportType,
+      total: counts.total,
+      active: counts.active,
+    }));
+  })();
+
   if (isOwner) {
     return (
       <div className="owner-venue-pricing-tab">
@@ -46,21 +68,29 @@ export default function PricingTab({
           ) : (
             <div className="owner-venue-courts-table-wrapper">
               <table className="owner-venue-courts-table">
+                <thead>
+                  <tr>
+                    <th>Loại sân</th>
+                    <th style={{ textAlign: 'center' }}>Số lượng sân</th>
+                    <th>Đang hoạt động</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  {courts && courts.length > 0 ? (
-                    courts.map((court: any) => (
-                      <tr key={court.id} className="owner-venue-court-row">
-                        <td className="owner-venue-court-name">{court.courtName}</td>
+                  {groupedCourtsList.length > 0 ? (
+                    groupedCourtsList.map((group, idx) => (
+                      <tr key={idx} className="owner-venue-court-row">
+                        <td className="owner-venue-court-name">Sân {group.sportType}</td>
+                        <td className="owner-venue-court-count">{group.total}</td>
                         <td className="owner-venue-court-status">
-                          <span className={`owner-venue-court-badge ${court.status === 'AVAILABLE' ? 'owner-venue-court-badge--success' : 'owner-venue-court-badge--warning'}`}>
-                            {court.status === 'AVAILABLE' ? 'Hoạt động' : 'Đang bảo trì'}
+                          <span className="owner-venue-court-badge owner-venue-court-badge--success">
+                            Hoạt động ({group.active})
                           </span>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={2} className="owner-venue-courts-empty">
+                      <td colSpan={3} className="owner-venue-courts-empty">
                         Chưa có sân con nào. Vui lòng thêm sân mới.
                       </td>
                     </tr>
