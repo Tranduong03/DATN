@@ -42,6 +42,16 @@ export const useUpdateCourt = () => {
   });
 };
 
+export const useDeleteCourt = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ venueId, courtId }: { venueId: string; courtId: string }) => ownerService.deleteCourt(venueId, courtId),
+    onSuccess: (_, { venueId }) => {
+      queryClient.invalidateQueries({ queryKey: ['ownerCourts', venueId] });
+    },
+  });
+};
+
 export const useUpsertPriceRules = () => {
   const queryClient = useQueryClient();
   return useMutation({

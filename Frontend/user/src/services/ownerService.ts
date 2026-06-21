@@ -39,12 +39,16 @@ export const ownerService = {
     return axiosClient.get(`/owner/venues/${venueId}/courts`).then(res => (res as any).data);
   },
 
-  addCourt: (venueId: string, data: { courtName: string; status?: string }) => {
+  addCourt: (venueId: string, data: { courtName: string; status?: string; sportType?: string }) => {
     return axiosClient.post(`/owner/venues/${venueId}/courts`, data).then(res => (res as any).data);
   },
 
-  updateCourt: (venueId: string, courtId: string, data: { courtName: string; status: string }) => {
+  updateCourt: (venueId: string, courtId: string, data: { courtName: string; status: string; sportType?: string }) => {
     return axiosClient.put(`/owner/venues/${venueId}/courts/${courtId}`, data).then(res => (res as any).data);
+  },
+
+  deleteCourt: (venueId: string, courtId: string) => {
+    return axiosClient.delete(`/owner/venues/${venueId}/courts/${courtId}`).then(res => (res as any).data);
   },
 
   // --- Pricing ---

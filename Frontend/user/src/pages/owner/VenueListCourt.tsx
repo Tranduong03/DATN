@@ -1,32 +1,67 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
-import { useVenueDetail, usePriceRules } from '../../hooks/queries/useOwnerQueries';
-import { useUpsertPriceRules } from '../../hooks/mutations/useOwnerMutations';
-import AddPricingTypeModal from '../../components/venue/AddPricingTypeModal';
+import { useVenueDetail, useCourts } from '../../hooks/queries/useOwnerQueries';
+import { useAddCourt, useUpdateCourt, useDeleteCourt } from '../../hooks/mutations/useOwnerMutations';
+import { useSportCategories } from '../../hooks/queries/usePublicQueries';
+import { FALLBACK_SPORTS } from '../../utils/sport';
 import ConfirmModal from '../../components/venue/ConfirmModal';
-import { formatOperatingHour, mapDefaultHoursToOperating } from '../../utils/time';
+
+// Helper to generate the next court name based on sequential numbering
+const generateNextCourtName = (sportType: string, existingCourts: any[]) => {
+  const filtered = existingCourts.filter(c => c.sportType?.toLowerCase() === sportType.toLowerCase());
+  if (filtered.length === 0) {
+    return 'SÂN 1';
+  }
+  let maxNum = 0;
+  filtered.forEach(c => {
+    const match = c.courtName.match(/\d+/);
+    if (match) {
+      const num = parseInt(match[0], 10);
+      if (num > maxNum) {
+        maxNum = num;
+      }
+    }
+  });
+  return `SÂN ${maxNum + 1}`;
+};
 
 export default function VenueListCourt() {
   const { id: venueId } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Queries & Mutations
+  // Queries
   const { data: venue, isLoading: loadingVenue } = useVenueDetail(venueId!);
-  const { data: priceRules, isLoading: loadingPrices } = usePriceRules(venueId!);
-  const { data: upsertPricesMutation } = { data: useUpsertPriceRules() }; // helper wrapper matching original hooks pattern
-  const upsertPrices = upsertPricesMutation;
+  const { data: courts, isLoading: loadingCourts, refetch: refetchCourts } = useCourts(venueId!);
+  const { data: sportsCategories = [] } = useSportCategories();
 
-  // Grouped Pricing Table States & Helpers (Grouped by sport type)
-  const [pricingData, setPricingData] = useState<Record<string, any[]>>({});
-  const [initialPricingData, setInitialPricingData] = useState<string>('');
-  const [activePricingTab, setActivePricingTab] = useState<string>('');
+  const isFirstTimeSetup = !courts || courts.length === 0;
+
+  // Mutations
+  const addCourtMutation = useAddCourt();
+  const updateCourtMutation = useUpdateCourt();
+  const deleteCourtMutation = useDeleteCourt();
+
+  // Local Court States
+  const [localCourts, setLocalCourts] = useState<any[]>([]);
+  const [deletedCourtIds, setDeletedCourtIds] = useState<string[]>([]);
+  const [initialLocalCourts, setInitialLocalCourts] = useState<string>('');
+  const [activePricingTab, setActivePricingTab] = useState<string>(''); // active sport type tab
+
+  // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [tabToDelete, setTabToDelete] = useState<string>('');
   const [isBackModalOpen, setIsBackModalOpen] = useState(false);
 
-  // Set page background colors for the pricing sheet unconditionally
+  // Popup Form States
+  const [selectedSportType, setSelectedSportType] = useState('');
+  const [courtNameInput, setCourtNameInput] = useState('');
+  const [courtStatusInput, setCourtStatusInput] = useState<'AVAILABLE' | 'MAINTENANCE'>('AVAILABLE');
+
+  // Inline row edit states
+  const [editingCourtId, setEditingCourtId] = useState<string | null>(null);
+  const [editCourtName, setEditCourtName] = useState('');
+  const [editCourtStatus, setEditCourtStatus] = useState<'AVAILABLE' | 'MAINTENANCE'>('AVAILABLE');
+
+  // Set page background colors for the pricing/court sheet unconditionally
   useEffect(() => {
     const originalBodyBg = document.body.style.backgroundColor;
     const originalHtmlBg = document.documentElement.style.backgroundColor;
@@ -38,188 +73,160 @@ export default function VenueListCourt() {
     };
   }, []);
 
-  // Parse and group price rules
+  // Initialize local courts
   useEffect(() => {
-    if (priceRules && !loadingPrices && venue) {
+    if (venue && courts) {
+      if (courts.length > 0) {
+        setLocalCourts(courts);
+        if (!initialLocalCourts) {
+          setInitialLocalCourts(JSON.stringify(courts));
+        }
+      } else {
+        // Create default courts based on venue.venueScale
+        const defaultSport = (venue.sportTypes && venue.sportTypes.length > 0) ? venue.sportTypes[0] : 'Cầu lông';
+        const defaultCourts = Array.from({ length: venue.venueScale || 1 }, (_, i) => ({
+          id: `temp_${i}`,
+          courtName: `SÂN ${i + 1}`,
+          sportType: defaultSport,
+          status: 'AVAILABLE'
+        }));
+        setLocalCourts(defaultCourts);
+        if (!initialLocalCourts) {
+          setInitialLocalCourts(JSON.stringify(defaultCourts));
+        }
+      }
+    }
+  }, [courts, venue, initialLocalCourts]);
+
+  // Set default active tab
+  useEffect(() => {
+    if (venue && !activePricingTab) {
       const defaultSport = (venue.sportTypes && venue.sportTypes.length > 0) ? venue.sportTypes[0] : 'Cầu lông';
-      const tempPricingData: Record<string, any[]> = {};
-
-      if (priceRules.length > 0) {
-        priceRules.forEach((rule: any) => {
-          const sport = (rule.sportType && rule.sportType.trim()) || defaultSport;
-          if (!tempPricingData[sport]) {
-            tempPricingData[sport] = [];
-          }
-
-          const ruleStart = rule.startHour || '00:00';
-          const ruleEnd = rule.endHour || '23:59';
-          const { start: startStr, end: endStr } = mapDefaultHoursToOperating(
-            ruleStart,
-            ruleEnd,
-            venue.operatingStartHour,
-            venue.operatingEndHour
-          );
-
-          const key = `${startStr}_${endStr}_${rule.dayOfWeek}`;
-
-          let row = tempPricingData[sport].find(r => r.key === key);
-          if (!row) {
-            row = {
-              key,
-              startHour: startStr,
-              endHour: endStr,
-              dayOfWeek: rule.dayOfWeek,
-              fixedPrice: 0,
-              casualPrice: 0,
-              isEditing: false,
-              timeDisplay: `${formatOperatingHour(startStr)} - ${formatOperatingHour(endStr)}`
-            };
-            tempPricingData[sport].push(row);
-          }
-
-          const desc = (rule.description || '').toLowerCase();
-          if (desc.includes('cố định') || desc.includes('co dinh') || desc.includes('cố')) {
-            row.fixedPrice = rule.price || 0;
-          } else {
-            row.casualPrice = rule.price || 0;
-          }
-        });
-      }
-
-      // Ensure at least the default sport tab exists
-      if (!tempPricingData[defaultSport]) {
-        const venueStart = venue.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00';
-        const venueEnd = venue.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00';
-        tempPricingData[defaultSport] = [
-          {
-            key: `${venueStart}_${venueEnd}_null`,
-            startHour: venueStart,
-            endHour: venueEnd,
-            dayOfWeek: null,
-            fixedPrice: 100000,
-            casualPrice: 110000,
-            isEditing: false,
-            timeDisplay: `${formatOperatingHour(venueStart)} - ${formatOperatingHour(venueEnd)}`
-          }
-        ];
-      }
-
-      // Initialize other sports from venue if not present, copying default sport's rules
-      const defaultRules = tempPricingData[defaultSport];
-      if (venue.sportTypes && venue.sportTypes.length > 0) {
-        venue.sportTypes.forEach((sport: string) => {
-          if (sport && sport.trim() && !tempPricingData[sport]) {
-            tempPricingData[sport] = JSON.parse(JSON.stringify(defaultRules));
-          }
-        });
-      }
-
-      setPricingData(tempPricingData);
-      if (!initialPricingData) {
-        setInitialPricingData(JSON.stringify(tempPricingData));
-      }
-
-      // Set active tab to defaultSport if not set or invalid
-      if (!activePricingTab || !tempPricingData[activePricingTab]) {
-        setActivePricingTab(defaultSport);
-      }
+      setActivePricingTab(defaultSport);
     }
-  }, [priceRules, loadingPrices, venue, venueId, initialPricingData]);
+  }, [venue, activePricingTab]);
 
+  // Handle open modal
+  const openAddCourtModal = () => {
+    const defaultSport = activePricingTab || (venue?.sportTypes && venue.sportTypes.length > 0 ? venue.sportTypes[0] : 'Cầu lông');
+    setSelectedSportType(defaultSport);
+    const autoName = generateNextCourtName(defaultSport, localCourts);
+    setCourtNameInput(autoName);
+    setCourtStatusInput('AVAILABLE');
+    setIsAddModalOpen(true);
+  };
 
+  // Auto-generate name when sport type changes in modal
+  useEffect(() => {
+    if (isAddModalOpen && selectedSportType) {
+      const autoName = generateNextCourtName(selectedSportType, localCourts);
+      setCourtNameInput(autoName);
+    }
+  }, [selectedSportType, isAddModalOpen]);
 
-  const handleSavePricingGrouped = async () => {
-    const flatRules: any[] = [];
-    Object.keys(pricingData).forEach((sportType) => {
-      const rows = pricingData[sportType];
-      if (rows && Array.isArray(rows)) {
-        rows.forEach((row) => {
-          const ruleStart = row.startHour || (venue?.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00');
-          const ruleEnd = row.endHour || (venue?.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00');
-          flatRules.push({
-            dayOfWeek: row.dayOfWeek,
-            startHour: ruleStart.includes(':') ? `${ruleStart}:00` : ruleStart,
-            endHour: ruleEnd.includes(':') ? `${ruleEnd}:00` : ruleEnd,
-            price: row.fixedPrice || 0,
-            description: 'Cố định',
-            sportType: sportType
-          });
-          flatRules.push({
-            dayOfWeek: row.dayOfWeek,
-            startHour: ruleStart.includes(':') ? `${ruleStart}:00` : ruleStart,
-            endHour: ruleEnd.includes(':') ? `${ruleEnd}:00` : ruleEnd,
-            price: row.casualPrice || 0,
-            description: 'Vãng lai',
-            sportType: sportType
-          });
-        });
+  const handleConfirmAddCourt = () => {
+    if (!courtNameInput.trim()) {
+      alert('Vui lòng nhập tên sân');
+      return;
+    }
+    const newCourt = {
+      id: `temp_${Date.now()}_${Math.random()}`,
+      courtName: courtNameInput.trim(),
+      sportType: selectedSportType,
+      status: courtStatusInput
+    };
+    setLocalCourts(prev => [...prev, newCourt]);
+    setActivePricingTab(selectedSportType); // switch to the added sport type
+    setIsAddModalOpen(false);
+  };
+
+  // Row editing functions
+  const startEditCourt = (court: any) => {
+    setEditingCourtId(court.id);
+    setEditCourtName(court.courtName);
+    setEditCourtStatus(court.status);
+  };
+
+  const handleUpdateCourtRow = (courtId: string) => {
+    if (!editCourtName.trim()) {
+      alert('Vui lòng nhập tên sân');
+      return;
+    }
+    setLocalCourts(prev => prev.map(c => c.id === courtId ? { ...c, courtName: editCourtName, status: editCourtStatus } : c));
+    setEditingCourtId(null);
+  };
+
+  const handleDeleteCourt = (courtId: string, courtName: string) => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa sân "${courtName}"? Hành động này sẽ xóa vĩnh viễn sân khỏi hệ thống và có thể ảnh hưởng đến lịch đặt sân liên quan.`)) {
+      if (!String(courtId).startsWith('temp_')) {
+        setDeletedCourtIds(prev => [...prev, courtId]);
       }
-    });
+      setLocalCourts(prev => prev.filter(c => c.id !== courtId));
+    }
+  };
 
+  // Batch save to backend
+  const handleSaveAllCourts = async () => {
     try {
-      await upsertPrices.mutateAsync({ venueId: venueId!, data: flatRules });
-      alert('Đã lưu cấu hình bảng giá thành công!');
-      setInitialPricingData(JSON.stringify(pricingData));
-      navigate(`/owner/venues/${venueId}?tab=pricing`);
-    } catch (error) {
-      console.error(error);
-      alert('Lỗi khi lưu cấu hình bảng giá');
-    }
-  };
+      const originalList = courts ? JSON.parse(initialLocalCourts) : [];
 
-  const handleAddPricingType = (name: string) => {
-    if (!name || !name.trim()) return;
-    const trimmed = name.trim();
-    if (pricingData[trimmed]) {
-      alert('Loại sân này đã tồn tại trong danh sách bảng giá.');
-      return;
-    }
-
-    const venueStart = venue?.operatingStartHour ? venue.operatingStartHour.substring(0, 5) : '06:00';
-    const venueEnd = venue?.operatingEndHour ? venue.operatingEndHour.substring(0, 5) : '22:00';
-
-    const baseRules = (activePricingTab && pricingData[activePricingTab]) || Object.values(pricingData)[0] || [
-      {
-        key: `${venueStart}_${venueEnd}_null`,
-        startHour: venueStart,
-        endHour: venueEnd,
-        dayOfWeek: null,
-        fixedPrice: 100000,
-        casualPrice: 110000,
-        isEditing: false,
-        timeDisplay: `${formatOperatingHour(venueStart)} - ${formatOperatingHour(venueEnd)}`
+      // Delete courts first
+      for (const courtId of deletedCourtIds) {
+        await deleteCourtMutation.mutateAsync({
+          venueId: venueId!,
+          courtId
+        });
       }
-    ];
 
-    setPricingData({
-      ...pricingData,
-      [trimmed]: JSON.parse(JSON.stringify(baseRules))
-    });
-    setActivePricingTab(trimmed);
-  };
+      // Find new courts to add
+      const toAdd = localCourts.filter(c => String(c.id).startsWith('temp_'));
 
-  const handleDeletePricingType = (name: string) => {
-    if (!name) return;
-    if (Object.keys(pricingData).length <= 1) {
-      alert('Không thể xóa bảng giá duy nhất còn lại.');
-      return;
+      // Find modified courts to update
+      const toUpdate = localCourts.filter(c => {
+        if (String(c.id).startsWith('temp_')) return false;
+        const orig = originalList.find((o: any) => o.id === c.id);
+        if (!orig) return false;
+        return orig.courtName !== c.courtName || orig.status !== c.status || orig.sportType !== c.sportType;
+      });
+
+      // Add courts
+      for (const c of toAdd) {
+        await addCourtMutation.mutateAsync({
+          venueId: venueId!,
+          data: {
+            courtName: c.courtName,
+            status: c.status || 'AVAILABLE',
+            sportType: c.sportType
+          }
+        });
+      }
+
+      // Update courts
+      for (const c of toUpdate) {
+        await updateCourtMutation.mutateAsync({
+          venueId: venueId!,
+          courtId: c.id,
+          data: {
+            courtName: c.courtName,
+            status: c.status,
+            sportType: c.sportType
+          }
+        });
+      }
+
+      alert('Đã lưu cấu hình danh sách sân thành công!');
+      setDeletedCourtIds([]); // Clear deleted courts tracker
+      refetchCourts();
+      setInitialLocalCourts(JSON.stringify(localCourts));
+      navigate(`/owner/venues/${venueId}?tab=pricing`);
+    } catch (e) {
+      console.error(e);
+      alert('Có lỗi xảy ra khi lưu danh sách sân');
     }
-    setTabToDelete(name);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDeleteTab = () => {
-    if (!tabToDelete) return;
-    const copy = { ...pricingData };
-    delete copy[tabToDelete];
-    setPricingData(copy);
-    setActivePricingTab(Object.keys(copy)[0] || '');
-    setIsDeleteModalOpen(false);
-    setTabToDelete('');
   };
 
   const handleBackClick = () => {
-    const hasUnsavedChanges = JSON.stringify(pricingData) !== initialPricingData;
+    const hasUnsavedChanges = (JSON.stringify(localCourts) !== initialLocalCourts) || deletedCourtIds.length > 0 || isFirstTimeSetup;
     if (hasUnsavedChanges) {
       setIsBackModalOpen(true);
     } else {
@@ -227,9 +234,9 @@ export default function VenueListCourt() {
     }
   };
 
-  if (loadingVenue || loadingPrices) {
+  if (loadingVenue || loadingCourts) {
     return (
-      <div className="owner-venue-detail-page" style={{ backgroundColor: '#2b6139', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+      <div className="owner-venue-detail-page owner-pricing-loading-screen">
         <p>Đang tải dữ liệu cấu hình...</p>
       </div>
     );
@@ -237,102 +244,236 @@ export default function VenueListCourt() {
 
   if (!venue) {
     return (
-      <div className="owner-venue-detail-page" style={{ backgroundColor: '#2b6139', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+      <div className="owner-venue-detail-page owner-pricing-loading-screen">
         <p>Không tìm thấy thông tin cơ sở.</p>
       </div>
     );
   }
+
+  // Get dynamic tabs (configured in venue + any added in localCourts)
+  const tabs = Array.from(new Set([
+    ...(venue.sportTypes || []),
+    ...localCourts.map(c => c.sportType).filter(Boolean)
+  ]));
+
+  const activeTabCourts = localCourts.filter(c => c.sportType === activePricingTab);
+  const sports = sportsCategories.length > 0 ? sportsCategories : FALLBACK_SPORTS;
 
   return (
     <div className="owner-venue-detail-page">
       <div className="owner-pricing-content">
         {/* Custom PWA Header */}
         <div className="owner-pricing-header">
-          <button
-            onClick={handleBackClick}
-            className="owner-pricing-back-btn"
-          >
+          <button onClick={handleBackClick} className="owner-pricing-back-btn">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <span className="owner-pricing-title-text">Danh sách sân thể thao</span>
-          <button
-            onClick={() => handleDeletePricingType(activePricingTab)}
-            className="owner-pricing-delete-btn"
-          >
-            <Trash2 size={15} color="#ef4444" />
-          </button>
+          <div style={{ width: '28px' }}></div>
         </div>
+
+        {isFirstTimeSetup && (
+          <div className="owner-courts-setup-warning">
+            <strong>Lưu ý quan trọng:</strong> Sân con của cơ sở hiện chưa được lưu trên hệ thống. Dưới đây là gợi ý thiết lập mặc định dựa trên quy mô sân khi đăng ký ({venue?.venueScale} sân). Bạn <strong>bắt buộc phải bấm nút LƯU</strong> ở cuối trang để chính thức lưu thông tin và cho phép khách đặt lịch trực tuyến!
+          </div>
+        )}
 
         {/* Custom Tab buttons */}
         <div className="owner-pricing-tabs" style={{ marginBottom: '10px' }}>
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="owner-pricing-tab-btn-dotted"
-          >
-            Thêm sân <span style={{ fontSize: "18px", fontWeight: "700" }}>+</span>
+          <button onClick={openAddCourtModal} className="owner-pricing-tab-btn-dotted">
+            Thêm sân <span className="owner-pricing-tabs-add-icon">+</span>
           </button>
-          {/* TODO: CÓ THỂ THÊM TAB */}
-          {Object.keys(pricingData).map((sportType) => (
-            <button
-              key={sportType}
-              onClick={() => setActivePricingTab(sportType)}
-              className={activePricingTab === sportType ? "owner-pricing-tab-btn-active" : "owner-pricing-tab-btn-dotted"}>
-                {/* TODO: Hiển thị số lượng sân theo từng loại */}
-              {sportType} (Số lượng sân setup sẵn)
-            </button>
-          ))}
+          {tabs.map((sportType) => {
+            const count = localCourts.filter(c => c.sportType === sportType).length;
+            return (
+              <button
+                key={sportType}
+                onClick={() => setActivePricingTab(sportType)}
+                className={activePricingTab === sportType ? "owner-pricing-tab-btn-active" : "owner-pricing-tab-btn-dotted"}
+              >
+                {sportType} ({count})
+              </button>
+            );
+          })}
         </div>
 
         {/* Target Group */}
         <div className="owner-pricing-section">
-          <div className="owner-pricing-section-title">Tổng số loại sân thể thao: </div>
-          <div className="owner-pricing-section-subtitle">Tổng số sân hiện tại: {venue.totalCourts}</div>
+          <div className="owner-pricing-section-title">Tổng số loại sân thể thao: {tabs.length}</div>
+          <div className="owner-pricing-section-subtitle">Tổng số sân hiện tại: {localCourts.length}</div>
         </div>
 
-        {/* TODO: HIỂN THỊ DANH SÁCH TỪNG LOẠI SÂN THỂ THAO THEO TAB */}
-        {/* TO DO: THÊM VÀ QUẢN LÝ SÂN MỚI */}
+        {/* Court list table */}
+        <div className="owner-pricing-card owner-courts-card">
+          <div className="owner-pricing-card-header">
+            <span className="owner-pricing-card-sport-title">Danh sách sân: {activePricingTab}</span>
+          </div>
 
-       
+          <div className="owner-pricing-table-wrapper">
+            <table className="owner-pricing-table">
+              <thead>
+                <tr>
+                  <th className="owner-courts-th-name">Tên sân</th>
+                  <th className="owner-courts-th-status">Trạng thái</th>
+                  <th className="owner-courts-th-action">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activeTabCourts.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="owner-courts-td-empty">
+                      Chưa có sân nào thuộc loại này. Nhấp "Thêm sân" để tạo mới.
+                    </td>
+                  </tr>
+                ) : (
+                  activeTabCourts.map((court) => {
+                    const isEditing = editingCourtId === court.id;
+                    return (
+                      <tr key={court.id}>
+                        <td>
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              value={editCourtName}
+                              onChange={(e) => setEditCourtName(e.target.value)}
+                              className="owner-pricing-input-number owner-courts-edit-input"
+                            />
+                          ) : (
+                            <span className="owner-courts-name-text">{court.courtName}</span>
+                          )}
+                        </td>
+                        <td>
+                          {isEditing ? (
+                            <select
+                              value={editCourtStatus}
+                              onChange={(e) => setEditCourtStatus(e.target.value as any)}
+                              className="owner-pricing-input-time owner-courts-edit-select"
+                            >
+                              <option value="AVAILABLE">Hoạt động</option>
+                              <option value="MAINTENANCE">Bảo trì</option>
+                            </select>
+                          ) : (
+                            <span className={`status-badge ${court.status === 'AVAILABLE' ? 'status-available' : 'status-maintenance'}`}>
+                              {court.status === 'AVAILABLE' ? 'Hoạt động' : 'Bảo trì'}
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          {isEditing ? (
+                            <div className="owner-courts-actions-cell">
+                              <button
+                                onClick={() => handleUpdateCourtRow(court.id)}
+                                className="owner-pricing-action-btn btn-action-save"
+                              >
+                                Lưu
+                              </button>
+                              <button
+                                onClick={() => setEditingCourtId(null)}
+                                className="owner-pricing-action-btn btn-action-cancel"
+                              >
+                                Hủy
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="owner-courts-actions-cell">
+                              <button
+                                onClick={() => startEditCourt(court)}
+                                className="owner-pricing-action-btn btn-action-edit"
+                              >
+                                Sửa
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCourt(court.id, court.courtName)}
+                                className="owner-pricing-action-btn btn-action-delete"
+                              >
+                                Xóa
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* Bottom Save Button - Flowing layout */}
-        <div 
-          className="owner-pricing-save-container"
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            left: '12px',
-            right: '12px',
-            width: 'auto',
-            padding: 0,
-            zIndex: 1000
-          }}
-        >
+        <div className="owner-pricing-save-container owner-courts-save-container">
           <button
-            onClick={handleSavePricingGrouped}
+            onClick={handleSaveAllCourts}
             className="owner-pricing-save-btn"
           >
             LƯU
           </button>
         </div>
       </div>
-      <AddPricingTypeModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={handleAddPricingType}
-      />
-      <ConfirmModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setTabToDelete('');
-        }}
-        onConfirm={handleConfirmDeleteTab}
-        title="Xóa bảng giá"
-        message={`Bạn xác nhận muốn xóa bảng giá "${tabToDelete}".\nThao tác này không thể khôi phục`}
-        confirmText="XÓA"
-        cancelText="Hủy"
-      />
+
+      {/* Add Court Modal */}
+      {isAddModalOpen && (
+        <div className="owner-modal-overlay">
+          <div className="owner-modal-container">
+            <h3 className="owner-modal-title">Thêm sân con mới</h3>
+            
+            <div className="owner-modal-field">
+              <label className="owner-modal-label">Loại sân thể thao</label>
+              <select
+                value={selectedSportType}
+                onChange={(e) => setSelectedSportType(e.target.value)}
+                className="owner-modal-select"
+              >
+                {sports.map((sport: any) => (
+                  <option key={sport.name} value={sport.name}>
+                    {sport.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="owner-modal-field">
+              <label className="owner-modal-label">Tên sân</label>
+              <input
+                type="text"
+                value={courtNameInput}
+                onChange={(e) => setCourtNameInput(e.target.value)}
+                className="owner-modal-input"
+              />
+            </div>
+
+            <div className="owner-modal-field-large">
+              <label className="owner-modal-label">Trạng thái</label>
+              <select
+                value={courtStatusInput}
+                onChange={(e) => setCourtStatusInput(e.target.value as any)}
+                className="owner-modal-select"
+              >
+                <option value="AVAILABLE">Hoạt động</option>
+                <option value="MAINTENANCE">Bảo trì</option>
+              </select>
+            </div>
+
+            <div className="owner-modal-actions">
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="owner-modal-btn-cancel"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmAddCourt}
+                className="owner-modal-btn-confirm"
+              >
+                Thêm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Back Warning Modal */}
       <ConfirmModal
         isOpen={isBackModalOpen}
         onClose={() => setIsBackModalOpen(false)}

@@ -242,6 +242,21 @@ public class OwnerVenueService : IOwnerVenueService
         };
     }
 
+    public async Task<bool> DeleteCourtAsync(Guid venueId, Guid courtId, Guid ownerId)
+    {
+        var venue = await _unitOfWork.Repository<Venue>().GetByIdAsync(venueId);
+        if (venue == null || venue.OwnerId != ownerId)
+            throw new Exception("Venue not found or unauthorized access.");
+
+        var court = await _unitOfWork.Repository<Court>().GetByIdAsync(courtId);
+        if (court == null || court.VenueId != venueId)
+            throw new Exception("Court not found in this venue.");
+
+        _unitOfWork.Repository<Court>().Remove(court);
+        await _unitOfWork.CompleteAsync();
+        return true;
+    }
+
     public async Task<IEnumerable<PriceRuleDto>> GetPriceRulesAsync(Guid venueId, Guid ownerId)
     {
         if (!await IsOwnerOfVenue(venueId, ownerId))

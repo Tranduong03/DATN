@@ -85,6 +85,13 @@ public class OwnerVenueController : ControllerBase
         return Ok(new { isSuccess = true, message = "Cập nhật trạng thái sân con thành công.", data = court });
     }
 
+    [HttpDelete("{id}/courts/{courtId}")]
+    public async Task<IActionResult> DeleteCourt(Guid id, Guid courtId)
+    {
+        var result = await _ownerVenueService.DeleteCourtAsync(id, courtId, GetUserId());
+        return Ok(new { isSuccess = result, message = "Xóa sân con thành công." });
+    }
+
     // --- Pricing Rules Management ---
 
     [HttpGet("{id}/pricerules")]

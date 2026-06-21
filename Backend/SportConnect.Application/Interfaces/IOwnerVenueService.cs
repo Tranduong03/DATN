@@ -19,6 +19,7 @@ public interface IOwnerVenueService
     Task<IEnumerable<CourtDto>> GetCourtsAsync(Guid venueId, Guid ownerId);
     Task<CourtDto> AddCourtAsync(Guid venueId, Guid ownerId, CreateCourtDto dto);
     Task<CourtDto> UpdateCourtAsync(Guid venueId, Guid courtId, Guid ownerId, UpdateCourtDto dto);
+    Task<bool> DeleteCourtAsync(Guid venueId, Guid courtId, Guid ownerId);
     
     // Pricing
     Task<IEnumerable<PriceRuleDto>> GetPriceRulesAsync(Guid venueId, Guid ownerId);
