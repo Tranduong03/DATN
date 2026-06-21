@@ -138,9 +138,9 @@ export default function BookingGrid({
 
   groupsList.forEach((groupName, groupIdx) => {
     const courtsInGroup = groupedCourts[groupName];
+    const isSingleCourt = courtsInGroup.length === 1;
 
-      const isSingleCourt = courtsInGroup.length === 1;
-
+    courtsInGroup.forEach((court, courtIndex) => {
       renderedRows.push(
         <tr key={court.courtId}>
           {isSingleCourt ? (
