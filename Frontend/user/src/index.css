@@ -5444,7 +5444,7 @@ input[type="password"]::-ms-clear {
 }
 
 .owner-courts-card {
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
 }
 

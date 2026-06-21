@@ -11,6 +11,7 @@ interface TimeSlot {
 interface CourtAvailability {
   courtId: string;
   courtName: string;
+  sportType?: string;
   timeSlots: TimeSlot[];
 }
 
@@ -44,9 +45,13 @@ export default function BookingGrid({
     return `${hours}:${minutes}`;
   };
 
-  // Grouping logic based on court name
-  const getGroupForCourt = (courtName: string) => {
-    const nameLower = courtName.toLowerCase().trim();
+  // Grouping logic based on court object
+  const getGroupForCourt = (court: CourtAvailability) => {
+    if (court.sportType) {
+      return court.sportType;
+    }
+
+    const nameLower = court.courtName.toLowerCase().trim();
 
     // 1. Try matching with database sportsCategories
     if (sportsCategories && sportsCategories.length > 0) {
@@ -75,13 +80,7 @@ export default function BookingGrid({
     if (nameLower.includes('tennis') || nameLower.includes('quần vợt')) {
       return 'Quần vợt';
     }
-    // General database fallback
-    if (nameLower.includes('sân 1') || nameLower.includes('sân 2')) {
-      return 'Sân 1-2';
-    }
-    if (nameLower.includes('sân 3') || nameLower.includes('sân 4')) {
-      return 'Sân 3-4';
-    }
+
     return 'Khác';
   };
 
@@ -124,7 +123,7 @@ export default function BookingGrid({
   // Pre-process grouping
   const groupedCourts: { [key: string]: typeof courtsAvailability } = {};
   courtsAvailability.forEach((court) => {
-    const groupName = getGroupForCourt(court.courtName);
+    const groupName = getGroupForCourt(court);
     if (!groupedCourts[groupName]) {
       groupedCourts[groupName] = [];
     }
@@ -140,27 +139,39 @@ export default function BookingGrid({
   groupsList.forEach((groupName, groupIdx) => {
     const courtsInGroup = groupedCourts[groupName];
 
-    courtsInGroup.forEach((court, courtIndex) => {
+      const isSingleCourt = courtsInGroup.length === 1;
+
       renderedRows.push(
         <tr key={court.courtId}>
-          {/* Vertical Category Column - only render on first court in the group */}
-          {courtIndex === 0 && (
-            <td
-              rowSpan={courtsInGroup.length}
-              className="sticky-category-cell"
-            >
-              <div className="vertical-category-text">
-                {groupName}
+          {isSingleCourt ? (
+            /* Merged Category + Court cell when there's only 1 court in the group */
+            <td colSpan={2} className="sticky-court-cell-merged">
+              <div className="sticky-court-text">
+                Sân {groupName}
               </div>
             </td>
-          )}
+          ) : (
+            <>
+              {/* Vertical Category Column - only render on first court in the group */}
+              {courtIndex === 0 && (
+                <td
+                  rowSpan={courtsInGroup.length}
+                  className="sticky-category-cell"
+                >
+                  <div className="vertical-category-text">
+                    {groupName}
+                  </div>
+                </td>
+              )}
 
-          {/* Sub-Court Name Column */}
-          <td className="sticky-court-cell">
-            <div className="sticky-court-text">
-              {court.courtName}
-            </div>
-          </td>
+              {/* Sub-Court Name Column */}
+              <td className="sticky-court-cell">
+                <div className="sticky-court-text">
+                  {court.courtName}
+                </div>
+              </td>
+            </>
+          )}
 
           {/* Time Slots Cells */}
           {court.timeSlots.map((slot, idx) => {

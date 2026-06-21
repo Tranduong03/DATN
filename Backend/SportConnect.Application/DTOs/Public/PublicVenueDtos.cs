@@ -61,6 +61,7 @@ public class CourtAvailabilityDto
 {
     public Guid CourtId { get; set; }
     public string CourtName { get; set; } = string.Empty;
+    public string SportType { get; set; } = string.Empty;
     public List<TimeSlotDto> TimeSlots { get; set; } = new();
 }
 

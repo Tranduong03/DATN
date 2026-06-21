@@ -109,6 +109,7 @@ public class BookingService : IBookingService
             {
                 CourtId = court.Id,
                 CourtName = court.CourtName,
+                SportType = court.SportType,
                 TimeSlots = timeSlots
             });
         }
