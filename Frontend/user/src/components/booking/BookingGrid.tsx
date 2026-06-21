@@ -98,23 +98,10 @@ export default function BookingGrid({
     return 'Khác';
   };
 
-  const getSlotStatus = (courtName: string, slot: TimeSlot, idx: number) => {
+  const getSlotStatus = (slot: TimeSlot) => {
     if (slot.isAvailable) {
       return 'available';
     }
-    const nameLower = courtName.toLowerCase();
-    // Emulate BB 1-1 red booking at index 4 (8:00)
-    if (nameLower.includes('1-1') && idx === 4) {
-      return 'booked';
-    }
-    // Emulate BB 1 hatched gray locking at index 5 and 6
-    if (nameLower === 'bb 1' && (idx === 5 || idx === 6)) {
-      return 'locked';
-    }
-
-    // General fallback
-    if (idx % 7 === 0) return 'locked';
-    if (idx % 11 === 0) return 'event';
     return 'booked';
   };
 
@@ -201,7 +188,7 @@ export default function BookingGrid({
               s => s.courtId === court.courtId && s.startTime === court.timeSlots[idx + 1].startTime
             );
 
-            const status = getSlotStatus(court.courtName, slot, idx);
+            const status = getSlotStatus(slot);
 
             const selectedClasses = [
               isLeftSelected ? 'adj-left' : '',
@@ -219,14 +206,11 @@ export default function BookingGrid({
                 className={`slot-td ${cellClass}`}
               >
                 <div
-                  onClick={() => !isPastSlot && slot.isAvailable && onSlotClick(court.courtId, court.courtName, slot)}
-                  className="slot-inner"
-                  title={isPastSlot ? 'Không thể đặt giờ đã qua' : (slot.isAvailable ? `Giá: ${slot.price.toLocaleString('vi-VN')}đ` : 'Không khả dụng')}
-                >
-                  {status === 'event' && !isSelected && !isPastSlot && (
-                    <div className="event-icon">!</div>
-                  )}
-                </div>
+                   onClick={() => !isPastSlot && slot.isAvailable && onSlotClick(court.courtId, court.courtName, slot)}
+                   className="slot-inner"
+                   title={isPastSlot ? 'Không thể đặt giờ đã qua' : (slot.isAvailable ? `Giá: ${slot.price.toLocaleString('vi-VN')}đ` : 'Không khả dụng')}
+                 >
+                 </div>
               </td>
             );
           })}

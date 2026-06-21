@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, X, ChevronDown } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenueDetail } from '../../hooks/queries/usePublicQueries';
-import { useCreateBooking, useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
+import { useCreateBooking } from '../../hooks/mutations/useBookingMutations';
 import axiosClient from '../../api/axiosClient';
+import ConfirmModal from '../../components/venue/ConfirmModal';
 
 export default function BookingConfirmPage() {
   const location = useLocation();
@@ -44,9 +45,12 @@ export default function BookingConfirmPage() {
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Modals state
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isFailureModalOpen, setIsFailureModalOpen] = useState(false);
+
   // Mutations
   const createBookingMutation = useCreateBooking();
-  const getPaymentUrlMutation = useGetPaymentUrl();
 
   useEffect(() => {
     axiosClient.get('/users/profile')
@@ -96,7 +100,7 @@ export default function BookingConfirmPage() {
       });
 
       // 2. Create the bookings sequentially or in parallel
-      const bookings = await Promise.all(
+      await Promise.all(
         groupedBookings.map((selection) =>
           createBookingMutation.mutateAsync({
             courtId: selection.courtId,
@@ -106,16 +110,11 @@ export default function BookingConfirmPage() {
         )
       );
 
-      if (bookings.length > 0) {
-        const bookingId = bookings[0].id;
-        const paymentUrl = await getPaymentUrlMutation.mutateAsync(bookingId);
-        window.location.href = paymentUrl;
-      } else {
-        alert('Đặt lịch thành công!');
-        navigate('/reservedBooking');
-      }
+      // Open success modal
+      setIsSuccessModalOpen(true);
     } catch (error: any) {
-      alert('Lỗi đặt lịch: ' + (error.response?.data?.message || error.message));
+      console.error('Lỗi đặt lịch:', error);
+      setIsFailureModalOpen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -318,6 +317,38 @@ export default function BookingConfirmPage() {
           </button>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => {
+          setIsSuccessModalOpen(false);
+          navigate('/');
+        }}
+        onConfirm={() => {
+          setIsSuccessModalOpen(false);
+          navigate('/reservedBooking');
+        }}
+        title="Đặt sân thành công"
+        message='Vui lòng kiểm tra trạng thái lịch đặt tại tab "Tài khoản -> Lịch đã đặt" tới khi chủ sân xác nhận đơn.'
+        confirmText="Lịch đã đặt"
+        cancelText="Home"
+      />
+
+      <ConfirmModal
+        isOpen={isFailureModalOpen}
+        onClose={() => {
+          setIsFailureModalOpen(false);
+          navigate('/');
+        }}
+        onConfirm={() => {
+          setIsFailureModalOpen(false);
+          navigate(-1);
+        }}
+        title="Đặt sân thất bại"
+        message="Có lỗi xảy ra trong quá trình đặt lịch, vui lòng kiểm tra lại trạng thái sân và thông tin. Xin cảm ơn"
+        confirmText="Quay lại"
+        cancelText="Home"
+      />
     </MainLayout>
   );
 }

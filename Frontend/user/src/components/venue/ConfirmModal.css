@@ -14,7 +14,7 @@
 
 .confirm-modal-container {
   background-color: #ffffff;
-  border-radius: 10px;
+  border-radius: 6px;
   width: 100%;
   max-width: 380px;
   padding: 15px 15px;
@@ -36,8 +36,8 @@
 }
 
 .confirm-modal-title {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 600;
   color: #e9a13b;
   margin-bottom: 20px;
 }
