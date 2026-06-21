@@ -41,6 +41,7 @@ const CreateCourtPage = lazy(() => import('./pages/owner/CreateCourtPage'));
 // General/Home pages
 const VenueDetailPage = lazy(() => import('./pages/home/VenueDetailPage'));
 const UserBooking = lazy(() => import('./pages/home/UserBooking'));
+const BookingConfirmPage = lazy(() => import('./pages/home/BookingConfirmPage'));
 const PaymentResultPage = lazy(() => import('./pages/home/PaymentResultPage'));
 const MatchListPage = lazy(() => import('./pages/home/MatchListPage'));
 const MatchDetailPage = lazy(() => import('./pages/home/MatchDetailPage'));
@@ -145,6 +146,7 @@ function AppRoutes() {
           <Route path="/explore" element={withTransition(ExplorePage)} />
           <Route path="/venue/:id" element={withTransition(VenueDetailPage)} />
           <Route path="/UserBooking" element={withTransition(UserBooking)} />
+          <Route path="/UserBooking/confirm" element={withTransition(BookingConfirmPage)} />
           <Route path="/payment-result" element={withTransition(PaymentResultPage)} />
           <Route path="/matches" element={withTransition(MatchListPage)} />
           <Route path="/matches/:id" element={withTransition(MatchDetailPage)} />

@@ -37,6 +37,20 @@ export default function BookingGrid({
   sportsCategories = [],
 }: BookingGridProps) {
 
+  const minAllowedTime = (() => {
+    const now = new Date();
+    const m = now.getMinutes();
+    const rounded = new Date(now);
+    if (m === 0) {
+      rounded.setMinutes(0, 0, 0);
+    } else if (m <= 30) {
+      rounded.setMinutes(30, 0, 0);
+    } else {
+      rounded.setHours(now.getHours() + 1, 0, 0, 0);
+    }
+    return rounded;
+  })();
+
 
   const formatTimeHeader = (timeStr: string) => {
     const dateObj = new Date(timeStr);
@@ -194,17 +208,22 @@ export default function BookingGrid({
               isRightSelected ? 'adj-right' : ''
             ].filter(Boolean).join(' ');
 
+            const isPastSlot = new Date(slot.startTime) < minAllowedTime;
+            const cellClass = isPastSlot 
+              ? 'past-disabled' 
+              : (isSelected ? `selected ${selectedClasses}` : status);
+
             return (
               <td
                 key={idx}
-                className={`slot-td ${isSelected ? `selected ${selectedClasses}` : status}`}
+                className={`slot-td ${cellClass}`}
               >
                 <div
-                  onClick={() => slot.isAvailable && onSlotClick(court.courtId, court.courtName, slot)}
+                  onClick={() => !isPastSlot && slot.isAvailable && onSlotClick(court.courtId, court.courtName, slot)}
                   className="slot-inner"
-                  title={slot.isAvailable ? `Giá: ${slot.price.toLocaleString()}đ` : 'Không khả dụng'}
+                  title={isPastSlot ? 'Không thể đặt giờ đã qua' : (slot.isAvailable ? `Giá: ${slot.price.toLocaleString()}đ` : 'Không khả dụng')}
                 >
-                  {status === 'event' && !isSelected && (
+                  {status === 'event' && !isSelected && !isPastSlot && (
                     <div className="event-icon">!</div>
                   )}
                 </div>

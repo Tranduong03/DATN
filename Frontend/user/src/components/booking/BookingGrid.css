@@ -300,3 +300,11 @@
   min-width: var(--left-columns-width);
   max-width: var(--left-columns-width);
 }
+
+.slot-td.past-disabled {
+  background-color: #b2b2b2 !important;
+}
+
+.slot-td.past-disabled .slot-inner {
+  cursor: not-allowed;
+}

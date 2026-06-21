@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { usePublicVenueDetail, useSportCategories } from '../../hooks/queries/usePublicQueries';
 import { useVenueAvailability } from '../../hooks/queries/useBookingQueries';
-import { useCreateBooking, useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
 import BookingGrid from '../../components/booking/BookingGrid';
 
 export default function UserBooking() {
@@ -32,8 +31,6 @@ export default function UserBooking() {
   const { data: venue } = usePublicVenueDetail(venueId || '');
   const { data: courtsAvailability = [], isLoading: loadingAvailability } = useVenueAvailability(venueId || '', selectedDate);
   const { data: sportsCategories = [] } = useSportCategories();
-  const createBookingMutation = useCreateBooking();
-  const getPaymentUrlMutation = useGetPaymentUrl();
 
   useEffect(() => {
     setSelectedSlots([]);
@@ -109,7 +106,7 @@ export default function UserBooking() {
     return `${hours}h${minutes.toString().padStart(2, '0')}`;
   })();
 
-  const handleBookNext = async () => {
+  const handleBookNext = () => {
     if (groupedBookings.length === 0) return;
 
     const token = localStorage.getItem('token');
@@ -119,30 +116,15 @@ export default function UserBooking() {
       return;
     }
 
-    try {
-      const bookings = await Promise.all(
-        groupedBookings.map((selection) =>
-          createBookingMutation.mutateAsync({
-            courtId: selection.courtId,
-            startTime: selection.startTime,
-            endTime: selection.endTime,
-          })
-        )
-      );
-
-      setSelectedSlots([]);
-
-      if (bookings.length > 0) {
-        const bookingId = bookings[0].id;
-        const paymentUrl = await getPaymentUrlMutation.mutateAsync(bookingId);
-        window.location.href = paymentUrl;
-      } else {
-        alert('Đặt lịch thành công!');
-        navigate('/reservedBooking');
+    navigate('/UserBooking/confirm', {
+      state: {
+        venueId,
+        selectedDate,
+        groupedBookings,
+        totalPriceSum,
+        totalHoursStr
       }
-    } catch (error: any) {
-      alert('Lỗi đặt lịch: ' + (error.response?.data?.message || error.message));
-    }
+    });
   };
 
   const formatTimeHeader = (timeStr: string) => {
@@ -359,10 +341,10 @@ export default function UserBooking() {
           <div className="booking-confirm-btn-wrapper">
             <button
               onClick={handleBookNext}
-              disabled={createBookingMutation.isPending || selectedSlots.length === 0}
+              disabled={selectedSlots.length === 0}
               className="booking-confirm-btn"
             >
-              {createBookingMutation.isPending ? 'Đang xử lý...' : 'TIẾP THEO'}
+              TIẾP THEO
             </button>
           </div>
         </div>
