@@ -64,7 +64,7 @@ export default function LoginPage() {
       </div>
 
       <div className="login-banner">
-        <p>Nếu bạn là CHỦ SÂN hoặc NHÂN VIÊN, Bấm vào đây để tải ứng dụng ALOBO - Quản lý sân thể thao!</p>
+        <p>Nếu bạn là CHỦ SÂN hoặc NHÂN VIÊN, Bấm vào đây để mở ứng dụng SportConnect - Quản lý sân thể thao!</p>
       </div>
     </div>
   );

@@ -496,7 +496,7 @@ input[type="password"]::-ms-clear {
 .main-layout.no-padding-bottom {
   padding-bottom: 0 !important;
   background-color: transparent !important;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .bottom-nav {
@@ -5632,4 +5632,361 @@ input[type="password"]::-ms-clear {
   display: flex;
   gap: 8px;
   justify-content: center;
+}
+
+/* ========================================================
+   BOOKING CONFIRMATION PAGE STYLES (PORTED FROM PAGE CSS)
+   ======================================================== */
+.booking-confirm-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #306c3c;
+  color: #ffffff;
+  font-family: 'Inter', 'Montserrat', sans-serif;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-bottom: 96px; 
+}
+
+/* Header bar */
+.booking-confirm-header {
+  margin-top: 40px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  background-color: #306c3c;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.booking-confirm-back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.booking-confirm-header-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+/* Scrollable Content */
+.booking-confirm-content {
+  padding: 5px 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+/* Card components */
+.booking-confirm-card {
+  background-color: #265d36;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.05);
+}
+
+.booking-confirm-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #fbed94;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-title-icon {
+  font-size: 16px;
+}
+
+.booking-confirm-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirm-info-row {
+  display: flex;
+  justify-content: left;
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 1.5;
+  gap: 6px;
+}
+
+.confirm-info-label {
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.confirm-info-val {
+  color: #ffffff;
+  text-align: left;
+  word-break: break-word;
+}
+
+.confirm-info-val.bold {
+  font-weight: 500;
+}
+
+.price-highlight {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+/* Slots list */
+.confirm-slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 6px;
+  border-left: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.confirm-slot-item {
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.confirm-slot-item .underline {
+  text-decoration: underline;
+}
+
+
+.confirm-promo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0 0;
+}
+
+.promo-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #dfdf92;
+}
+
+.promo-selector-btn {
+  background: none;
+  border: none;
+  color: #dfdf92;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.confirm-promo-divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 20px 0 10px;
+}
+
+.confirm-payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #ffffff;
+  opacity: 0.85;
+}
+
+/* Form Inputs */
+.booking-confirm-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.confirm-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.confirm-input-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #ffffff;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.confirm-input-field-wrapper {
+  background-color: #ffffff;
+  border-radius: 4px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.confirm-text-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14.5px;
+  color: #1e293b;
+  font-weight: 500;
+  padding: 0;
+}
+
+.confirm-text-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Country Selector for Phone */
+.confirm-country-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: #1e293b;
+  font-weight: 600;
+  border-right: 1.5px solid #e2e8f0;
+  padding-right: 12px;
+  margin-right: 12px;
+  user-select: none;
+}
+
+.country-flag {
+  font-size: 16px;
+}
+
+.dropdown-arrow {
+  color: #64748b;
+  margin-left: 2px;
+}
+
+.confirm-clear-btn {
+  background: #64748b;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+  transition: background-color 0.2s;
+}
+
+.confirm-clear-btn:hover {
+  background-color: #475569;
+}
+
+/* Warnings / Notes block */
+.booking-confirm-warnings {
+  background: linear-gradient(135deg, #275d38 0%, #306c3c 100%);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.05);
+  margin-top: 8px;
+}
+
+.warnings-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #eceb9c;
+  margin: 0 0 10px 0;
+}
+
+.warnings-list {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warnings-list li {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.45;
+  padding-left: 0;
+}
+
+.warnings-consent {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  padding-top: 12px;
+}
+
+.consent-link {
+  color: #eceb9c;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Sticky Footer Button */
+.booking-confirm-footer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background-color: #306c3c;
+  padding: 12px;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.booking-confirm-action-btn {
+  width: 100%;
+  height: 46px;
+  background-color: #dcb250; /* Golden accent */
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.booking-confirm-action-btn:hover {
+  background-color: #caa042;
+}
+
+.booking-confirm-action-btn:active {
+  transform: scale(0.99);
+}
+
+.booking-confirm-action-btn:disabled {
+  background-color: rgba(220, 178, 80, 0.5);
+  cursor: not-allowed;
 }

@@ -175,7 +175,7 @@ export default function VenueDetailSheet({
   };
 
   const handleCopyLink = () => {
-    const linkText = `https://datlich.alobo.vn/san/${venue?.id || ''}`;
+    const linkText = `https://datlich.sportconnect.vn/san/${venue?.id || ''}`;
     navigator.clipboard.writeText(linkText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -414,7 +414,7 @@ export default function VenueDetailSheet({
                       isOwner={false}
                       copied={copied}
                       onCopyLink={handleCopyLink}
-                      onlineLink={`https://datlich.alobo.vn/san/${venue.id || ''}`}
+                      onlineLink={`https://datlich.sportconnect.vn/san/${venue.id || ''}`}
                     />
                   )}
 

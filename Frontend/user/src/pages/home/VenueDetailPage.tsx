@@ -271,7 +271,7 @@ export default function VenueDetailPage() {
                               fontWeight: isSelected ? 'bold' : 'normal',
                               border: isSelected ? 'none' : '1px solid transparent'
                             }}
-                            title={slot.isAvailable ? `Giá: ${slot.price.toLocaleString()}đ` : 'Đã có người đặt'}
+                            title={slot.isAvailable ? `Giá: ${slot.price.toLocaleString('vi-VN')}đ` : 'Đã có người đặt'}
                           >
                             {isSelected ? 'Đang chọn' : slot.isAvailable ? (slot.price / 1000) + 'k' : 'Hết'}
                           </div>

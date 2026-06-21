@@ -12,8 +12,15 @@ export default function UserBooking() {
   const navigate = useNavigate();
 
   // Selected date (default: today)
+  const getLocalDateString = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
+    getLocalDateString(new Date())
   );
 
   // Selected slots: [{ courtId, courtName, startTime, endTime, price }]
@@ -143,8 +150,8 @@ export default function UserBooking() {
 
   const getDayOfWeekName = (dateObj: Date) => {
     const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    const todayStr = new Date().toISOString().split('T')[0];
-    const targetStr = dateObj.toISOString().split('T')[0];
+    const todayStr = getLocalDateString(new Date());
+    const targetStr = getLocalDateString(dateObj);
     if (todayStr === targetStr) {
       return 'Hôm nay';
     }
@@ -162,7 +169,7 @@ export default function UserBooking() {
   }
 
   const activeIndex = (() => {
-    const idx = dateList.findIndex(d => d.toISOString().split('T')[0] === selectedDate);
+    const idx = dateList.findIndex(d => getLocalDateString(d) === selectedDate);
     if (idx !== -1) return idx;
     return 14;
   })();
@@ -239,7 +246,7 @@ export default function UserBooking() {
             style={{ transform: `translateX(${activeIndex * 66}px)` }}
           />
           {dateList.map((dateObj) => {
-            const dateStr = dateObj.toISOString().split('T')[0];
+            const dateStr = getLocalDateString(dateObj);
             const isSelected = dateStr === selectedDate;
             const dayName = getDayOfWeekName(dateObj);
             const dayNum = dateObj.getDate();
@@ -330,7 +337,7 @@ export default function UserBooking() {
               <div className="booking-summary-total-row">
                 <span>Tổng giờ: {totalHoursStr}</span>
                 <span>
-                  Tổng tiền: {totalPriceSum.toLocaleString()}{' '}
+                  Tổng tiền: {totalPriceSum.toLocaleString('vi-VN')}{' '}
                   <span style={{ textDecoration: 'underline' }}>đ</span>
                 </span>
               </div>

@@ -421,7 +421,7 @@ export default function MatchListPage() {
                         Phí/người:
                       </div>
                       <div style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>
-                        {match.feePerPlayer === 0 ? 'Miễn phí' : `${match.feePerPlayer.toLocaleString()}đ`}
+                        {match.feePerPlayer === 0 ? 'Miễn phí' : `${match.feePerPlayer.toLocaleString('vi-VN')}đ`}
                       </div>
                     </div>
 

@@ -221,7 +221,7 @@ export default function BookingGrid({
                 <div
                   onClick={() => !isPastSlot && slot.isAvailable && onSlotClick(court.courtId, court.courtName, slot)}
                   className="slot-inner"
-                  title={isPastSlot ? 'Không thể đặt giờ đã qua' : (slot.isAvailable ? `Giá: ${slot.price.toLocaleString()}đ` : 'Không khả dụng')}
+                  title={isPastSlot ? 'Không thể đặt giờ đã qua' : (slot.isAvailable ? `Giá: ${slot.price.toLocaleString('vi-VN')}đ` : 'Không khả dụng')}
                 >
                   {status === 'event' && !isSelected && !isPastSlot && (
                     <div className="event-icon">!</div>

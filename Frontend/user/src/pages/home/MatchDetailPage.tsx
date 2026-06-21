@@ -205,7 +205,7 @@ export default function MatchDetailPage() {
                   <div>
                     <div style={{ fontSize: '13px', color: '#64748b' }}>Phí tham gia dự kiến</div>
                     <div style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>
-                      {match.feePerPlayer === 0 ? 'Miễn phí' : `${match.feePerPlayer.toLocaleString()}đ / người`}
+                      {match.feePerPlayer === 0 ? 'Miễn phí' : `${match.feePerPlayer.toLocaleString('vi-VN')}đ / người`}
                     </div>
                   </div>
                 </div>
