@@ -89,4 +89,5 @@ public class BookingDto
     // For Owner view
     public string BookerName { get; set; } = string.Empty;
     public string BookerPhone { get; set; } = string.Empty;
+    public int OrderNumber { get; set; }
 }

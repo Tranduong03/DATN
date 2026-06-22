@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 interface Ribbon3Props {
   children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-export default function Ribbon3({ children }: Ribbon3Props) {
+export default function Ribbon3({ children, className, style }: Ribbon3Props) {
   const [opacity, setOpacity] = useState(1);
 
   useEffect(() => {
@@ -19,8 +21,7 @@ export default function Ribbon3({ children }: Ribbon3Props) {
     fontSize: '11px',
     fontWeight: 700,
     padding: '4px 10px',
-    borderRadius: '6px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.08)',
+    borderRadius: '4px',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
     display: 'inline-flex',
@@ -29,10 +30,13 @@ export default function Ribbon3({ children }: Ribbon3Props) {
     opacity: opacity,
     transition: 'opacity 0.5s ease',
     fontFamily: '"Montserrat", sans-serif',
+    marginLeft: '8px',
+    zIndex: 3,
+    ...style
   };
 
   return (
-    <div style={badgeStyle}>
+    <div className={className} style={badgeStyle}>
       {children}
     </div>
   );

@@ -188,7 +188,8 @@ public class BookingService : IBookingService
             EndTime = booking.EndTime,
             TotalPrice = booking.TotalPrice,
             Status = booking.Status,
-            CreatedAt = booking.CreatedAt
+            CreatedAt = booking.CreatedAt,
+            OrderNumber = booking.OrderNumber
         };
     }
 
@@ -224,7 +225,8 @@ public class BookingService : IBookingService
                 EndTime = b.EndTime,
                 TotalPrice = b.TotalPrice,
                 Status = b.Status,
-                CreatedAt = b.CreatedAt
+                CreatedAt = b.CreatedAt,
+                OrderNumber = b.OrderNumber
             };
         }).ToList();
     }
@@ -272,7 +274,8 @@ public class BookingService : IBookingService
                 Status = b.Status,
                 CreatedAt = b.CreatedAt,
                 BookerName = booker?.FullName ?? booker?.Username ?? "Unknown",
-                BookerPhone = booker?.Phone ?? ""
+                BookerPhone = booker?.Phone ?? "",
+                OrderNumber = b.OrderNumber
             };
         }).ToList();
     }
@@ -289,7 +292,7 @@ public class BookingService : IBookingService
         if (venue == null || venue.OwnerId != ownerId) return false; // Unauthorized
 
         booking.Status = status;
-        _unitOfWork.Repository<Booking>().Update(booking);
+        // Entity is tracked by DbContext, EF Core will auto-detect changes and update only the status column.
         await _unitOfWork.CompleteAsync();
         return true;
     }

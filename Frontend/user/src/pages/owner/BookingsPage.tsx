@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import OwnerLayout from './OwnerLayout';
 import { useOwnerBookings } from '../../hooks/queries/useBookingQueries';
 import { useUpdateBookingStatus } from '../../hooks/mutations/useBookingMutations';
 import { Search, ShieldAlert } from 'lucide-react';
 import BookingCard2 from '../../components/booking/BookingCard2';
+import { TabUnderline } from '../../components/ui/AnimatedTabs';
+import './owner.css';
+
+const tabTransition = { type: 'tween', ease: 'easeOut', duration: 0.22 };
 
 interface BookingItem {
   id: string;
@@ -16,6 +20,7 @@ interface BookingItem {
   endTime: string;
   createdAt: string;
   bookingType?: string;
+  orderNumber?: number;
 }
 
 export default function OwnerBookingsPage() {
@@ -24,43 +29,109 @@ export default function OwnerBookingsPage() {
   
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'DATE' | 'CODE'>('DATE');
+  const [isSortOpen, setIsSortOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.owner-sort-select-wrapper')) {
+        setIsSortOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, []);
 
   const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any)?.data || [];
 
   const handleUpdateStatus = (id: string, status: string) => {
-    const actionText = status === 'CONFIRMED' ? 'xác nhận đơn đặt này' : 'hủy đơn đặt này';
-    if (confirm(`Bạn có chắc chắn muốn ${actionText}?`)) {
-      updateStatusMutation.mutate({ bookingId: id, status });
-    }
+    updateStatusMutation.mutate({ bookingId: id, status });
   };
 
   const filteredBookings = bookings.filter((b: BookingItem) => {
     const matchStatus = filterStatus === 'ALL' || b.status === filterStatus;
     const matchSearch = (b.bookerName || '').toLowerCase().includes(search.toLowerCase()) || 
-                        (b.bookerPhone || '').includes(search);
+                        (b.bookerPhone || '').includes(search) ||
+                        (b.id || '').includes(search) ||
+                        (b.orderNumber?.toString() || '').includes(search);
     return matchStatus && matchSearch;
+  });
+
+  // Thực hiện sắp xếp
+  const sortedBookings = [...filteredBookings].sort((a, b) => {
+    if (sortBy === 'DATE') {
+      const dateA = new Date(a.createdAt || a.startTime).getTime();
+      const dateB = new Date(b.createdAt || b.startTime).getTime();
+      return dateB - dateA; // Mới nhất lên đầu
+    } else {
+      const numA = a.orderNumber || 0;
+      const numB = b.orderNumber || 0;
+      return numB - numA; // Mã đơn giảm dần
+    }
   });
 
   return (
     <OwnerLayout title="Lịch đặt sân" showSystemHeader={true}>
-      <div className="owner-bookings-wrapper" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="owner-bookings-wrapper">
         
         {/* Search & Tabs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Search bar */}
-          <div style={{ position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#9ca3af' }} />
-            <input 
-              type="text" 
-              placeholder="Tìm theo tên, SĐT khách..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '10px 12px 10px 40px', borderRadius: 12, border: '1px solid #cbd5e1', outline: 'none', background: 'white', fontSize: 13 }}
-            />
+        <div className="owner-search-tabs-container">
+          {/* Search bar & Sort Dropdown */}
+          <div className="owner-search-sort-container">
+            <div className="owner-search-bar-wrapper">
+              <Search size={18} className="owner-search-icon" />
+              <input 
+                type="text" 
+                placeholder="Tìm theo tên, Mã đơn..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="owner-search-input"
+              />
+            </div>
+            
+            <div className="owner-sort-wrapper">
+              <span>Sắp xếp:</span>
+              <div className="owner-sort-select-wrapper" onClick={() => setIsSortOpen(!isSortOpen)}>
+                <span className="owner-sort-select-val">
+                  {sortBy === 'DATE' ? 'Ngày đặt' : 'Mã đơn'}
+                </span>
+                <span className="owner-sort-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </span>
+                {isSortOpen && (
+                  <div className="owner-sort-dropdown-menu">
+                    <div 
+                      className={`owner-sort-dropdown-item ${sortBy === 'CODE' ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSortBy('CODE');
+                        setIsSortOpen(false);
+                      }}
+                    >
+                      Mã đơn
+                    </div>
+                    <div className="owner-sort-dropdown-divider" />
+                    <div 
+                      className={`owner-sort-dropdown-item ${sortBy === 'DATE' ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSortBy('DATE');
+                        setIsSortOpen(false);
+                      }}
+                    >
+                      Ngày đặt
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Quick status tabs */}
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+          <div className="owner-venue-tabs-bar">
             {[
               { label: 'Tất cả', value: 'ALL' },
               { label: 'Chờ duyệt', value: 'PENDING' },
@@ -70,20 +141,19 @@ export default function OwnerBookingsPage() {
               <button
                 key={tab.value}
                 onClick={() => setFilterStatus(tab.value)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: 20,
-                  border: 'none',
-                  backgroundColor: filterStatus === tab.value ? '#047857' : '#e2e8f0',
-                  color: filterStatus === tab.value ? '#ffffff' : '#475569',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`owner-venue-tab ${filterStatus === tab.value ? 'active' : ''}`}
               >
                 {tab.label}
+                {filterStatus === tab.value && (
+                  <TabUnderline 
+                    layoutId="ownerBookingsTabUnderline" 
+                    color="#dee4d8" 
+                    height="1.5px" 
+                    left={0} 
+                    right={0} 
+                    transition={tabTransition} 
+                  />
+                )}
               </button>
             ))}
           </div>
@@ -93,17 +163,16 @@ export default function OwnerBookingsPage() {
         {isLoading ? (
           <div className="admin-loading">
             <div className="admin-spinner"></div>
-            <p style={{ fontSize: 13, color: '#64748b' }}>Đang tải danh sách...</p>
+            <p className="owner-loading-text">Đang tải danh sách...</p>
           </div>
         ) : filteredBookings.length === 0 ? (
-          <div style={{ padding: '40px 20px', textAlign: 'center', color: '#64748b', backgroundColor: '#fff', borderRadius: 16, border: '1px dashed #cbd5e1' }}>
-            <ShieldAlert size={36} style={{ color: '#94a3b8', marginBottom: 8, margin: '0 auto' }} />
-            <div style={{ fontWeight: 700, color: '#475569', fontSize: 14 }}>Không tìm thấy đơn đặt sân nào</div>
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>Không có đơn đặt sân nào khớp với bộ lọc hiện tại.</p>
+          <div className="owner-empty-placeholder">
+            <div className="owner-empty-title">Không tìm thấy đơn đặt sân nào</div>
+            <p className="owner-empty-desc">Không có đơn đặt sân nào khớp với bộ lọc hiện tại.</p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 80 }}>
-            {filteredBookings.map((b: BookingItem, idx: number) => {
+          <div className="owner-cards-list">
+            {sortedBookings.map((b: BookingItem, idx: number) => {
               const isPending = b.status === 'PENDING';
               const isConfirmed = b.status === 'CONFIRMED';
 
@@ -115,7 +184,8 @@ export default function OwnerBookingsPage() {
                 endTime: b.endTime,
                 bookingType: b.bookingType || 'DAILY',
                 paymentStatus: isConfirmed ? 'PAID' : 'UNPAID',
-                isExpiringSoon: false
+                isExpiringSoon: false,
+                orderNumber: b.orderNumber
               };
 
               return (

@@ -434,6 +434,11 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
                 .HasColumnName("created_at")
                 .HasDefaultValueSql("GETDATE()");
 
+            entity.Property(e => e.OrderNumber)
+                .HasColumnName("order_number")
+                .ValueGeneratedOnAdd()
+                .Metadata.SetAfterSaveBehavior(Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Ignore);
+
             entity.HasOne(b => b.Booker)
                 .WithMany(u => u.Bookings)
                 .HasForeignKey(b => b.BookerId)

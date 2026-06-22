@@ -1,134 +1,149 @@
 /* BookingCard2.css - Styles cho trang duyệt đặt lịch của chủ sân (owner) */
 
 .booking-card2-container {
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  padding: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  margin-top: -1px;
+  padding: 0 8px;
   position: relative;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 16px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding-bottom: 6px;
 }
 
-.booking-card2-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
-}
-
-/* Nhóm Badge Trạng thái (Góc phải trên) */
-.booking-card2-badges-wrapper {
-  position: absolute;
-  top: 12px;
-  right: 16px;
+/* Ribbon Container */
+.booking-card2-ribbon-container {
   display: flex;
-  gap: 8px;
   align-items: center;
+  margin-left: -8px;
+}
+
+.booking-card2-ribbon-type {
+  background-color: #52c484;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px 6px 16px;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.booking-card2-ribbon-payment {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px 6px 20px;
+  display: inline-flex;
+  align-items: center;
+  margin-left: -10px;
+  /* đè lên một phần của ribbon type */
   z-index: 2;
 }
 
-/* Body Content */
-.booking-card2-body {
-  margin-top: 36px; /* Dành khoảng trống cho dải băng ở trên */
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.booking-card2-ribbon-payment.unpaid {
+  background-color: #e15024;
+  /* màu đỏ cam của Chưa thanh toán */
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 10px 100%, 0 50%);
 }
 
-.booking-card2-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  border-bottom: 1px dashed #e2e8f0;
-  padding-bottom: 10px;
+.booking-card2-ribbon-payment.paid {
+  background-color: #3b82f6;
+  /* màu xanh dương của Đã thanh toán */
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 10px 100%, 0 50%);
 }
 
-.booking-card2-customer-box {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.booking-card2-customer-label {
+.booking-card2-ribbon-expiring {
+  background-color: #f59e0b;
+  color: #ffffff;
   font-size: 11px;
-  color: #94a3b8;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
   text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  margin-left: 8px;
+  z-index: 3;
+}
+
+/* Card Content Row */
+.booking-card2-content-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1px;
+  width: 100%;
+}
+
+/* Info Column */
+.booking-card2-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
 
 .booking-card2-customer-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: #0f172a;
+  color: #f9eb9d;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 8px 0 4px 0;
+  font-family: inherit;
 }
 
-.booking-card2-code {
+.booking-card2-info-item {
+  color: #ffffff;
   font-size: 13px;
-  color: #64748b;
-  font-weight: 700;
-  background-color: #f1f5f9;
-  padding: 4px 8px;
-  border-radius: 6px;
+  line-height: 1.4;
+  font-weight: 400;
 }
 
-.booking-card2-details-box {
-  background-color: #f8fafc;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border-left: 4px solid #64748b;
+.booking-card2-info-item span {
+  color: rgba(255, 255, 255, 0.7);
+  margin-right: 4px;
+  font-weight: 400;
 }
 
-.booking-card2-detail-text {
-  font-size: 14px;
-  color: #475569;
-  line-height: 1.5;
-}
-
-.booking-card2-detail-bold {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-/* Footer & Action Buttons */
-.booking-card2-footer {
-  margin-top: 14px;
+/* Action Column */
+.booking-card2-action-col {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .booking-card2-btn-confirm {
-  background-color: #10b981;
+  background-color: #dcb250;
   color: #ffffff;
   border: none;
-  border-radius: 8px;
-  padding: 10px 18px;
+  border-radius: 4px;
+  padding: 8px 20px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 200;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
-  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .booking-card2-btn-confirm:hover:not(:disabled) {
-  background-color: #059669;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-  transform: translateY(-1px);
+  background-color: #d0aa5c;
 }
 
 .booking-card2-btn-confirm:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 .booking-card2-btn-confirm:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.booking-card2-btn-confirm.auto-disabled {
+  background-color: #6b7280 !important;
+  color: #d1d5db !important;
+  cursor: not-allowed;
+  opacity: 0.7;
 }

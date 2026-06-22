@@ -3558,25 +3558,22 @@ input[type="password"]::-ms-clear {
 .owner-mobile-container {
   margin: 0 auto;
   max-width: 480px;
-  min-height: 100vh;
-  background-color: #f8fafc;
+  height: 100vh;
+  background-color: #306c3c;
   display: flex;
   flex-direction: column;
   position: relative;
-  border-left: 1px solid #cbd5e1;
-  border-right: 1px solid #cbd5e1;
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.08);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
 }
 
 .owner-mobile-header {
-  height: 60px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  margin-top: 40px;
+  height: 30px;
+  background-color: #306c3c;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
   position: sticky;
   top: 0;
   z-index: 99;
@@ -3585,7 +3582,7 @@ input[type="password"]::-ms-clear {
 .owner-header-back-btn {
   border: none;
   background: none;
-  color: #475569;
+  color: #ffffff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -3602,8 +3599,8 @@ input[type="password"]::-ms-clear {
 
 .owner-header-title {
   font-size: 15px;
-  font-weight: 800;
-  color: #0f172a;
+  font-weight: 600;
+  color: #ffffff;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -3700,8 +3697,9 @@ input[type="password"]::-ms-clear {
 
 .owner-dashboard-content-card {
   background-color: #ffffff;
-  border-radius: 28px 28px 0 0;
-  padding: 24px 20px 90px;
+  border-radius: 12px 12px 12px 12px;
+  padding: 16px 12px 16px;
+  margin: 0 12px;
   /* Combined padding-bottom */
   margin-top: -24px;
   position: relative;

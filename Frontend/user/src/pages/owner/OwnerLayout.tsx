@@ -14,7 +14,6 @@ export default function OwnerLayout({ children, title, showSystemHeader = true, 
 
   return (
     <div className="owner-mobile-container">
-      {/* Page Header (only shown if title exists and header is enabled) */}
       {showSystemHeader && title && (
         <header className="owner-mobile-header">
           <button className="owner-header-back-btn" onClick={() => navigate(-1)}>

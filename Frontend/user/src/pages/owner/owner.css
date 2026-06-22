@@ -1,0 +1,163 @@
+.owner-bookings-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-search-tabs-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-search-bar-wrapper {
+  margin: 8px;
+  position: relative;
+}
+
+.owner-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: #9ca3af;
+}
+
+.owner-search-input {
+  width: 100%;
+  padding: 12px 12px 10px 40px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  background: white;
+  font-size: 14px;
+}
+
+.owner-loading-text {
+  font-size: 14px;
+  color: #bdc6d3;
+}
+
+.owner-empty-placeholder {
+  padding: 60px 16px;
+  text-align: center;
+}
+
+.owner-empty-title {
+  font-weight: 600;
+  color: #e3eeff;
+  font-size: 16px;
+}
+
+.owner-empty-desc {
+  font-size: 14px;
+  color: #adadad;
+  margin-top: 4px;
+}
+
+.owner-cards-list {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
+  margin-top: 12px;
+}
+
+.owner-search-sort-container {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  gap: 8px;
+}
+
+.owner-search-sort-container .owner-search-bar-wrapper {
+  flex: 1;
+  margin: 0;
+}
+
+.owner-sort-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  font-size: 14px;
+  white-space: nowrap;
+  padding-right: 4px;
+}
+
+.owner-sort-wrapper span {
+  opacity: 0.85;
+}
+
+.owner-sort-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.owner-sort-select-val {
+  color: #ffffff;
+  font-weight: 400;
+  font-size: 13px;
+  cursor: pointer;
+  padding-right: 14px;
+  user-select: none;
+}
+
+.owner-sort-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: #fbf5d5; /* màu kem nhạt */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 140px;
+  overflow: hidden;
+  padding: 8px 0;
+  animation: ownerFadeIn 0.15s ease-out;
+}
+
+@keyframes ownerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.owner-sort-dropdown-item {
+  padding: 12px 16px;
+  color: #224229;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.owner-sort-dropdown-item:hover {
+  background-color: rgba(34, 66, 41, 0.05);
+}
+
+.owner-sort-dropdown-item.active {
+  background-color: rgba(34, 66, 41, 0.1);
+}
+
+.owner-sort-dropdown-divider {
+  height: 1px;
+  background-color: rgba(34, 66, 41, 0.15);
+  margin: 0 16px;
+}
+
+.owner-sort-arrow {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+/* Override background of owner-venue-tabs-bar for bookings wrapper */
+.owner-bookings-wrapper .owner-venue-tabs-bar {
+  background-color: #306c3c !important;
+}

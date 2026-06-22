@@ -15,6 +15,8 @@ public class Booking
     /// </summary>
     public string Status { get; set; } = string.Empty;
 
+    public int OrderNumber { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation properties

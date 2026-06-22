@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Ribbon1a from '../ui/Ribbon1a';
 import Ribbon1b from '../ui/Ribbon1b';
 import Ribbon2a from '../ui/Ribbon2a';
@@ -16,8 +16,9 @@ export interface BookingCard2Props {
     bookingType: 'DAILY' | 'FIXED' | string; // Đơn ngày / Đơn cố định
     paymentStatus: 'PAID' | 'UNPAID' | string; // Đã thanh toán / Chưa thanh toán
     isExpiringSoon?: boolean;         // Sắp hết hạn
+    orderNumber?: number;             // Mã đơn số tự tăng
   };
-  index: number;                     // Số thứ tự đơn, tăng dần từ 0
+  index: number;                     // Số thứ tự đơn
   onConfirm?: (bookingId: string) => void; // Hàm xử lý nút xác nhận
   isConfirming?: boolean;            // Trạng thái đang xác nhận (loading)
 }
@@ -67,52 +68,60 @@ export default function BookingCard2({
   const RibbonPayment = isPaid ? Ribbon2a : Ribbon2b;
   const paymentText = isPaid ? 'Đã thanh toán' : 'Chưa thanh toán';
 
+  const [autoTriggered, setAutoTriggered] = useState(false);
+  
+  // Chỉ tự động xác nhận nếu đơn sắp bắt đầu trong vòng 30 phút tới (0 <= diffMins <= 30)
+  const startTimeMs = new Date(booking.startTime).getTime();
+  const diffMins = (startTimeMs - Date.now()) / (1000 * 60);
+  const isAutoConfirm = !!onConfirm && (diffMins >= 0 && diffMins <= 30);
+
+  useEffect(() => {
+    if (isAutoConfirm && onConfirm && !isConfirming && !autoTriggered) {
+      setAutoTriggered(true);
+      onConfirm(booking.id);
+    }
+  }, [isAutoConfirm, onConfirm, booking.id, isConfirming, autoTriggered]);
+
+  const buttonText = isConfirming ? 'ĐANG DUYỆT...' : 'XÁC NHẬN';
+
   return (
     <div className="booking-card2-container">
-      {/* Ribbon 1: Loại đơn đặt (góc trái trên) */}
-      <RibbonType>{typeText}</RibbonType>
-
-      {/* Nhóm Ribbon/Badge góc phải trên */}
-      <div className="booking-card2-badges-wrapper">
-        {/* Ribbon 2: Trạng thái thanh toán */}
+      <div className="booking-card2-ribbon-container">
+        <RibbonType>{typeText}</RibbonType>
         <RibbonPayment>{paymentText}</RibbonPayment>
-
-        {/* Ribbon 3: Cảnh báo sắp hết hạn (nếu có và chưa thanh toán) */}
         {booking.isExpiringSoon && !isPaid && (
           <Ribbon3>Sắp hết hạn</Ribbon3>
         )}
       </div>
 
-      {/* Nội dung chính của Card */}
-      <div className="booking-card2-body">
-        <div className="booking-card2-header-row">
-          <div className="booking-card2-customer-box">
-            <span className="booking-card2-customer-label">Người đặt</span>
-            <span className="booking-card2-customer-name">{booking.customerName}</span>
+      {/* Nội dung chính và nút xác nhận dạng 2 cột */}
+      <div className="booking-card2-content-row">
+        {/* Cột trái: Thông tin đặt sân */}
+        <div className="booking-card2-info-col">
+          <h3 className="booking-card2-customer-name">{booking.customerName}</h3>
+          
+          <div className="booking-card2-info-item">
+            <span>Mã đơn:</span> #{booking.orderNumber || index}
           </div>
-          <span className="booking-card2-code">Đơn #{index}</span>
+          
+          <div className="booking-card2-info-item">
+            <span>Chi tiết:</span> {detailStr}
+          </div>
         </div>
 
-        <div className="booking-card2-details-box">
-          <div className="booking-card2-detail-text">
-            Chi tiết: <span className="booking-card2-detail-bold">{detailStr}</span>
+        {/* Cột phải: Nút xác nhận */}
+        {onConfirm && (
+          <div className="booking-card2-action-col">
+            <button
+              onClick={() => onConfirm(booking.id)}
+              disabled={isConfirming || isAutoConfirm}
+              className={`booking-card2-btn-confirm ${isAutoConfirm ? 'auto-disabled' : ''}`}
+            >
+              {buttonText}
+            </button>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Nút xác nhận ở Footer */}
-      {onConfirm && (
-        <div className="booking-card2-footer">
-          <button
-            onClick={() => onConfirm(booking.id)}
-            disabled={isConfirming}
-            className="booking-card2-btn-confirm"
-          >
-            <Check size={14} />
-            {isConfirming ? 'Đang xác nhận...' : 'Xác nhận'}
-          </button>
-        </div>
-      )}
     </div>
   );
 }
