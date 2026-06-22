@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Home, Calendar, ClipboardCheck } from 'lucide-react';
 import { useOwnerBookings } from '../../hooks/queries/useBookingQueries';
 
@@ -50,24 +50,23 @@ export default function OwnerLayout({ children, title, showSystemHeader = true, 
       {/* Bottom Navigation */}
       {showBottomNav && (
         <nav className="owner-mobile-bottom-nav">
-          <NavLink 
+          <Link 
             to="/owner" 
-            end 
             className={`owner-bottom-nav-item ${isHomeActive ? 'active' : ''}`}
           >
             <Home size={22} />
             <span>Trang chủ</span>
-          </NavLink>
+          </Link>
           
-          <NavLink 
+          <Link 
             to="/owner/bookings" 
             className={`owner-bottom-nav-item ${isBookingsActive ? 'active' : ''}`}
           >
             <Calendar size={22} />
             <span>Lịch đặt</span>
-          </NavLink>
+          </Link>
           
-          <NavLink 
+          <Link 
             to="/owner/bookings?status=PENDING" 
             className={`owner-bottom-nav-item ${isApprovalsActive ? 'active' : ''}`}
           >
@@ -78,7 +77,7 @@ export default function OwnerLayout({ children, title, showSystemHeader = true, 
               )}
             </div>
             <span>Duyệt đơn</span>
-          </NavLink>
+          </Link>
         </nav>
       )}
     </div>
