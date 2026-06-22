@@ -24,6 +24,7 @@ export default function OwnerSubFeaturePage() {
   // Determine current active section
   const isPos = path.startsWith('/owner/pos');
   const isInventory = path.startsWith('/owner/inventory');
+  // const isService = path.startsWith('/owner/services');
   const isAnalytics = path.startsWith('/owner/analytics');
   const isCustomers = path.startsWith('/owner/customers');
   const isVouchers = path.startsWith('/owner/vouchers');

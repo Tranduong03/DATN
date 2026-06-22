@@ -29,12 +29,13 @@ const MemberPage = lazy(() => import('./pages/profile/MemberPage'));
 
 // Owner pages
 const OwnerOnboardingFlow = lazy(() => import('./pages/owner/OwnerOnboardingFlow'));
-const OwnerDashboardPage = lazy(() => import('./pages/owner/OwnerDashboardPage'));
+const OwnerDashboardPage = lazy(() => import('./pages/owner/DashboardPage'));
 const OwnerVenuesPage = lazy(() => import('./pages/owner/OwnerVenuesPage'));
 const VenuePricePage = lazy(() => import('./pages/owner/VenuePricePage'));
 const VenueListCourt = lazy(() => import('./pages/owner/VenueListCourt'));
-const OwnerVenueDetailPage = lazy(() => import('./pages/owner/OwnerVenueDetailPage'));
-const OwnerBookingsPage = lazy(() => import('./pages/owner/OwnerBookingsPage'));
+const OwnerVenueDetailPage = lazy(() => import('./pages/owner/VenueDetailPage'));
+const OwnerBookingsPage = lazy(() => import('./pages/owner/BookingsPage'));
+const OwnerBookingServicesPage = lazy(() => import('./pages/owner/BookingServicesPage'));
 const OwnerSubFeaturePage = lazy(() => import('./pages/owner/OwnerSubFeaturePage'));
 const CreateCourtPage = lazy(() => import('./pages/owner/CreateCourtPage'));
 
@@ -174,6 +175,7 @@ function AppRoutes() {
           <Route element={<OwnerGuard />}>
             <Route path="/owner" element={withSuspense(OwnerDashboardPage)} />
             <Route path="/owner/bookings" element={withSuspense(OwnerBookingsPage)} />
+            <Route path="/owner/BookingServices" element={withSuspense(OwnerBookingServicesPage)} />
             <Route path="/owner/venues" element={withSuspense(OwnerVenuesPage)} />
             <Route path="/owner/venues/:id" element={withSuspense(OwnerVenueDetailPage)} />
             <Route path="/owner/venues/:id/edit" element={withSuspense(VenuePricePage)} />
@@ -181,6 +183,7 @@ function AppRoutes() {
             <Route path="/owner/venues/:id/courts" element={withSuspense(CreateCourtPage)} />
             <Route path="/owner/pos" element={withSuspense(OwnerSubFeaturePage)} />
             <Route path="/owner/inventory" element={withSuspense(OwnerSubFeaturePage)} />
+            <Route path="/owner/services" element={withSuspense(OwnerSubFeaturePage)} />
             <Route path="/owner/analytics" element={withSuspense(OwnerSubFeaturePage)} />
             <Route path="/owner/customers" element={withSuspense(OwnerSubFeaturePage)} />
             <Route path="/owner/vouchers" element={withSuspense(OwnerSubFeaturePage)} />
