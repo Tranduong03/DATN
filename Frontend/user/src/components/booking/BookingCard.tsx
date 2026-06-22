@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CreditCard, Trophy, Star, Ban, CheckCircle2, Clock } from 'lucide-react';
+import { Ban, CheckCircle2, Clock } from 'lucide-react';
 import './BookingCard.css';
 
 interface BookingCardProps {
@@ -23,11 +23,7 @@ interface BookingCardProps {
 }
 
 export default function BookingCard({
-  booking,
-  onPayNow,
-  onCreateMatch,
-  onReview,
-  isPaying
+  booking
 }: BookingCardProps) {
   // Format short time: e.g. 8h30 or 9h
   const formatTimeShort = (timeStr: string) => {
@@ -75,11 +71,6 @@ export default function BookingCard({
 
   const statusCfg = getStatusConfig(booking.status);
   const detailStr = `${booking.courtName}: ${formatTimeShort(booking.startTime)} - ${formatTimeShort(booking.endTime)} | Ngày ${formatDateShort(booking.startTime)}`;
-  
-  // Format price
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  };
 
   return (
     <div className="booking-item-card">
@@ -111,45 +102,6 @@ export default function BookingCard({
         </div>
         <div className="booking-card-detail-line">
           Địa chỉ: <span className="bold">{booking.venueAddress || 'Chưa cập nhật'}</span>
-        </div>
-      </div>
-
-      <div className="booking-card-footer">
-        <div className="booking-card-actions">
-          {booking.status === 'PENDING' && (
-            <button
-              onClick={() => onPayNow(booking.id)}
-              disabled={isPaying}
-              className="booking-card-btn booking-btn-pay"
-            >
-              <CreditCard size={14} />
-              {isPaying ? 'Đang tải...' : 'Thanh toán ngay'}
-            </button>
-          )}
-
-          {booking.status === 'CONFIRMED' && (
-            <div className="booking-card-action-group">
-              <button
-                onClick={() => onCreateMatch(booking)}
-                className="booking-card-btn booking-btn-match"
-              >
-                <Trophy size={14} />
-                Tạo kèo (Tìm đối)
-              </button>
-              <button
-                onClick={() => onReview(booking)}
-                className="booking-card-btn booking-btn-review"
-              >
-                <Star size={14} />
-                Đánh giá
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="booking-card-price-container">
-          <span className="booking-card-price-label">Tổng thanh toán</span>
-          <span className="booking-card-price-value">{formatPrice(booking.totalPrice)}</span>
         </div>
       </div>
     </div>

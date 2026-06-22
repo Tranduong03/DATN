@@ -7,6 +7,7 @@ import { useCreateReview } from '../../hooks/mutations/useReviewMutations';
 import { CircleDollarSign, Star, Calendar } from 'lucide-react';
 import SubPageHeader from '../../components/common/SubPageHeader';
 import BookingCard from '../../components/booking/BookingCard';
+import './profile.css';
 
 export default function MyBookingsPage() {
   const navigate = useNavigate();
@@ -94,51 +95,29 @@ export default function MyBookingsPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+    <div className="profile-page-container">
       <SubPageHeader title="Danh sách đặt lịch" />
 
-      <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div className="profile-page-content">
         
         {/* Filter Dropdown Area */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-          <div style={{ position: 'relative', width: '200px' }}>
+        <div className="profile-filter-wrapper">
+          <div className="profile-dropdown-container">
             <button 
               onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-              style={{ 
-                display: 'flex', alignItems: 'center', gap: '8px', 
-                padding: '10px 16px', border: '1px solid #94a3b8', 
-                borderRadius: '6px', backgroundColor: '#ffffff',
-                color: '#1e293b', fontSize: '14px', cursor: 'pointer',
-                width: '100%', justifyContent: 'space-between',
-                boxSizing: 'border-box'
-              }}
+              className="profile-dropdown-btn"
             >
               <span style={{ fontWeight: '500' }}>Xem tất cả</span>
               <Calendar size={18} color="#0f172a" />
             </button>
             
             {showFilterDropdown && (
-              <div style={{ 
-                position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px',
-                backgroundColor: '#fef3c7', borderRadius: '6px', border: '1px solid #d97706',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', zIndex: 20,
-                boxSizing: 'border-box', overflow: 'hidden'
-              }}>
+              <div className="profile-dropdown-menu">
                 {['Chọn khoảng ngày', 'Chọn tháng', 'Chọn năm', 'Xem tất cả'].map((item, idx) => (
                   <div 
                     key={idx}
                     onClick={() => setShowFilterDropdown(false)}
-                    style={{
-                      padding: '12px 16px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#064e3b',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      borderBottom: idx < 3 ? '1px solid #d97706' : 'none'
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#fde68a')}
-                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    className="profile-dropdown-item"
                   >
                     {item}
                   </div>
@@ -150,13 +129,13 @@ export default function MyBookingsPage() {
         
         {/* Content */}
         {isLoading ? (
-          <p style={{ textAlign: 'center', color: '#64748b', marginTop: '40px' }}>Đang tải lịch sử đặt sân...</p>
+          <p className="profile-loading-text">Đang tải lịch sử đặt sân...</p>
         ) : bookings.length === 0 ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ color: '#064e3b', fontSize: '15px', fontWeight: '500' }}>Bạn chưa có lịch đặt</p>
+          <div className="profile-empty-container">
+            <p className="profile-empty-text">Bạn chưa có lịch đặt</p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="profile-list-gap">
             {bookings.map((booking: any) => (
               <BookingCard
                 key={booking.id}
@@ -172,45 +151,20 @@ export default function MyBookingsPage() {
 
         {/* Modal Tạo Kèo Đấu */}
         {selectedBooking && (
-          <div 
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(15, 23, 42, 0.6)',
-              backdropFilter: 'blur(4px)',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 999
-            }}
-          >
-            <div 
-              style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '24px',
-                padding: '32px',
-                maxWidth: '500px',
-                width: '100%',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid #e2e8f0',
-                margin: '0 20px'
-              }}
-            >
-              <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', marginBottom: '8px' }}>
+          <div className="profile-modal-overlay">
+            <div className="profile-modal-box">
+              <h2 className="profile-modal-title">
                 Tạo Kèo Đấu Giao Lưu
               </h2>
-              <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>
+              <p className="profile-modal-subtitle">
                 Nhập thông tin trận đấu để những người chơi khác trên hệ thống có thể đăng ký tham gia cùng bạn.
               </p>
 
-              <form onSubmit={handleCreateMatchSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <form onSubmit={handleCreateMatchSubmit} className="profile-modal-form">
                 
                 {/* Title */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                <div className="profile-form-group">
+                  <label className="profile-form-label">
                     Tiêu đề kèo đấu
                   </label>
                   <input
@@ -218,22 +172,22 @@ export default function MyBookingsPage() {
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                    className="profile-form-input"
                   />
                 </div>
 
                 {/* Grid inputs */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="profile-form-grid">
                   
                   {/* Skill level */}
-                  <div>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                  <div className="profile-form-group">
+                    <label className="profile-form-label">
                       Yêu cầu trình độ
                     </label>
                     <select
                       value={skillLevel}
                       onChange={(e) => setSkillLevel(e.target.value)}
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', backgroundColor: '#fff' }}
+                      className="profile-form-select"
                     >
                       <option value="Newbie">Mới chơi (Newbie)</option>
                       <option value="Intermediate">Trung bình (Intermediate)</option>
@@ -242,8 +196,8 @@ export default function MyBookingsPage() {
                   </div>
 
                   {/* Max Players */}
-                  <div>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                  <div className="profile-form-group">
+                    <label className="profile-form-label">
                       Số người chơi tối đa
                     </label>
                     <input
@@ -253,64 +207,46 @@ export default function MyBookingsPage() {
                       required
                       value={maxPlayers}
                       onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                      className="profile-form-input"
                     />
                   </div>
 
                 </div>
 
                 {/* Fee */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                <div className="profile-form-group">
+                  <label className="profile-form-label">
                     Phí chia sẻ / người chơi (VND)
                   </label>
-                  <div style={{ position: 'relative' }}>
-                    <CircleDollarSign size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <div className="profile-input-icon-wrapper">
+                    <CircleDollarSign size={18} className="profile-input-icon" />
                     <input
                       type="number"
                       min={0}
                       required
                       value={feePerPlayer}
                       onChange={(e) => setFeePerPlayer(parseInt(e.target.value))}
-                      style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                      className="profile-form-input has-icon"
                     />
                   </div>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'block', marginTop: '4px' }}>
+                  <span className="profile-form-tip">
                     Nhập 0 nếu bạn muốn bao trọn tiền sân và chơi giao lưu miễn phí.
                   </span>
                 </div>
 
                 {/* Buttons */}
-                <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <div className="profile-modal-buttons">
                   <button
                     type="button"
                     onClick={() => setSelectedBooking(null)}
-                    style={{
-                      flex: 1,
-                      padding: '12px',
-                      borderRadius: '10px',
-                      border: '1px solid #cbd5e1',
-                      backgroundColor: 'transparent',
-                      color: '#475569',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
+                    className="profile-btn-cancel"
                   >
                     Hủy bỏ
                   </button>
                   <button
                     type="submit"
                     disabled={createMatchMutation.isPending}
-                    style={{
-                      flex: 1,
-                      padding: '12px',
-                      borderRadius: '10px',
-                      border: 'none',
-                      backgroundColor: '#3b82f6',
-                      color: '#ffffff',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
+                    className="profile-btn-submit"
                   >
                     {createMatchMutation.isPending ? 'Đang tạo...' : 'Tạo kèo'}
                   </button>
@@ -323,42 +259,17 @@ export default function MyBookingsPage() {
 
         {/* Modal Đánh giá */}
         {reviewBooking && (
-          <div 
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(15, 23, 42, 0.6)',
-              backdropFilter: 'blur(4px)',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 999
-            }}
-          >
-            <div 
-              style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '24px',
-                padding: '32px',
-                maxWidth: '400px',
-                width: '100%',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid #e2e8f0',
-                margin: '0 20px'
-              }}
-            >
-              <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', marginBottom: '8px' }}>
+          <div className="profile-modal-overlay">
+            <div className="profile-modal-box small">
+              <h2 className="profile-modal-title">
                 Đánh giá sân
               </h2>
-              <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>
+              <p className="profile-modal-subtitle">
                 Chia sẻ trải nghiệm của bạn tại {reviewBooking.venueName} nhé!
               </p>
 
-              <form onSubmit={handleCreateReviewSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+              <form onSubmit={handleCreateReviewSubmit} className="profile-modal-form">
+                <div className="profile-stars-container">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star 
                       key={star}
@@ -366,13 +277,13 @@ export default function MyBookingsPage() {
                       fill={star <= reviewRating ? "#f59e0b" : "transparent"} 
                       color={star <= reviewRating ? "#f59e0b" : "#cbd5e1"}
                       onClick={() => setReviewRating(star)}
-                      style={{ cursor: 'pointer' }}
+                      className="profile-star-clickable"
                     />
                   ))}
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+                <div className="profile-form-group">
+                  <label className="profile-form-label">
                     Nhận xét (không bắt buộc)
                   </label>
                   <textarea
@@ -380,40 +291,22 @@ export default function MyBookingsPage() {
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     placeholder="Sân sạch đẹp, anh chủ nhiệt tình..."
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', resize: 'vertical' }}
+                    className="profile-form-textarea"
                   />
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <div className="profile-modal-buttons">
                   <button
                     type="button"
                     onClick={() => setReviewBooking(null)}
-                    style={{
-                      flex: 1,
-                      padding: '12px',
-                      borderRadius: '10px',
-                      border: '1px solid #cbd5e1',
-                      backgroundColor: 'transparent',
-                      color: '#475569',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
+                    className="profile-btn-cancel"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
                     disabled={createReviewMutation.isPending}
-                    style={{
-                      flex: 1,
-                      padding: '12px',
-                      borderRadius: '10px',
-                      border: 'none',
-                      backgroundColor: '#10b981',
-                      color: '#ffffff',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
+                    className="profile-btn-submit green"
                   >
                     {createReviewMutation.isPending ? 'Đang gửi...' : 'Gửi đánh giá'}
                   </button>

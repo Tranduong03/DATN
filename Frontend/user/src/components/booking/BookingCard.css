@@ -1,13 +1,14 @@
 .booking-item-card {
-  padding: 16px 20px 20px 20px;
+  padding: 0 10px;
+  margin-top: -1px;
   background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
   box-sizing: border-box;
   overflow: hidden;
+  border-bottom: 1px solid #016d38;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -18,20 +19,18 @@
 
 /* 3D Ribbon styling */
 .booking-card-ribbon {
-  background: linear-gradient(90deg, #5bbb8b 0%, #48a678 100%);
+  background: #00cf77;
   color: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 14px 4px 12px;
+  font-size: 15px;
+  font-weight: 400;
+  padding: 5px 30px 5px 20px;
   display: inline-flex;
   align-items: center;
   position: relative;
   width: fit-content;
   clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
   margin-left: -20px;
-  margin-top: 4px;
   z-index: 2;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .booking-card-ribbon::before {
@@ -49,13 +48,13 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-top: 4px;
+  margin: 6px 0;
 }
 
 .booking-card-venue-title {
   margin: 0;
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .booking-card-venue-link {
@@ -78,7 +77,7 @@
 
 .booking-card-status-text {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .booking-card-status-icon-circle {
@@ -94,9 +93,9 @@
 .booking-card-body-details {
   display: flex;
   flex-direction: column;
-  gap: 6px;
   border-bottom: 1px dashed #e2e8f0;
-  padding-bottom: 14px;
+  gap: 2px;
+  padding-bottom: 4px;
 }
 
 .booking-card-detail-line {
@@ -106,8 +105,8 @@
 }
 
 .booking-card-detail-line .bold {
-  font-weight: 700;
-  color: #1e293b;
+  font-weight: 600;
+  color: #003f21;
 }
 
 .booking-card-footer {
