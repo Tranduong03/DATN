@@ -1,0 +1,200 @@
+.booking-item-card {
+  padding: 16px 20px 20px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.booking-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* 3D Ribbon styling */
+.booking-card-ribbon {
+  background: linear-gradient(90deg, #5bbb8b 0%, #48a678 100%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 14px 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  width: fit-content;
+  clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+  margin-left: -20px;
+  margin-top: 4px;
+  z-index: 2;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.booking-card-ribbon::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  border-top: 4px solid #2b6139;
+  border-left: 4px solid transparent;
+  z-index: 1;
+}
+
+.booking-card-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.booking-card-venue-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.booking-card-venue-link {
+  color: #e07242; /* Coral/orange color from screenshot */
+  text-decoration: none;
+  line-height: 1.3;
+}
+
+.booking-card-venue-link:hover {
+  text-decoration: underline;
+  color: #c95d2e;
+}
+
+.booking-card-status-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.booking-card-status-text {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.booking-card-status-icon-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.booking-card-body-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 14px;
+}
+
+.booking-card-detail-line {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.booking-card-detail-line .bold {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.booking-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.booking-card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.booking-card-action-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.booking-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #ffffff;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.booking-card-btn:hover {
+  opacity: 0.9;
+}
+
+.booking-card-btn:active {
+  transform: scale(0.97);
+}
+
+.booking-btn-pay {
+  background-color: #3b82f6;
+}
+
+.booking-btn-match {
+  background-color: #f59e0b;
+}
+
+.booking-btn-review {
+  background-color: #10b981;
+}
+
+.booking-card-price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  margin-left: auto;
+}
+
+.booking-card-price-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.booking-card-price-value {
+  font-size: 19px;
+  font-weight: 800;
+  color: #ef4444;
+}
+
+@media (max-width: 576px) {
+  .booking-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .booking-card-price-container {
+    align-items: flex-start;
+    text-align: left;
+    margin-left: 0;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+  }
+}

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshAccessToken } from '../utils/auth';
 
 const axiosClient = axios.create({
   baseURL: '/api',
@@ -6,23 +7,6 @@ const axiosClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-let isRefreshing = false;
-let refreshSubscribers: { resolve: (token: string) => void; reject: (err: any) => void }[] = [];
-
-function subscribeTokenRefresh(resolve: (token: string) => void, reject: (err: any) => void) {
-  refreshSubscribers.push({ resolve, reject });
-}
-
-function onRefreshed(token: string) {
-  refreshSubscribers.forEach((sub) => sub.resolve(token));
-  refreshSubscribers = [];
-}
-
-function onRefreshFailed(error: any) {
-  refreshSubscribers.forEach((sub) => sub.reject(error));
-  refreshSubscribers = [];
-}
 
 // Add a request interceptor
 axiosClient.interceptors.request.use(
@@ -60,63 +44,21 @@ axiosClient.interceptors.response.use(
         originalRequest.headers['X-Retry'] = 'true';
       }
 
-      const refreshToken = localStorage.getItem('refreshToken');
-      const accessToken = localStorage.getItem('token');
-
-      if (!refreshToken || !accessToken) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+      try {
+        const newAccessToken = await refreshAccessToken();
+        if (newAccessToken) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return axiosClient(originalRequest);
         }
-        return Promise.reject(error);
+      } catch (err) {
+        console.error('Không thể refresh token tự động hoặc gửi lại request:', err);
       }
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-
-        axios
-          .post('/api/auth/refresh', {
-            accessToken,
-            refreshToken,
-          })
-          .then((res) => {
-            const newAccessToken = res.data.token || res.data.Token;
-            const newRefreshToken = res.data.refreshToken || res.data.RefreshToken;
-            if (newAccessToken && newRefreshToken) {
-              localStorage.setItem('token', newAccessToken);
-              localStorage.setItem('refreshToken', newRefreshToken);
-              onRefreshed(newAccessToken);
-            } else {
-              throw new Error('Response body does not contain valid access or refresh tokens.');
-            }
-          })
-          .catch((err) => {
-            console.error('Không thể refresh token tự động:', err);
-            onRefreshFailed(err);
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
-            if (window.location.pathname !== '/login') {
-              window.location.href = '/login';
-            }
-          })
-          .finally(() => {
-            isRefreshing = false;
-          });
+      // Nếu refresh token thất bại hoặc không tồn tại token, chuyển hướng về trang login
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
       }
-
-      // Đợi refresh thành công rồi chạy lại request ban đầu
-      return new Promise((resolve, reject) => {
-        subscribeTokenRefresh(
-          (newToken) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            resolve(axiosClient(originalRequest));
-          },
-          (err) => {
-            reject(err);
-          }
-        );
-      });
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);
@@ -124,3 +66,4 @@ axiosClient.interceptors.response.use(
 );
 
 export default axiosClient;
+

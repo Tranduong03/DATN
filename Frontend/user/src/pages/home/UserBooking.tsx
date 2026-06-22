@@ -213,6 +213,11 @@ export default function UserBooking() {
               <div className="booking-legend-color booked" />
               <span className="booking-legend-text">Đã đặt</span>
             </div>
+
+            <div className="booking-legend-item">
+              <div className="booking-legend-color locked" />
+              <span className="booking-legend-text">Khóa</span>
+            </div>
           </div>
 
           {/* Bottom Row: Link */}

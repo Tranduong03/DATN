@@ -73,12 +73,12 @@ export default function MePage() {
 
             {/* Quick Actions Grid */}
             <div className="me-grid-actions">
-              <div className="me-action-item">
+              <Link to="/reservedBooking" className="me-action-item" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="me-action-icon">
                   <span style={{ fontSize: '28px' }}>📅</span>
                 </div>
                 <span>Lịch đã đặt</span>
-              </div>
+              </Link>
               <div className="me-action-item">
                 <div className="me-action-icon">
                   <span style={{ fontSize: '28px' }}>🎉</span>

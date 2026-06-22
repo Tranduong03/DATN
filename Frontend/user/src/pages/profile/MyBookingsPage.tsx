@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useMyBookings } from '../../hooks/queries/useBookingQueries';
 import { useGetPaymentUrl } from '../../hooks/mutations/useBookingMutations';
 import { useCreateMatch } from '../../hooks/mutations/useMatchMutations';
 import { useCreateReview } from '../../hooks/mutations/useReviewMutations';
-import { CircleDollarSign, Trophy, CreditCard, Star, Calendar } from 'lucide-react';
+import { CircleDollarSign, Star, Calendar } from 'lucide-react';
 import SubPageHeader from '../../components/common/SubPageHeader';
+import BookingCard from '../../components/booking/BookingCard';
 
 export default function MyBookingsPage() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const { data: bookingsData, isLoading: queryLoading } = useMyBookings();
-  const bookings = token ? (bookingsData?.data || []) : [];
+  const bookings = token ? (Array.isArray(bookingsData) ? bookingsData : (bookingsData as any)?.data || []) : [];
   const isLoading = token ? queryLoading : false;
 
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
@@ -31,30 +32,6 @@ export default function MyBookingsPage() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const createReviewMutation = useCreateReview();
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleString('vi-VN', { 
-      year: 'numeric', month: '2-digit', day: '2-digit', 
-      hour: '2-digit', minute: '2-digit' 
-    });
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return <span style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: '#fff7ed', color: '#c2410c', fontSize: 12, fontWeight: '700' }}>CHỜ THANH TOÁN</span>;
-      case 'CONFIRMED':
-        return <span style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: '#e6f4ea', color: '#137333', fontSize: 12, fontWeight: '700' }}>ĐÃ XÁC NHẬN</span>;
-      case 'CANCELLED':
-        return <span style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: '#f1f5f9', color: '#475569', fontSize: 12, fontWeight: '700' }}>ĐÃ HỦY</span>;
-      default:
-        return <span style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: '#f1f5f9', color: '#475569', fontSize: 12, fontWeight: '700' }}>{status}</span>;
-    }
-  };
 
   const handlePayNow = async (bookingId: string) => {
     try {
@@ -181,110 +158,14 @@ export default function MyBookingsPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {bookings.map((booking: any) => (
-              <div 
-                key={booking.id} 
-                style={{ 
-                  border: '1px solid #e2e8f0', 
-                  borderRadius: '16px', 
-                  padding: '24px', 
-                  backgroundColor: '#ffffff', 
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)',
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '20px'
-                }}
-              >
-                <div>
-                  <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', fontWeight: '700' }}>
-                    <Link to={`/venue/${booking.venueId}`} style={{ color: '#0f172a', textDecoration: 'none' }}>
-                      {booking.venueName}
-                    </Link>
-                  </h3>
-                  <div style={{ color: '#475569', fontSize: 14, marginBottom: 6 }}>
-                    <strong>Sân:</strong> {booking.courtName}
-                  </div>
-                  <div style={{ color: '#475569', fontSize: 14, marginBottom: 12 }}>
-                    <strong>Thời gian:</strong> {formatDate(booking.startTime)} - {new Date(booking.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {getStatusBadge(booking.status)}
-                    
-                    {/* Nút hành động bổ sung */}
-                    {booking.status === 'PENDING' && (
-                      <button
-                        onClick={() => handlePayNow(booking.id)}
-                        disabled={getPaymentUrlMutation.isPending}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '6px 12px',
-                          border: 'none',
-                          borderRadius: '8px',
-                          backgroundColor: '#3b82f6',
-                          color: '#ffffff',
-                          fontSize: '12px',
-                          fontWeight: '700',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <CreditCard size={14} />
-                        {getPaymentUrlMutation.isPending ? 'Đang tải...' : 'Thanh toán ngay'}
-                      </button>
-                    )}
-
-                    {booking.status === 'CONFIRMED' && (
-                      <button
-                        onClick={() => handleOpenCreateMatchModal(booking)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '6px 12px',
-                          border: 'none',
-                          borderRadius: '8px',
-                          backgroundColor: '#f59e0b',
-                          color: '#ffffff',
-                          fontSize: '12px',
-                          fontWeight: '700',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Trophy size={14} />
-                        Tạo kèo (Tìm đối)
-                      </button>
-                    )}
-                    
-                    {booking.status === 'CONFIRMED' && (
-                      <button
-                        onClick={() => handleOpenReviewModal(booking)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '6px 12px',
-                          border: 'none',
-                          borderRadius: '8px',
-                          backgroundColor: '#10b981',
-                          color: '#ffffff',
-                          fontSize: '12px',
-                          fontWeight: '700',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Star size={14} />
-                        Đánh giá
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 13, color: '#64748b', marginBottom: '4px' }}>Tổng thanh toán</div>
-                  <div style={{ fontSize: 20, fontWeight: '800', color: '#ef4444' }}>{formatPrice(booking.totalPrice)}</div>
-                </div>
-              </div>
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                onPayNow={handlePayNow}
+                onCreateMatch={handleOpenCreateMatchModal}
+                onReview={handleOpenReviewModal}
+                isPaying={getPaymentUrlMutation.isPending}
+              />
             ))}
           </div>
         )}

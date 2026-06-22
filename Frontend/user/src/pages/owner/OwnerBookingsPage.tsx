@@ -36,7 +36,7 @@ export default function OwnerBookingsPage() {
     }
   }, [statusParam]);
 
-  const bookings = bookingsData?.data || [];
+  const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any)?.data || [];
 
   const handleUpdateStatus = (id: string, status: string) => {
     const actionText = status === 'CONFIRMED' ? 'xác nhận đơn đặt này' : 'hủy đơn đặt này';

@@ -37,6 +37,8 @@ export default function BookingGrid({
   sportsCategories = [],
 }: BookingGridProps) {
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
   const minAllowedTime = (() => {
     const now = new Date();
     const m = now.getMinutes();
@@ -104,6 +106,44 @@ export default function BookingGrid({
     }
     return 'booked';
   };
+
+  React.useEffect(() => {
+    if (loadingAvailability || courtsAvailability.length === 0) return;
+
+    const firstCourt = courtsAvailability[0];
+    if (!firstCourt || !firstCourt.timeSlots) return;
+
+    let targetIndex = -1;
+
+    // Priority 1: First future available slot
+    targetIndex = firstCourt.timeSlots.findIndex(slot => {
+      const isPastSlot = new Date(slot.startTime) < minAllowedTime;
+      return !isPastSlot && slot.isAvailable;
+    });
+
+    // Priority 2: First future slot (first slot not in the past)
+    if (targetIndex === -1) {
+      targetIndex = firstCourt.timeSlots.findIndex(slot => {
+        return new Date(slot.startTime) >= minAllowedTime;
+      });
+    }
+
+    if (targetIndex === -1) return;
+
+    if (containerRef.current) {
+      const cellWidth = 37; // --grid-cell-width in BookingGrid.css
+      const scrollOffset = Math.max(0, targetIndex * cellWidth - 40);
+      
+      setTimeout(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTo({
+            left: scrollOffset,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }
+  }, [courtsAvailability, loadingAvailability]);
 
   if (loadingAvailability) {
     return (
@@ -197,7 +237,7 @@ export default function BookingGrid({
 
             const isPastSlot = new Date(slot.startTime) < minAllowedTime;
             const cellClass = isPastSlot 
-              ? 'past-disabled' 
+              ? `past-disabled ${status}` 
               : (isSelected ? `selected ${selectedClasses}` : status);
 
             return (
@@ -208,7 +248,9 @@ export default function BookingGrid({
                 <div
                    onClick={() => !isPastSlot && slot.isAvailable && onSlotClick(court.courtId, court.courtName, slot)}
                    className="slot-inner"
-                   title={isPastSlot ? 'Không thể đặt giờ đã qua' : (slot.isAvailable ? `Giá: ${slot.price.toLocaleString('vi-VN')}đ` : 'Không khả dụng')}
+                   title={isPastSlot 
+                     ? (status === 'booked' ? 'Đã được đặt (Giờ đã qua)' : 'Không thể đặt giờ đã qua') 
+                     : (slot.isAvailable ? `Giá: ${slot.price.toLocaleString('vi-VN')}đ` : 'Không khả dụng')}
                  >
                  </div>
               </td>
@@ -232,7 +274,7 @@ export default function BookingGrid({
   });
 
   return (
-    <div className="booking-grid-wrapper">
+    <div ref={containerRef} className="booking-grid-wrapper">
       <table className="booking-table">
         <colgroup>
           <col className="col-category" />

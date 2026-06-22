@@ -16,7 +16,8 @@ export default function OwnerLayout({ children, title, showSystemHeader = true, 
 
   // Get pending count for badge
   const { data: bookingsData } = useOwnerBookings();
-  const pendingCount = bookingsData?.data?.filter((b: any) => b.status === 'PENDING').length || 0;
+  const bookingsList = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any)?.data || [];
+  const pendingCount = bookingsList.filter((b: any) => b.status === 'PENDING').length || 0;
 
   // Active status flags
   const isHomeActive = location.pathname === '/owner' || 

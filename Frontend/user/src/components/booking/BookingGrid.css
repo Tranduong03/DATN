@@ -305,6 +305,11 @@
   background-color: #b2b2b2 !important;
 }
 
+.slot-td.past-disabled.booked {
+  background-color: #b24646 !important;
+  opacity: 0.95;
+}
+
 .slot-td.past-disabled .slot-inner {
   cursor: not-allowed;
 }

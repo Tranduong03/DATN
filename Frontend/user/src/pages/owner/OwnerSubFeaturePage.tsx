@@ -95,9 +95,8 @@ export default function OwnerSubFeaturePage() {
   const { data: statsData } = useOwnerStats();
   const stats = statsData?.data || { todayBookings: 2, weeklyRevenue: 450000, newReviews: 1 };
   
-  // --- 4. Customers State ---
   const { data: bookingsData } = useOwnerBookings();
-  const bookings = bookingsData?.data || [];
+  const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any)?.data || [];
   const [customerSearch, setCustomerSearch] = useState('');
   
   const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
