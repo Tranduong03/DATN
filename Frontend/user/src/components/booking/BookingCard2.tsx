@@ -17,6 +17,7 @@ export interface BookingCard2Props {
     paymentStatus: 'PAID' | 'UNPAID' | string; // Đã thanh toán / Chưa thanh toán
     isExpiringSoon?: boolean;         // Sắp hết hạn
     orderNumber?: number;             // Mã đơn số tự tăng
+    status?: string;                  // Trạng thái đơn đặt sân
   };
   index: number;                     // Số thứ tự đơn
   onConfirm?: (bookingId: string) => void; // Hàm xử lý nút xác nhận
@@ -63,17 +64,17 @@ export default function BookingCard2({
   const RibbonType = isFixed ? Ribbon1b : Ribbon1a;
   const typeText = isFixed ? 'Đơn cố định' : 'Đơn ngày';
 
-  // Xác định Ribbon 2 (trạng thái thanh toán)
+  // Xác định Ribbon 2 (trạng thái xác nhận)
   const isPaid = booking.paymentStatus?.toUpperCase() === 'PAID';
   const RibbonPayment = isPaid ? Ribbon2a : Ribbon2b;
-  const paymentText = isPaid ? 'Đã thanh toán' : 'Chưa thanh toán';
+  const paymentText = isPaid ? 'Đã xác nhận' : 'Chưa thanh toán';
 
   const [autoTriggered, setAutoTriggered] = useState(false);
   
-  // Chỉ tự động xác nhận nếu đơn sắp bắt đầu trong vòng 30 phút tới (0 <= diffMins <= 30)
+  // Tự động xác nhận nếu đơn sắp bắt đầu dưới 30 phút hoặc đã qua giờ bắt đầu (diffMins <= 30)
   const startTimeMs = new Date(booking.startTime).getTime();
   const diffMins = (startTimeMs - Date.now()) / (1000 * 60);
-  const isAutoConfirm = !!onConfirm && (diffMins >= 0 && diffMins <= 30);
+  const isAutoConfirm = !!onConfirm && (diffMins <= 30);
 
   useEffect(() => {
     if (isAutoConfirm && onConfirm && !isConfirming && !autoTriggered) {
@@ -89,8 +90,8 @@ export default function BookingCard2({
       <div className="booking-card2-ribbon-container">
         <RibbonType>{typeText}</RibbonType>
         <RibbonPayment>{paymentText}</RibbonPayment>
-        {booking.isExpiringSoon && !isPaid && (
-          <Ribbon3>Sắp hết hạn</Ribbon3>
+        {booking.status === 'CANCELLED' && (
+          <Ribbon3 style={{ backgroundColor: '#ef4444' }}>Đơn hủy</Ribbon3>
         )}
       </div>
 

@@ -16,8 +16,8 @@ export default function Ribbon2a({ children, className, style }: Ribbon2aProps) 
     alignItems: 'center',
     backgroundColor: '#033b94ff', // màu xanh dương cho đã thanh toán
     clipPath: 'polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%)',
-    marginLeft: '-15x',
-    zIndex: 2,
+    marginLeft: '-15px',
+    zIndex: 1,
     ...style
   };
 

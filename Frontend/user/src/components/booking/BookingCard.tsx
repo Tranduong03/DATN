@@ -85,7 +85,7 @@ export default function BookingCard({
             {booking.venueName}
           </Link>
         </h3>
-        
+
         <div className="booking-card-status-wrapper">
           <span className="booking-card-status-text" style={{ color: statusCfg.color }}>
             {statusCfg.text}

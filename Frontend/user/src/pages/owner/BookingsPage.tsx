@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import OwnerLayout from './OwnerLayout';
 import { useOwnerBookings } from '../../hooks/queries/useBookingQueries';
 import { useUpdateBookingStatus } from '../../hooks/mutations/useBookingMutations';
-import { Search, ShieldAlert } from 'lucide-react';
+import { Search } from 'lucide-react';
 import BookingCard2 from '../../components/booking/BookingCard2';
 import { TabUnderline } from '../../components/ui/AnimatedTabs';
 import './owner.css';
@@ -50,7 +50,19 @@ export default function OwnerBookingsPage() {
   };
 
   const filteredBookings = bookings.filter((b: BookingItem) => {
-    const matchStatus = filterStatus === 'ALL' || b.status === filterStatus;
+    let matchStatus = true;
+    if (filterStatus === 'DAILY') {
+      matchStatus = (b.bookingType || 'DAILY').toUpperCase() === 'DAILY' && b.status === 'PENDING';
+    } else if (filterStatus === 'FIXED') {
+      matchStatus = (b.bookingType || '').toUpperCase() === 'FIXED';
+    } else if (filterStatus === 'PENDING') {
+      matchStatus = b.status === 'PENDING';
+    } else if (filterStatus === 'CANCELLED') {
+      matchStatus = b.status === 'CANCELLED';
+    } else if (filterStatus === 'ALL') {
+      matchStatus = true;
+    }
+
     const matchSearch = (b.bookerName || '').toLowerCase().includes(search.toLowerCase()) || 
                         (b.bookerPhone || '').includes(search) ||
                         (b.id || '').includes(search) ||
@@ -133,10 +145,11 @@ export default function OwnerBookingsPage() {
           {/* Quick status tabs */}
           <div className="owner-venue-tabs-bar">
             {[
-              { label: 'Tất cả', value: 'ALL' },
+              { label: 'Đơn ngày', value: 'DAILY' },
+              { label: 'Đơn cố định', value: 'FIXED' },
               { label: 'Chờ duyệt', value: 'PENDING' },
-              { label: 'Đã nhận', value: 'CONFIRMED' },
-              { label: 'Đã hủy', value: 'CANCELLED' }
+              { label: 'Đơn hủy', value: 'CANCELLED' },
+              { label: 'Tất cả', value: 'ALL' }
             ].map(tab => (
               <button
                 key={tab.value}
@@ -185,7 +198,8 @@ export default function OwnerBookingsPage() {
                 bookingType: b.bookingType || 'DAILY',
                 paymentStatus: isConfirmed ? 'PAID' : 'UNPAID',
                 isExpiringSoon: false,
-                orderNumber: b.orderNumber
+                orderNumber: b.orderNumber,
+                status: b.status
               };
 
               return (

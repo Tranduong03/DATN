@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import OwnerLayout from './OwnerLayout';
 import { useOwnerBookings } from '../../hooks/queries/useBookingQueries';
 import { useUpdateBookingStatus } from '../../hooks/mutations/useBookingMutations';
-import { Search, ShieldAlert } from 'lucide-react';
+import { Search } from 'lucide-react';
 import BookingCard2 from '../../components/booking/BookingCard2';
 import { TabUnderline } from '../../components/ui/AnimatedTabs';
 import './owner.css';
@@ -190,7 +190,8 @@ export default function OwnerBookingServicesPage() {
                 bookingType: b.bookingType || 'DAILY',
                 paymentStatus: 'UNPAID',
                 isExpiringSoon: false,
-                orderNumber: b.orderNumber
+                orderNumber: b.orderNumber,
+                status: b.status
               };
 
               return (
