@@ -493,6 +493,7 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
             entity.HasOne(m => m.Booking)
                 .WithOne(b => b.Match)
                 .HasForeignKey<Match>(m => m.BookingId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Quan hệ Host
