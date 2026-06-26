@@ -31,6 +31,7 @@ Tài liệu này tổng hợp toàn bộ các tính năng đã được xây d�
 | Đặt lịch nhiều sân cùng lúc (Multi-court) | ✅ Hoàn thành | ✅ Hoàn thành | Hoàn thành | Đặt nhiều block giờ và nhiều sân con |
 | Kiểm tra trùng lịch (Concurrency) | ✅ Hoàn thành | - | Hoàn thành | Chống double-booking |
 | Tích hợp cổng thanh toán | ✅ Hoàn thành | ✅ Hoàn thành | Hoàn thành | Đã kết nối thành công với **VNPay** |
+| Nút hành động ở Lịch sử đặt sân | - | ✅ Hoàn thành | Hoàn thành | Tích hợp Thanh toán, Tạo kèo đấu, Đánh giá |
 
 ### Phân Hệ 4: Đội Nhóm & Đề Xuất (Teams & Recommendation)
 | Tính Năng | Backend | Frontend User | Trạng Thái | Ghi Chú |
@@ -55,6 +56,8 @@ Tài liệu này tổng hợp toàn bộ các tính năng đã được xây d�
 | Quản lý chi tiết sân (Tabbed interface) | ✅ Hoàn thành | ✅ Hoàn thành | Hoàn thành | Tab thông tin, bảng giá, ảnh, đánh giá |
 | Đồng bộ Tab Active lên URL | - | ✅ Hoàn thành | Hoàn thành | Đã đồng bộ qua URL query `?tab=...` |
 | Cấu hình sân & bảng giá | ✅ Hoàn thành | ✅ Hoàn thành | Hoàn thành | Override giá theo giờ/ngày |
+| Tự động duyệt đơn hàng | ✅ Hoàn thành | ✅ Hoàn thành | Hoàn thành | Auto-confirm đơn hàng < 30p hoặc quá giờ |
+| Sắp xếp & lọc đơn hàng theo tab | ✅ Hoàn thành | ✅ Hoàn thành | Hoàn thành | Tabs (Đơn ngày, Đơn cố định, Chờ duyệt, Đơn hủy, Tất cả) kèm sort |
 
 ### Phân Hệ 7: Quản Trị Hệ Thống (Admin Portal)
 | Tính Năng | Backend | Frontend Admin | Trạng Thái | Ghi Chú |
