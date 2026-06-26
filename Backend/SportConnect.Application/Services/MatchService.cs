@@ -31,18 +31,28 @@ public class MatchService : IMatchService
         var userIds = query.Select(m => m.HostId).Union(matchPlayers.Select(mp => mp.UserId)).ToHashSet();
         var users = (await _unitOfWork.Repository<User>().FindAsync(u => userIds.Contains(u.Id))).ToDictionary(u => u.Id);
 
-        var bookingIds = query.Select(m => m.BookingId).ToHashSet();
-        var bookings = (await _unitOfWork.Repository<Booking>().FindAsync(b => bookingIds.Contains(b.Id))).ToDictionary(b => b.Id);
+        var bookingIds = query.Where(m => m.BookingId.HasValue).Select(m => m.BookingId!.Value).ToHashSet();
+        var bookings = bookingIds.Any()
+            ? (await _unitOfWork.Repository<Booking>().FindAsync(b => bookingIds.Contains(b.Id))).ToDictionary(b => b.Id)
+            : new Dictionary<Guid, Booking>();
         
         var courtIds = bookings.Values.Select(b => b.CourtId).ToHashSet();
-        var courts = (await _unitOfWork.Repository<Court>().FindAsync(c => courtIds.Contains(c.Id))).ToDictionary(c => c.Id);
+        var courts = courtIds.Any()
+            ? (await _unitOfWork.Repository<Court>().FindAsync(c => courtIds.Contains(c.Id))).ToDictionary(c => c.Id)
+            : new Dictionary<Guid, Court>();
         
         var venueIds = courts.Values.Select(c => c.VenueId).ToHashSet();
-        var venues = (await _unitOfWork.Repository<Venue>().FindAsync(v => venueIds.Contains(v.Id))).ToDictionary(v => v.Id);
+        var venues = venueIds.Any()
+            ? (await _unitOfWork.Repository<Venue>().FindAsync(v => venueIds.Contains(v.Id))).ToDictionary(v => v.Id)
+            : new Dictionary<Guid, Venue>();
 
         return query.Select(m =>
         {
-            bookings.TryGetValue(m.BookingId, out var booking);
+            Booking? booking = null;
+            if (m.BookingId.HasValue)
+            {
+                bookings.TryGetValue(m.BookingId.Value, out booking);
+            }
             var court = booking != null && courts.TryGetValue(booking.CourtId, out var c) ? c : null;
             var venue = court != null && venues.TryGetValue(court.VenueId, out var v) ? v : null;
             users.TryGetValue(m.HostId, out var host);
@@ -73,10 +83,10 @@ public class MatchService : IMatchService
                 FeePerPlayer = m.FeePerPlayer,
                 Status = m.Status,
                 CreatedAt = m.CreatedAt,
-                VenueName = venue?.Name ?? "N/A",
-                CourtName = court?.CourtName ?? "N/A",
-                StartTime = booking?.StartTime ?? DateTime.MinValue,
-                EndTime = booking?.EndTime ?? DateTime.MinValue,
+                VenueName = venue?.Name ?? m.CustomVenueName ?? "N/A",
+                CourtName = court?.CourtName ?? m.CustomCourtName ?? "N/A",
+                StartTime = booking?.StartTime ?? m.CustomStartTime ?? DateTime.MinValue,
+                EndTime = booking?.EndTime ?? m.CustomEndTime ?? DateTime.MinValue,
                 Players = players
             };
         }).ToList();
@@ -95,7 +105,7 @@ public class MatchService : IMatchService
         
         var users = (await _unitOfWork.Repository<User>().FindAsync(u => userIds.Contains(u.Id))).ToDictionary(u => u.Id);
 
-        var booking = await _unitOfWork.Repository<Booking>().GetByIdAsync(match.BookingId);
+        var booking = match.BookingId.HasValue ? await _unitOfWork.Repository<Booking>().GetByIdAsync(match.BookingId.Value) : null;
         var court = booking != null ? await _unitOfWork.Repository<Court>().GetByIdAsync(booking.CourtId) : null;
         var venue = court != null ? await _unitOfWork.Repository<Venue>().GetByIdAsync(court.VenueId) : null;
         
@@ -127,30 +137,38 @@ public class MatchService : IMatchService
             FeePerPlayer = match.FeePerPlayer,
             Status = match.Status,
             CreatedAt = match.CreatedAt,
-            VenueName = venue?.Name ?? "N/A",
-            CourtName = court?.CourtName ?? "N/A",
-            StartTime = booking?.StartTime ?? DateTime.MinValue,
-            EndTime = booking?.EndTime ?? DateTime.MinValue,
+            VenueName = venue?.Name ?? match.CustomVenueName ?? "N/A",
+            CourtName = court?.CourtName ?? match.CustomCourtName ?? "N/A",
+            StartTime = booking?.StartTime ?? match.CustomStartTime ?? DateTime.MinValue,
+            EndTime = booking?.EndTime ?? match.CustomEndTime ?? DateTime.MinValue,
             Players = players
         };
     }
 
     public async Task<MatchDto> CreateMatchAsync(Guid userId, CreateMatchDto dto)
     {
-        var booking = await _unitOfWork.Repository<Booking>().GetByIdAsync(dto.BookingId);
-        if (booking == null) throw new Exception("Booking not found");
-        if (booking.BookerId != userId) throw new Exception("Only the booker can create a match");
+        if (dto.BookingId.HasValue && dto.BookingId.Value != Guid.Empty)
+        {
+            var booking = await _unitOfWork.Repository<Booking>().GetByIdAsync(dto.BookingId.Value);
+            if (booking == null) throw new Exception("Booking not found");
+            if (booking.BookerId != userId) throw new Exception("Only the booker can create a match");
+        }
 
         var match = new Match
         {
-            BookingId = dto.BookingId,
+            BookingId = dto.BookingId == Guid.Empty ? null : dto.BookingId,
             HostId = userId,
             Title = dto.Title,
             SkillLevel = dto.SkillLevel,
             MaxPlayers = dto.MaxPlayers,
             FeePerPlayer = dto.FeePerPlayer,
             Status = "OPEN",
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            CustomVenueName = dto.CustomVenueName,
+            CustomCourtName = dto.CustomCourtName,
+            CustomStartTime = dto.CustomStartTime,
+            CustomEndTime = dto.CustomEndTime,
+            SportType = dto.SportType
         };
 
         await _unitOfWork.Repository<Match>().AddAsync(match);

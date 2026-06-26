@@ -6,6 +6,7 @@ import BottomNavigation from './components/layout/BottomNavigation';
 import GlobalNotification from './components/common/GlobalNotification';
 import LoadingOverlay from './components/common/LoadingOverlay';
 import Preloader from './components/common/Preloader';
+import CreateMatchButton from './components/ui/CreateMatchButton';
 
 // Route Guards (imported statically to avoid authentication validation delays)
 import AuthGuard from './pages/auth/AuthGuard';
@@ -49,6 +50,7 @@ const MatchDetailPage = lazy(() => import('./pages/home/MatchDetailPage'));
 const MapPage = lazy(() => import('./pages/home/MapPage'));
 const ExplorePage = lazy(() => import('./pages/home/ExplorePage'));
 const NotificationsPage = lazy(() => import('./pages/home/NotificationsPage'));
+const CreateMatchPage = lazy(() => import('./pages/home/CreateMatchPage'));
 
 // Team pages
 const TeamListPage = lazy(() => import('./pages/teams/TeamListPage'));
@@ -136,6 +138,7 @@ function AppRoutes() {
 
   // Only show bottom nav on 5 main routes (plus /account as unauthenticated profile root)
   const showBottomNav = ['/', '/map', '/explore', '/matches', '/me', '/account'].includes(location.pathname);
+  const showCreateMatchBtn = ['/', '/map', '/explore', '/matches', '/me'].includes(location.pathname);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
@@ -169,6 +172,7 @@ function AppRoutes() {
             <Route path="/settings" element={withTransition(SettingsPage)} />
             <Route path="/settings/change-password" element={withTransition(ChangePasswordPage)} />
             <Route path="/owner/onboarding" element={withTransition(OwnerOnboardingFlow)} />
+            <Route path="/matches/create" element={withTransition(CreateMatchPage)} />
           </Route>
 
           {/* Owner Only Routes */}
@@ -195,6 +199,7 @@ function AppRoutes() {
         </Routes>
       </AnimatePresence>
       {showBottomNav && <BottomNavigation />}
+      {showCreateMatchBtn && <CreateMatchButton />}
       <GlobalNotification />
       {isPreloading && <Preloader />}
     </div>

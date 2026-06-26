@@ -6,7 +6,7 @@ namespace SportConnect.Application.DTOs.Public;
 public class MatchDto
 {
     public Guid Id { get; set; }
-    public Guid BookingId { get; set; }
+    public Guid? BookingId { get; set; }
     public Guid HostId { get; set; }
     public string HostName { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
@@ -37,9 +37,16 @@ public class MatchPlayerDto
 
 public class CreateMatchDto
 {
-    public Guid BookingId { get; set; }
+    public Guid? BookingId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string? SkillLevel { get; set; }
     public int MaxPlayers { get; set; }
     public decimal FeePerPlayer { get; set; }
+
+    // Manual details for external venues
+    public string? CustomVenueName { get; set; }
+    public string? CustomCourtName { get; set; }
+    public DateTime? CustomStartTime { get; set; }
+    public DateTime? CustomEndTime { get; set; }
+    public string? SportType { get; set; }
 }

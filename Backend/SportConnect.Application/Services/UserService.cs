@@ -107,9 +107,8 @@ public class UserService : IUserService
             double score = 0;
             var reasons = new List<string>();
 
-            // 1. Sport Category Match (40 points max)
             // Need to retrieve venue to check sport type
-            var booking = await _unitOfWork.Repository<Booking>().GetByIdAsync(match.BookingId);
+            var booking = match.BookingId.HasValue ? await _unitOfWork.Repository<Booking>().GetByIdAsync(match.BookingId.Value) : null;
             var court = booking != null ? await _unitOfWork.Repository<Court>().GetByIdAsync(booking.CourtId) : null;
             var venue = court != null ? await _unitOfWork.Repository<Venue>().GetByIdAsync(court.VenueId) : null;
 

@@ -10,7 +10,7 @@ export interface MatchPlayerDto {
 
 export interface MatchDto {
   id: string;
-  bookingId: string;
+  bookingId: string | null;
   hostId: string;
   hostName: string;
   title: string;
@@ -37,11 +37,16 @@ export const matchService = {
   },
   
   createMatch: (data: { 
-    bookingId: string; 
+    bookingId?: string | null; 
     title: string; 
     skillLevel: string; 
     maxPlayers: number; 
     feePerPlayer: number; 
+    customVenueName?: string;
+    customCourtName?: string;
+    customStartTime?: string;
+    customEndTime?: string;
+    sportType?: string;
   }) => {
     return axiosClient.post('/matches', data).then(res => (res as any).data as MatchDto);
   },

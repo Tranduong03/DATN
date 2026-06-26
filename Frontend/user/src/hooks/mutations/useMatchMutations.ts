@@ -5,11 +5,16 @@ export const useCreateMatch = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: { 
-      bookingId: string; 
+      bookingId?: string | null; 
       title: string; 
       skillLevel: string; 
       maxPlayers: number; 
       feePerPlayer: number; 
+      customVenueName?: string;
+      customCourtName?: string;
+      customStartTime?: string;
+      customEndTime?: string;
+      sportType?: string;
     }) => matchService.createMatch(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['matches'] });
