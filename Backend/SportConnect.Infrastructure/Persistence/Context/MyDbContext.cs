@@ -75,7 +75,7 @@ public class MyDbContext(DbContextOptions<MyDbContext> options) : DbContext(opti
 
             entity.Property(e => e.TrustScore)
                 .HasColumnName("trust_score")
-                .HasDefaultValue(5.0);
+                .HasDefaultValue(100.0);
 
             entity.Property(e => e.NoShowCount)
                 .HasColumnName("no_show_count")

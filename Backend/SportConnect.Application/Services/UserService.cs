@@ -204,9 +204,9 @@ public class UserService : IUserService
             var host = await _unitOfWork.Repository<User>().GetByIdAsync(match.HostId);
             if (host != null)
             {
-                double hostScore = host.TrustScore * 2; // e.g. 5.0 * 2 = 10 points
+                double hostScore = host.TrustScore * 0.1; // e.g. 100.0 * 0.1 = 10 points max
                 score += hostScore;
-                if (host.TrustScore >= 4.8)
+                if (host.TrustScore >= 96.0)
                 {
                     reasons.Add("Người tổ chức uy tín cao ⭐");
                 }

@@ -10,7 +10,7 @@ public class User
     public string? FullName { get; set; }
     public string? Phone { get; set; }
     public string? AvatarUrl { get; set; }
-    public double TrustScore { get; set; } = 5.0;
+    public double TrustScore { get; set; } = 100.0;
     public int NoShowCount { get; set; } = 0;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool Status { get; set; } = true;
