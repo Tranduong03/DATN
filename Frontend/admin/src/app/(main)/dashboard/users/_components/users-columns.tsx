@@ -5,7 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { parseISO, format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -86,11 +86,8 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
       return (
         <div className="flex items-center gap-3">
           <Avatar size="lg" className="font-medium bg-muted">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={name} className="size-full object-cover rounded-full" />
-            ) : (
-              <AvatarFallback>{getInitials(name)}</AvatarFallback>
-            )}
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
+            <AvatarFallback>{getInitials(name)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
             <div className="truncate font-medium text-foreground text-sm">{name}</div>
@@ -126,7 +123,7 @@ export const usersColumns: ColumnDef<UserListItem>[] = [
     header: "Điểm uy tín",
     cell: ({ row }) => (
       <Badge className="font-mono" variant="outline">
-        {row.original.trustScore} / 100
+        {Math.round(row.original.trustScore)} / 100
       </Badge>
     ),
   },

@@ -341,7 +341,7 @@ export function OwnerRequests() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center gap-1.5"><ShieldCheck className="size-3.5" /> Điểm uy tín:</span>
-                        <Badge variant="outline" className="font-mono">{detailData.trustScore} / 100</Badge>
+                        <Badge variant="outline" className="font-mono">{Math.round(detailData.trustScore)} / 100</Badge>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="size-3.5" /> Ngày đăng ký:</span>
